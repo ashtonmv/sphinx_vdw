@@ -1,0 +1,10 @@
+4.086    # aLat angstrom
+2.967    # cohesive energy eV
+1.00     # vacancy formation energy eV
+0        # stress component sigma11
+0        #                  sigma33
+124.0    # elastic constant C11 GPa
+93.4     #                  C12
+46.1     #                  C44
+15-30    # stacking fault energy mJ m^(-2)
+0.007    # value for alpha in eV (Ackland 1987)

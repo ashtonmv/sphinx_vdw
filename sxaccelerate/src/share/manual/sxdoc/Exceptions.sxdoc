@@ -1,0 +1,225 @@
+a. SxException
+h1. Exception handling
+
+p1. SxAccelerate provides a simple but efficient way of implementing
+    C++ exceptions. In contrast to algorithmic assertions which will be
+    handled with @SX\_CHECK@ (see above), exceptions should be thrown
+    whenever a C++ function cannot fulfill its purpose due to environmental
+    issues such as:
+
+    * insufficient memory,
+    * insufficient file I/O permission or storage capacity, or
+    * invalid regular expressions.
+
+p1. *Important:* Exceptions must not be used for normal program control
+    flow.
+
+h2. Throwing exceptions, @SX\_THROW (msg)@
+
+p1. Since an exception refers to an environmental condition not being met,
+    the program requires external assistance, such as a human interaction.
+    Therefore, a specific context sensitive message is crucial to help
+    the user understanding the problem. However, if the exception is
+    triggered within a C++ class the general context cannot be known.
+
+p1. Imagine a file I/O operation which fails due to sufficient permissions.
+
+{{{cpp
+void myFileOp (const SxFile &file)
+{
+   ...
+   if (!file.isWritable())
+      SX_THROW ("Cannot write to file " + filename);
+   ...
+}
+}}}
+
+p1. If the above exception is being caught somewhere in the main executable
+    like
+
+{{{cpp
+try {
+   myFileOp ("/path/to/directory/abc");
+} catch (SxException e) {
+   cout << e.toString ().wrap ("ERROR: ") << endl;
+}
+}}}
+
+p1. the user is being presented with the information about some file cannot
+    be written to:
+
+{{{
+ERROR: Cannot write to file /patch/to/directory/abc
+}}}
+
+p1. but the user may fail to understand, what the relevance of this file
+    is in the first place. The context is missing. This problem can be
+    overcome by chaining exceptions.
+
+h2. Chaining exceptions, @SX\_THROW (e,msg)@
+
+p1. To solve this issue, SxAccelerate supports exception chaining which allows
+    for re-throwing exceptions from different parts of the C++ class hierarchy.
+    Every level has a different context. While lower lying classes have a
+    very specific context (like insufficient file permissions) higher lying
+    classes define the abstract context, such as the relevance of a spcific
+    file within the main application.
+
+p1. For the sake of demonstration consider the following example which should
+    modify directories recursively:
+
+{{{cpp
+void myDirOp (const SxString &dir)
+{
+   try {
+      SxFSAction::find (dir).foreach ([](auto fileIt) {
+         myIOFunc (*fileIt);
+      });
+   } catch (SxException e)  {
+      // chain exception
+      SX_THROW (e, "Failed to optimize directory " + dir);
+   }
+}
+}}}
+
+p1. A low-level exception is being emitted in @myFileOp@ using
+    @SX\_THROW(msg)@ which is chained in @myDirOp@ with @SX\_THROW(e,msg)@.
+    The chained exception message contains a high abstraction context for the
+    user. The exception chain can pervade the whole C++ class hierarchy.
+
+p1. On the highest level which is typically the executable the end-user can
+    be informed about the exception by printing only the most abstract 
+    exception level to @STDOUT@ and the detailed exception stack in the 
+    log message (e.g., in @STDERR@).
+
+{{{cpp
+int main (int argc, char **argv)
+{
+   SxCLI cli (argc, argv);
+   SxString dir = cli.option ("-d", "Directory name").toString ();
+   cli.finalize ();
+   try {
+      myDirIo ("/path/to/directory");
+   } catch (SxException e) {
+      cout << e.toString ().wrap ("ERROR: ") << endl;
+
+      cerr << "Exception stack:" << endl;
+      cerr << e.toString (SxException::DebugStack) << endl;
+   } catch (...) {
+      cout << "Unsupported exception." << endl;
+      SX_QUIT;
+   }
+   return 0;
+}
+}}}
+
+p1. A typical output could read
+
+{{{
+ERROR: Failed to optimize directory /path/to/directory
+}}}
+
+p1. while a detailed output in @STDERR@ would be:
+
+{{{
+Exception stack:
+1: Failed to optimize directory /path/to/directory (myexample.cpp:81)
+2: Cannot write to file /patch/to/directory/abc/def (myexample.cpp:65)
+}}}
+
+h2. Tagging exceptions
+
+p1. The above examples discussed the concept of handling exceptions in
+    SxAccelerate in order to generate context sensitive messages for the
+    user. A programmatic evaluation of exceptions requires categories
+    of exceptions instead of messages. Therefore, every instance of an
+    SxException can optionally attach a tag. A tag can be any C string
+    acting as a label which can be retrieved recursively in the 
+    exception chain. In order to simplify the programmatic evaluation
+    of tags it is advised to stick to a minimal set of labels such as
+
+    * General I/O
+    ** @SyntaxError@
+    ** @PermissionDenied@
+    ** @NoSuchFile@
+    ** @FileExists@
+    ** @FileLocked@
+    ** @DiskFull@
+    * IPC
+    ** @Timeout@
+    ** @ForkFailed@
+    ** @ExecFailed@
+    ** @PipeFailed@
+    * Strings
+    ** @RegexFailed@
+
+p1. While the above labels should be used additional tags can be defined
+    within any class but should be clearly documented.
+
+p1. Attaching a tag to an exception is done using the following syntax:
+
+{{{cpp
+SX_THROW (tag, msg);
+}}}
+
+p1. or in case of a chained exception:
+
+{{{cpp
+try {
+   ...
+} catch (SxException e) {
+   SX_THROW (e, tag, msg);
+}
+}}}
+
+p1. with _tag_ being any valid C string, for example:
+
+{{{cpp
+SX_THROW ("PermissionDenied", "Cannot write to file");
+}}}
+
+p1. The function @SxException::hasTag@ can be invoked to check if the
+    current instance of the exception has a specific tag attached while
+    @SxException::findTag@ searches for a given tag in the whole chain
+    recursively:
+
+{{{cpp
+try {
+   ...
+} catch (SxException e)  {
+   if (e.findTag ("PermissionDenied"))  {
+      ...
+   }
+}
+}}}
+
+
+h2. Exception runtime tracing
+
+p1. The DEBUG mode of SxAccelerate allows for runtime tracing and runtime
+    breakpoints in SxAccelerate. In the following the tracing of exceptions
+    is discussed.
+
+p1. Errors which are handled in exceptions are not interrupting the program
+    flow. Thus, sometimes it is challenging the identify and understand those
+    situations during the development process.
+
+p1. In SxAccelerate all exceptions are derived from @SxException@ which throws
+    an exception with error message, source file name and line number as 
+    default behavior. The command line interface provided by @SxCLI@ is
+    shipped with a hidden built-in command line option @--no-exceptions@:
+
+{{{
+myprogram --no-exceptions ...
+}}}
+
+p1. Once a program is invoked with this parameter all SxException instances
+    will implicitly trigger an @SX\_BREAK@. This allows the developer of a
+    program to interact with any instance of an exception by:
+
+    * resuming the throwing of an exception (hit @<ENTER>@),
+    * printing a function call stack (hit @<t>@ for trace) to understand the
+      origin of the exception invokation,
+    * create a memory core (hit @<c>@), to continue with a _post-mortem_
+      analysis to inspect all relevant variables at the time of throwing
+      the exception.

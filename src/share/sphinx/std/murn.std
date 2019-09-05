@@ -1,0 +1,10 @@
+set validation;
+topLevelDefs;
+
+// see also: src/SFHIngX/std/sfhingx.std
+
+murndata       { type="group"; nItem=1;
+   volumes     { type="vector"; nItem=1; minDim=5;}
+   energies    { type="vector"; nItem=1; minDim=5;}
+}//without groupformat?!
+   

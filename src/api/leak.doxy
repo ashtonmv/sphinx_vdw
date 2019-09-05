@@ -1,0 +1,171 @@
+/**\page    page_leak        Memory Tracing
+
+  Besides the \ref page_debug SPHInX supports a memory based way of
+  debugging at runtime. It allows to follow all reading and writing access
+  to the RAM memory as well as the CPU's registers. So uninitialized variables
+  and corrupt pointer operations can easily be identified. The error report
+  contains information about the source file and the file number where the
+  error occured. In addition, the error report output is synchronized with
+  the program output so that the error can be correlated with the program
+  algorithm.
+
+  The runtime tracing requires a significant overhead. Hence, the executation
+  of a program in that mode is significantly slower than in the normal
+  DEBUG mode.
+
+\section    leak_req         Requirements
+
+   In order to use memory tracing the following packages have to be installed
+   properly and they have to be located in the search path:
+   - valgrind 2.0.0 or higher (http://valgrind.kde.org)
+   - gdb 5.3 or higher
+
+   A valgrind version prior to 2.0.0 does not support SSE or SSE2 statements!
+
+   The memory trace mode is available only if
+   - SPHInX has been compiled in the \ref page_debug.
+
+
+\section    leak_invoke      Invoke SPHInX in the tracing mode [--memtrace]
+
+   SPHInX, its add-ons, and the example programs are used to be started
+   from a wrapper script. These wrappers are generated from the \ref page_make.
+   If the package is compiled in the DEBUG mode all wrapper scripts 
+   automatically allow to invoke the SPHInX executables in the memory tracing
+   mode with the command line option \b --memtrace. Note, that this options
+   has to be the first command line option.
+
+   \b Example:
+   In order to run the add-on sx2pdb in the trace mode execute:
+   \verbatim
+      SPHInX/src/add-ons/sx2pdb --memtrace -i input.sx -o structure.o
+   \endverbatim
+   The synchronized output of both the SPHInX executable and the leak tracer
+   can be found in the file <EXECUTABLE>.log. In the previous example the 
+   log file would be "sx2pdb.log".
+
+   \b Note: You should fix errors in the order they are reported!!!
+   Otherwise the results might be confusing!!!
+
+   In the following sections the most frequent errors are explained. 
+
+\section    leak_uninit      Uninitialized variables
+
+   Valgrind is capable of finding even those uninitialized values
+   which are not reported from the C++ compiler. As an example let's assume
+   a class which contains a member variable that should be initialized in
+   the constructor. If the class contains more than one constructor the
+   developer easily can forget to preset that variable in one of the 
+   constructors. Most of the C++ compiler are not able to cope with this
+   special case. 
+   \verbatim
+      class ABC
+      {
+         ABC () { /* variable 'myInt' not initialized!!! */ }
+         ABC (int i)  { myI = i; }
+         void foo () {
+            printf ("myInt = %d\n", myInt);              <-- possible error!
+         }
+
+         int  myInt;
+      };
+
+      ABC a (5);  // OK
+      ABC b ();   // Error, because b.myInt is uninitialized!!!
+   \endverbatim
+
+   A typical report from valgrind could look like
+   \verbatim
+   ...
+   ==23283== Use of uninitialised value of size 8
+   ==23283==    at 0x82BDDC3: SxFermi::printOccupation() const (SxFermi.cpp:507)
+   ==23283==    by 0x80B222A: SxHamSolver::SxHamSolver(SxStructure const&, NgSymbolTable const*) (SxHamSolver.cpp:50)
+   ==23283==    by 0x806F554: main (dft.cpp:119)
+   ==23283==    by 0x403638AD: __libc_start_main (in /lib/libc.so.6)
+   ==23283== 
+   ....
+   \endverbatim
+   In this case the uninitialized variable has been used in the file
+   SxFermi.cpp at line 507. This function was called from SxHamSolver.cpp
+   at line 50 and so on. In this example a variable with 8 byte was not
+   initialzed. Hence in SxFermi.cpp:507 one has to watch out either for    
+   a double entity or single complex because both required 8 bytes.
+
+   Another typical error is when an uninitialized variable is used in
+   \b if or \b switch blocks, for example:
+   \verbatim
+      class ABC
+      {
+         ABC () { /* variable 'flag' not initialized!!! */ }
+         ABC (int i)  { flag = true; myI = i; }
+         void foo () {
+            if (flag)  { printf ("Flag is set\n"); }     <-- possible error!
+            else       { printf ("Flag is not set\n"); }
+         }
+
+         bool flag;
+         int  myI;
+      };
+
+      ABC a (5);  // OK
+      ABC b ();   // Error, because b.flag is uninitialized!!!
+   \endverbatim
+   A valgrind report for this kind of error usually likes like:
+   \verbatim
+   ==4474== Conditional jump or move depends on uninitialised value(s)
+   ==4474==    at 0x82BE132: SxFermi::printOccupation() const (SxFermi.cpp:544)
+   ==4474==    by 0x80B222A: SxHamSolver::SxHamSolver(SxStructure const&, NgSymbolTable const*) (SxHamSolver.cpp:50)
+   ==4474==    by 0x806F554: main (dft.cpp:119)
+   ==4474==    by 0x403638AD: __libc_start_main (in /lib/libc.so.6)
+   \endverbatim
+   That report informs the developer that the problem can be found in file
+   SxFermi.cpp at line 544.
+
+
+\section  leak_write         Access invalid pointers
+
+   A very severe bug is when a pointer refers to a wrong address. Valgrind
+   can trace such corrupt pointers in case of reading or writing accesses.
+   Here is an 
+   example report:
+   \verbatim
+   ...
+   ==28405== Invalid write of size 4
+   ==28405==    at 0x839272B: SxFFT3d::clean(double (*) [2]) (SxFFT3d.cpp:298)
+   ==28405==    by 0x82EDEE8: SxFFT3d::clean() (../include/SxFFT3d.h:197)
+   ...
+   \endverbatim
+   In this case the corrupt writing access occured in file SxFFT3d.cpp at line
+   298.
+
+
+\section  leak_memory         Memory Leaks
+
+   Memory leaks are most dangerous and they have to be traced down!
+   To demonstrate a simple memory leak we use the C++ "new" statement and
+   intentionally don't call the "delete" counterpart. Note, that in SPHInX
+   in higher level classes it is \b strictly \b forbidden to allocate memory
+   manually. Handle classes like SxList, SxArray, or SxVector have to be used
+   instead!
+   \verbatim
+   int main ()
+   {
+      int *intArray = new int [10];  // allocate 10 integers
+      
+      // Error: the required 
+      //           "delete [] intArray;" 
+      //        statement is missing!
+      return 0;
+   }
+   \endverbatim
+
+
+\section  leak_valgrind       More information
+
+   In this page only the most frequent errors have been described. For more
+   information about memory tracing please read the documentation the
+   valgrind package which can be found on the valgrind homepage
+   http://valgrind.kde.org.
+   
+\author Sixten Boeck */
+

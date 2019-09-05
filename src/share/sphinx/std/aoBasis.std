@@ -1,0 +1,73 @@
+// ---------------------------------------------------------------------------
+//
+//      The ab-initio based multiscale library
+//
+//                  S / P H I / n X
+//
+//      Copyright:  Max-Planck-Institute for Iron Research
+//                  40237 Duesseldorf, Germany
+//
+//      Contact:    https://sxlib.mpie.de
+//      Authors:    see sphinx/AUTHORS
+//      License:    see sphinx/LICENSE
+//
+// ---------------------------------------------------------------------------
+// Rather strict input file format definitions:
+//    * variables may be defined only in top level node
+//    * k-Points for bandstructures (path through the Brillouin zone) are
+//      expected in cartesion coordinates
+//    * k-Points used in the Monkhorst-Pack folding are expected in 
+//      relative coordinates
+//    * energy-cutoff limited 
+// --------------------------------------------------------------------------
+set validation;
+
+
+deprecateFormat;
+topLevelDefs;
+
+// Declare global "skipUnexpectedGroups". See also footer of this file.
+skipUnexpectedGroups;
+
+AOBasis                   { type="group"; minItems=1;
+   species                { type="group"; minItems=1;
+      radBasis            { type="group", minItems=1; optional;
+         fromPotential    { type="group";    minItems=1; xor="fromPotential,fromFile";
+            file          { type="string";   }            
+            is            { type="int";   min=0;}
+         }
+         fromFile         { type="group";  minItems=2; xor="fromPotential,fromFile";
+            file          { type="string";   }
+            is            { type="int";   min=0;}
+         }
+      }
+      orbital             { type="group"; minItems=1;
+         fromPotential    { type="group";    minItems=3; xor="fromPotential,fromFile,generateGaussian,gaussianBasis";
+            file          { type="string";   }
+            l             { type="int";   min=0;}
+            iot           { type="int";   min=0;}
+            is            { type="int";   min=0;}
+            scale         { type="real";  min=1.0; optional;}
+         }
+         fromFile         { type="group";  minItems=4; xor="fromPotential,fromFile,generateGaussian,gaussianBasis";
+            file          { type="string";   }
+            l             { type="int";   min=0;}
+            iot           { type="int";   min=0;}
+            is            { type="int";   min=0;}
+            scale         { type="real";  min=1.0; optional;}
+            rCut          { type="real";  min=0.0; optional;}
+            Siesta        { type="flag"; optional;}
+         }
+         generateGaussian { type="group";  minItems=2; xor="fromPotential,fromFile,generateGaussian,gaussianBasis";
+            n             { type="int";    min=1; optional;}
+            l             { type="int";    min=0;}
+            beta          { type="real";   min=0;}
+         }
+         gaussianBasis    { type="group"; minItems=3; xor="fromPotential,fromFile,generateGaussian,gaussianBasis";
+            l             { type="int";    min=0;}
+            exponents     { type="vector";}
+            coefficients  { type="vector";}
+         }
+      }
+   }
+}

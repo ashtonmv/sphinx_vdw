@@ -1,0 +1,24 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxMpiTestbed.h
+
+bin_PROGRAMS     = sxmpitestbed 
+
+sxmpitestbed_SOURCES   = $(AUX_SRC)
+sxmpitestbed_SOURCES  += SxMpiTestbed.cpp 
+sxmpitestbed_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmpitestbed_LDADD     =  $(SXIMPORTLIBS)
+sxmpitestbed_LDADD    +=  
+sxmpitestbed_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/ipc -I$(top_srcdir)/ipc
+AM_CPPFLAGS += -I$(top_builddir)/io -I$(top_srcdir)/io
+AM_CPPFLAGS += -I$(top_builddir)/mpi -I$(top_srcdir)/mpi
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

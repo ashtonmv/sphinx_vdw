@@ -1,0 +1,10 @@
+/** \brief Environment variables
+
+\verbinclude setenv.txt
+
+   Assuming a function evaluates a system environment variable and reacts
+   on it the used variable should be mentioned in the documentation.
+
+   \setenv HOME
+ */
+  void setenv ();

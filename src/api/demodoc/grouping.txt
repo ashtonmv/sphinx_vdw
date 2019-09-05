@@ -1,0 +1,14 @@
+/**@name My Member Group 
+   Members can be assembled in groups. */
+//@{ 
+/**  \brief demonstration how members can be grouped.
+
+     Functions and other members can be arranged in members. */
+
+void groupMember1 ();
+
+/** \brief just a member function in "My Member Group"
+
+    Find the actual documentation on grouping members in ::groupMember1.*/
+void groupMember2 ();
+//@}

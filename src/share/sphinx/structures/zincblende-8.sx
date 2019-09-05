@@ -1,0 +1,37 @@
+// --------------------------------------------------------------------------
+// SFHIngX  -  Zinkblend structure
+//             8 atom cell
+//
+// Sixten Boeck, boeck@fhi-berlin.mpg.de
+// 02/24/2003
+//
+// --------------------------------------------------------------------------
+// Arguments:
+//    aLat                lattice parameter a [Bohr]
+//    species_1           filename of 1st species file
+//    species_2           filename of 2nd species file
+// --------------------------------------------------------------------------
+
+
+needs aLat;
+needs species_1;
+needs species_2;
+
+include <structures/sc.sx>;
+
+species {
+   include species_1;
+   atom { coords = [0,   0,   0  ]; relative; }
+   atom { coords = [0,   1/2, 1/2]; relative; }
+   atom { coords = [1/2, 0,   1/2]; relative; }
+   atom { coords = [1/2, 1/2, 0  ]; relative; }
+}
+
+species {
+   include species_2;
+   atom { coords = [1/4, 1/4, 1/4]; relative; }
+   atom { coords = [1/4, 3/4, 3/4]; relative; }
+   atom { coords = [3/4, 1/4, 3/4]; relative; }
+   atom { coords = [3/4, 3/4, 1/4]; relative; }
+}
+

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup
+    Condition="'$(WinFlexBeforeTargets)' == '' and '$(WinFlexAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <WinFlexBeforeTargets>Midl</WinFlexBeforeTargets>
+    <WinFlexAfterTargets>CustomBuild</WinFlexAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <WinFlexDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(WinFlexDependsOn)</WinFlexDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <WinFlex>
+      <CommandLineTemplate>$(MSYSDIR)\usr\bin\flex -P%(Filename)_ -t %(Filename).lpp > $(IntDir)\%(Filename).yy.cpp</CommandLineTemplate>
+      <Outputs>$(IntDir)\%(Filename).yy.cpp</Outputs>
+    </WinFlex>
+  </ItemDefinitionGroup>
+</Project>

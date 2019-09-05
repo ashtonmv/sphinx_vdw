@@ -1,0 +1,43 @@
+set validation;
+
+level { type = "group"; optional;   // level 0
+   name { type = "string"; }
+   siblings { type = "int"; }
+   members { type = "int"; }
+   level { type = "group"; optional;   // level 1
+      name { type = "string"; }
+      siblings { type = "int"; }
+      members { type = "int"; }
+      level { type = "group"; optional;   // level 2
+         name { type = "string"; }
+         siblings { type = "int"; }
+         members { type = "int"; }
+         level { type = "group"; optional;   // level 3
+            name { type = "string"; }
+            siblings { type = "int"; }
+            members { type = "int"; }
+            level { type = "group"; optional;   // level 4
+               name { type = "string"; }
+               siblings { type = "int"; }
+               members { type = "int"; }
+               level { type = "group"; optional;   // level 5
+                  name { type = "string"; }
+                  siblings { type = "int"; }
+                  members { type = "int"; }
+                  level { type = "group"; optional;   // level 6
+                     name { type = "string"; }
+                     siblings { type = "int"; }
+                     members { type = "int"; }
+                     level { type = "group"; optional;   // level 7
+                        name { type = "string"; }
+                        siblings { type = "int"; }
+                        members { type = "int"; }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+

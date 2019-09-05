@@ -1,0 +1,58 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxEmergency.h \
+                  SxEvent.h \
+                  SxEventBus.h \
+                  SxEventBus.hpp \
+                  SxEventData.h \
+                  SxEventListener.h \
+                  SxIPC.h \
+                  SxLogBufThread.h \
+                  SxMutex.h \
+                  SxProcUnit.h \
+                  SxProcUnitGroup.h \
+                  SxProcess.h \
+                  SxSignalHandler.h \
+                  SxSingleton.h \
+                  SxSystemThread.h \
+                  SxThread.h \
+                  SxThreadCond.h \
+                  SxThreadPool.h \
+                  SxTimeOut.h \
+                  SxTimerThread.h
+
+lib_LTLIBRARIES       = libsxipc.la
+libsxipc_la_SOURCES  = $(AUX_SRC)
+libsxipc_la_SOURCES += SxEvent.cpp \
+   SxEventBus.cpp \
+   SxEventData.cpp \
+   SxEventListener.cpp \
+   SxLogBufThread.cpp \
+   SxMutex.cpp \
+   SxProcess.cpp \
+   SxProcUnit.cpp \
+   SxProcUnitGroup.cpp \
+   SxSignalHandler.cpp \
+   SxSystemThread.cpp \
+   SxThread.cpp \
+   SxThreadCond.cpp \
+   SxThreadPool.cpp \
+   SxTimeOut.cpp \
+   SxTimerThread.cpp
+
+libsxipc_la_LIBADD   = $(SXIMPORTLIBS)
+libsxipc_la_LIBADD  += 
+libsxipc_la_LIBADD  += $(SXIMPORTOBJS)
+libsxipc_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxipc_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

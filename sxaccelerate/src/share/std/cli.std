@@ -1,0 +1,47 @@
+set validation;
+
+topLevelDefs;
+
+progName    { type = "string"; } // program name
+description { type = "string"; } // preUsageMessage
+authors     { type = "string"; }
+version     { type = "string"; }
+
+groups { type = "group";
+   group { type = "group";
+      id       { type = "int"; }
+      name     { type = "string"; }
+      descr    { type = "string"; optional; }
+      excludes { type = "vector"; optional; } // ids of incompatible groups
+      requires { type = "vector"; optional; } // ids of required groups
+   }
+}
+
+options { type="group";
+   option { type = "group";
+      marks    { type = "stringlist"; // stringlist type does not exist
+                 optional; } // absent for direct arguments (no mark)
+      flag     { type = "flag";  // flags usually don't take parameters
+                 optional; not = "short"; }
+      optional { type = "flag"; optional; }
+      help     { type = "string"; } // the actual description of the option
+      short    { type = "string"; // short-hand description for the parameter
+                 optional; 
+                 not="flag,shortValue,optionalValue"; }
+      tag      { type = "string"; optional; } // hidden tags 
+
+      defaultInfo { type="string"; // contains text about defaults and limits
+                    optional; }
+
+      // --- these are for optionally valued flags, e.g. --log[=filename]
+      optionalValue { type = "flag"; optional; 
+                      needs="flag,shortValue"; not="short";}
+      shortValue    { type="string"; // would be "filename" in the above example
+                      optional; needs="flag,optionalValue"; not="short"; }
+
+      // group of this option
+      groupId   { type="int"; }
+      groupName { type="string"; } // redundant
+   }
+}
+

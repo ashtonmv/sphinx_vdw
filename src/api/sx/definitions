@@ -1,0 +1,29 @@
+#ifdef _GET_GROUPS
+#  define    NAME(n)
+#  define    PARENT(p)     RELATE(p;_FILE)
+#  define    TYPE(t)
+#endif
+
+#ifdef _MAKE_GROUPS
+#  define HASH            #
+#  define RELATE(b,c)     echo \HASH include #c >> b##_inc
+#  define CHILDREN
+#endif
+
+#ifdef _STD_MODE
+#  define NAME(x)         x {
+#  define PARENT(p)       
+#  define TYPE(t)         type=#t;
+#  define BEGIN   
+#  define END             }
+#  define CHILDREN
+#endif
+
+#ifdef _CPP_MODE
+#  define NAME(x)         class x
+#  define PARENT(p)       , public p
+#  define TYPE(t)         : private t
+#  define BEGIN           {
+#  define END             }
+#  define CHILDREN        { }
+#endif

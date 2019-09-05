@@ -1,0 +1,21 @@
+STEXX                  { type="group"; optional;
+   maxSteps            { type="int"; min=1; optional; }
+   dEnergy             { type="real"; min=0; }
+   useCorrectChi       { type="flag"; optional; }
+   noRhoStorage        { type="flag"; optional; }
+   noWavesStorage      { type="flag"; optional; }
+                      
+   fullDiag            { type="group"; optional;
+      include <std/diag.std>;
+      include <std/bandstruct.std>;
+      //include <std/diis-ccg.std>;
+      noRhoStorage     { type="flag"; optional; }
+      noWavesStorage   { type="flag"; optional; }
+   }
+
+   relaxRho            { type="group"; optional;
+      include <std/elmin.std>;
+      noRhoStorage     { type="flag"; optional; }
+      noWavesStorage   { type="flag"; optional; }
+   }
+}

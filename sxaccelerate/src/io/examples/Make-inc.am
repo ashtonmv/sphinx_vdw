@@ -1,0 +1,32 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = sxparser sxplugins 
+
+sxparser_SOURCES   = $(AUX_SRC)
+sxparser_SOURCES  += sxparser.cpp
+sxparser_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxparser_LDADD     =  $(SXIMPORTLIBS)
+sxparser_LDADD    +=  
+sxparser_LDADD    +=  $(SXIMPORTOBJS)
+
+sxplugins_SOURCES   = $(AUX_SRC)
+sxplugins_SOURCES  += sxplugins.cpp
+sxplugins_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxplugins_LDADD     =  $(SXIMPORTLIBS)
+sxplugins_LDADD    +=  
+sxplugins_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/io -I$(top_srcdir)/io
+AM_CPPFLAGS += -I$(top_builddir)/math -I$(top_srcdir)/math
+AM_CPPFLAGS += -I$(top_builddir)/fs -I$(top_srcdir)/fs
+AM_CPPFLAGS += -I$(top_builddir)/ipc -I$(top_srcdir)/ipc
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

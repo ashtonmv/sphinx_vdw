@@ -1,0 +1,17 @@
+/** \brief Adding code snippets to the the documentation
+
+  \verbinclude code.txt
+
+  Often it is useful to demonstrate the usage of functions with
+  code fragments.
+
+  \par Example:
+\code
+   // --- initialization of the class
+   SxMyClass A;
+
+   // --- calling some functions
+   A.foo ();
+\endcode
+  */
+  void codeSnippets ();

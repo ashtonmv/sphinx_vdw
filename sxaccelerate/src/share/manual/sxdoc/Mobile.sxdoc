@@ -1,0 +1,89 @@
+h1. Building SxAccelerate on mobile devices
+
+p1. SxAccelerate can be cross-compiled to mobile Android and iOS devices.
+    This chapter discusses how to setup the necessary build environment.
+
+h2. Prequisites
+
+p1. The Android build environment @Android Studio@ along with @Android NDK@ can
+    be executed on nearly all environments while the iOS counterpart @Xcode@ is
+    only supported on MacOS systems. For the following discussion it is assumed
+    that the basic SxAccelerate build environment requirements are already
+    satisfied.
+
+h3. Android Studio
+
+p1. Android Studio is the default IDE for building Android Apps. This section
+    focusses on the description of how to install Android Studio on *Linux*
+    and *MacOS* hosts.
+
+p1. When creating the Android Studio environment on *MacOS* please proceed as
+    follows:
+
+    # Download Android Studio as @\*.dmg@ file from
+      https://developer.android.com/studio/#downloads
+    # Open the @\*.dmg@ and move @Android Studio@ to your @/Applications@ folder
+
+p1. Launch Android Studio and navigate to the SDK configuration panel:
+    Select "Configure" > "SDK Manager" > "SDK Tools" and enable at least
+
+    * Android SDK Build-Tools
+    * *Cmake*
+    * Android Emulator
+    * Android SDK Platform-Tools
+    * Android SDK Tools
+    * Intel x86 Emulator Accelerator (HAXM installer)
+    * *NDK*
+
+
+p1. On a *Linux* host please follow these installation steps. Please also refer
+    to the Android Studio installation guide.
+
+    # Download Android Studio as @\*-linux.zip@ file from
+      https://developer.android.com/studio/#downloads
+    # Extract the @\*.zip@ archive to @/opt/android-studio@ at a temporary
+      location
+    # run @./bin/studio.sh@ to invoke the installer
+    # select "Custom Install", specify @/opt/android-studio/@ as installation
+      directory
+    
+
+p1. Once Android Studio is installed run the IDE and configure the necessary
+    build environment:
+
+h3. iOS (MacOS hosts only)
+
+p1. The iOS toolchain can be executed on MacOS hosts only. Please make sure
+    that the latest stable version of @Xcode@ is installed. The @Xcode@ IDE
+    is shipped already with all necessary tools required to build iOS mobile
+    apps.
+
+h2. Building SxAccelerate
+
+p1. Once the cross-compile tool chains are up and running (see above)
+    SxAccelerate can be compiled easily. In order to jump start building
+    mobile apps based on SxAccelerate please clone a copy of the demonstrator
+    @sxapps@:
+
+{{{
+git clone git@gitlab.com:sphinxlib/sxapps
+}}}
+
+p1. Prepare @SxApp@ as usual:
+
+    # @cd /path/to/sxapps@
+    # @./setup@
+    # @mkdir /path/to/build@
+    # @cd /path/to/build@
+
+p1. and configure with
+
+    Android := @/path/to/sxapps/src/system/conf-android.sh@
+    iOS     := @/path/to/sxapps/src/system/conf-ios.sh@
+
+p1. and eventually compile with
+
+{{{
+make
+}}}
+

@@ -1,0 +1,512 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = sx2aims sx2dx sx2gwst sx2pdb sx2poscar sx2xsf sx2xyz sxaojoin sxaomat sxatomicspin sxb2bspectrum sxbader sxbandaodecomp sxbandinfo sxcalcpot sxcalcquamoloverlap sxcheckinput sxdefectalign sxdefectalign2d sxeffmass sxelnes sxepscontrib sxepscontribpaw sxepsprint sxepsslope sxestimate sxextopt sxfastbs sxfindk sxforces sxgetfermi sxharmpottst sxinterpol sxkpprint sxlocalenergy sxmeshline sxmeshtrace sxmies sxmulliken sxpdos sxpespectrum sxposmatel sxprintocc sxrho2dx sxrhodiff sxrhograd sxrhorep sxrhosplit sxrictst sxsawtooth sxstructcom sxstructdiff sxstructjoin sxstructparam sxstructpatch sxstructprint sxstructrel sxstructrep sxstructrot sxstructshift sxstructsort sxstructsym sxsym sxtdos sxuniqdispl sxwaveh5tosxb sxwavesym sxwavetransfer sxzdos 
+
+sx2aims_SOURCES   = $(AUX_SRC)
+sx2aims_SOURCES  += Sx2Aims.cpp
+sx2aims_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sx2aims_LDADD     =  $(SXIMPORTLIBS)
+sx2aims_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sx2aims_LDADD    +=  $(SXIMPORTOBJS)
+
+sx2dx_SOURCES   = $(AUX_SRC)
+sx2dx_SOURCES  += Sx2DX.cpp
+sx2dx_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sx2dx_LDADD     =  $(SXIMPORTLIBS)
+sx2dx_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sx2dx_LDADD    +=  $(SXIMPORTOBJS)
+
+sx2gwst_SOURCES   = $(AUX_SRC)
+sx2gwst_SOURCES  += Sx2gwst.cpp
+sx2gwst_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sx2gwst_LDADD     =  $(SXIMPORTLIBS)
+sx2gwst_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sx2gwst_LDADD    +=  $(SXIMPORTOBJS)
+
+sx2pdb_SOURCES   = $(AUX_SRC)
+sx2pdb_SOURCES  += Sx2PDB.cpp
+sx2pdb_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sx2pdb_LDADD     =  $(SXIMPORTLIBS)
+sx2pdb_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sx2pdb_LDADD    +=  $(SXIMPORTOBJS)
+
+sx2poscar_SOURCES   = $(AUX_SRC)
+sx2poscar_SOURCES  += Sx2Poscar.cpp
+sx2poscar_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sx2poscar_LDADD     =  $(SXIMPORTLIBS)
+sx2poscar_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sx2poscar_LDADD    +=  $(SXIMPORTOBJS)
+
+sx2xsf_SOURCES   = $(AUX_SRC)
+sx2xsf_SOURCES  += Sx2XSF.cpp
+sx2xsf_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sx2xsf_LDADD     =  $(SXIMPORTLIBS)
+sx2xsf_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sx2xsf_LDADD    +=  $(SXIMPORTOBJS)
+
+sx2xyz_SOURCES   = $(AUX_SRC)
+sx2xyz_SOURCES  += Sx2XYZ.cpp
+sx2xyz_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sx2xyz_LDADD     =  $(SXIMPORTLIBS)
+sx2xyz_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sx2xyz_LDADD    +=  $(SXIMPORTOBJS)
+
+sxaojoin_SOURCES   = $(AUX_SRC)
+sxaojoin_SOURCES  += SxAOJoin.cpp
+sxaojoin_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxaojoin_LDADD     =  $(SXIMPORTLIBS)
+sxaojoin_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxaojoin_LDADD    +=  $(SXIMPORTOBJS)
+
+sxaomat_SOURCES   = $(AUX_SRC)
+sxaomat_SOURCES  += SxAOMat.cpp
+sxaomat_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxaomat_LDADD     =  $(SXIMPORTLIBS)
+sxaomat_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxaomat_LDADD    +=  $(SXIMPORTOBJS)
+
+sxatomicspin_SOURCES   = $(AUX_SRC)
+sxatomicspin_SOURCES  += SxAtomicSpin.cpp
+sxatomicspin_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxatomicspin_LDADD     =  $(SXIMPORTLIBS)
+sxatomicspin_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxatomicspin_LDADD    +=  $(SXIMPORTOBJS)
+
+sxb2bspectrum_SOURCES   = $(AUX_SRC)
+sxb2bspectrum_SOURCES  += SxB2BSpectrum.cpp
+sxb2bspectrum_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxb2bspectrum_LDADD     =  $(SXIMPORTLIBS)
+sxb2bspectrum_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxb2bspectrum_LDADD    +=  $(SXIMPORTOBJS)
+
+sxbader_SOURCES   = $(AUX_SRC)
+sxbader_SOURCES  += SxBader.cpp
+sxbader_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxbader_LDADD     =  $(SXIMPORTLIBS)
+sxbader_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxbader_LDADD    +=  $(SXIMPORTOBJS)
+
+sxbandaodecomp_SOURCES   = $(AUX_SRC)
+sxbandaodecomp_SOURCES  += SxBandAoDecomp.cpp
+sxbandaodecomp_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxbandaodecomp_LDADD     =  $(SXIMPORTLIBS)
+sxbandaodecomp_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxbandaodecomp_LDADD    +=  $(SXIMPORTOBJS)
+
+sxbandinfo_SOURCES   = $(AUX_SRC)
+sxbandinfo_SOURCES  += SxBandInfo.cpp
+sxbandinfo_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxbandinfo_LDADD     =  $(SXIMPORTLIBS)
+sxbandinfo_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxbandinfo_LDADD    +=  $(SXIMPORTOBJS)
+
+sxcalcpot_SOURCES   = $(AUX_SRC)
+sxcalcpot_SOURCES  += SxCalcPot.cpp
+sxcalcpot_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxcalcpot_LDADD     =  $(SXIMPORTLIBS)
+sxcalcpot_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxcalcpot_LDADD    +=  $(SXIMPORTOBJS)
+
+sxcalcquamoloverlap_SOURCES   = $(AUX_SRC)
+sxcalcquamoloverlap_SOURCES  += SxCalcQuamolOverlap.cpp
+sxcalcquamoloverlap_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxcalcquamoloverlap_LDADD     =  $(SXIMPORTLIBS)
+sxcalcquamoloverlap_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxcalcquamoloverlap_LDADD    +=  $(SXIMPORTOBJS)
+
+sxcheckinput_SOURCES   = $(AUX_SRC)
+sxcheckinput_SOURCES  += SxCheckInput.cpp
+sxcheckinput_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxcheckinput_LDADD     =  $(SXIMPORTLIBS)
+sxcheckinput_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxcheckinput_LDADD    +=  $(SXIMPORTOBJS)
+
+sxdefectalign_SOURCES   = $(AUX_SRC)
+sxdefectalign_SOURCES  += SxDefectAlign.cpp
+sxdefectalign_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxdefectalign_LDADD     =  $(SXIMPORTLIBS)
+sxdefectalign_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxdefectalign_LDADD    +=  $(SXIMPORTOBJS)
+
+sxdefectalign2d_SOURCES   = $(AUX_SRC)
+sxdefectalign2d_SOURCES  += SxDefectAlign2D.cpp
+sxdefectalign2d_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxdefectalign2d_LDADD     =  $(SXIMPORTLIBS)
+sxdefectalign2d_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxdefectalign2d_LDADD    +=  $(SXIMPORTOBJS)
+
+sxeffmass_SOURCES   = $(AUX_SRC)
+sxeffmass_SOURCES  += SxEffMass.cpp
+sxeffmass_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxeffmass_LDADD     =  $(SXIMPORTLIBS)
+sxeffmass_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxeffmass_LDADD    +=  $(SXIMPORTOBJS)
+
+sxelnes_SOURCES   = $(AUX_SRC)
+sxelnes_SOURCES  += SxELNES.cpp
+sxelnes_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxelnes_LDADD     =  $(SXIMPORTLIBS)
+sxelnes_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxelnes_LDADD    +=  $(SXIMPORTOBJS)
+
+sxepscontrib_SOURCES   = $(AUX_SRC)
+sxepscontrib_SOURCES  += SxEpsContrib.cpp
+sxepscontrib_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxepscontrib_LDADD     =  $(SXIMPORTLIBS)
+sxepscontrib_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxepscontrib_LDADD    +=  $(SXIMPORTOBJS)
+
+sxepscontribpaw_SOURCES   = $(AUX_SRC)
+sxepscontribpaw_SOURCES  += SxEpsContribPAW.cpp
+sxepscontribpaw_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxepscontribpaw_LDADD     =  $(SXIMPORTLIBS)
+sxepscontribpaw_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxepscontribpaw_LDADD    +=  $(SXIMPORTOBJS)
+
+sxepsprint_SOURCES   = $(AUX_SRC)
+sxepsprint_SOURCES  += SxEpsPrint.cpp
+sxepsprint_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxepsprint_LDADD     =  $(SXIMPORTLIBS)
+sxepsprint_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxepsprint_LDADD    +=  $(SXIMPORTOBJS)
+
+sxepsslope_SOURCES   = $(AUX_SRC)
+sxepsslope_SOURCES  += SxEpsSlope.cpp
+sxepsslope_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxepsslope_LDADD     =  $(SXIMPORTLIBS)
+sxepsslope_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxepsslope_LDADD    +=  $(SXIMPORTOBJS)
+
+sxestimate_SOURCES   = $(AUX_SRC)
+sxestimate_SOURCES  += SxEstimate.cpp
+sxestimate_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxestimate_LDADD     =  $(SXIMPORTLIBS)
+sxestimate_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxestimate_LDADD    +=  $(SXIMPORTOBJS)
+
+sxextopt_SOURCES   = $(AUX_SRC)
+sxextopt_SOURCES  += SxExtOpt.cpp
+sxextopt_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxextopt_LDADD     =  $(SXIMPORTLIBS)
+sxextopt_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxextopt_LDADD    +=  $(SXIMPORTOBJS)
+
+sxfastbs_SOURCES   = $(AUX_SRC)
+sxfastbs_SOURCES  += SxFastBS.cpp
+sxfastbs_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxfastbs_LDADD     =  $(SXIMPORTLIBS)
+sxfastbs_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxfastbs_LDADD    +=  $(SXIMPORTOBJS)
+
+sxfindk_SOURCES   = $(AUX_SRC)
+sxfindk_SOURCES  += SxFindK.cpp
+sxfindk_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxfindk_LDADD     =  $(SXIMPORTLIBS)
+sxfindk_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxfindk_LDADD    +=  $(SXIMPORTOBJS)
+
+sxforces_SOURCES   = $(AUX_SRC)
+sxforces_SOURCES  += SxForces.cpp
+sxforces_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxforces_LDADD     =  $(SXIMPORTLIBS)
+sxforces_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxforces_LDADD    +=  $(SXIMPORTOBJS)
+
+sxgetfermi_SOURCES   = $(AUX_SRC)
+sxgetfermi_SOURCES  += SxGetFermi.cpp
+sxgetfermi_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxgetfermi_LDADD     =  $(SXIMPORTLIBS)
+sxgetfermi_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxgetfermi_LDADD    +=  $(SXIMPORTOBJS)
+
+sxharmpottst_SOURCES   = $(AUX_SRC)
+sxharmpottst_SOURCES  += SxHarmPotTst.cpp
+sxharmpottst_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxharmpottst_LDADD     =  $(SXIMPORTLIBS)
+sxharmpottst_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxharmpottst_LDADD    +=  $(SXIMPORTOBJS)
+
+sxinterpol_SOURCES   = $(AUX_SRC)
+sxinterpol_SOURCES  += SxInterpol.cpp
+sxinterpol_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxinterpol_LDADD     =  $(SXIMPORTLIBS)
+sxinterpol_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxinterpol_LDADD    +=  $(SXIMPORTOBJS)
+
+sxkpprint_SOURCES   = $(AUX_SRC)
+sxkpprint_SOURCES  += SxKPPrint.cpp
+sxkpprint_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxkpprint_LDADD     =  $(SXIMPORTLIBS)
+sxkpprint_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxkpprint_LDADD    +=  $(SXIMPORTOBJS)
+
+sxlocalenergy_SOURCES   = $(AUX_SRC)
+sxlocalenergy_SOURCES  += SxLocalEnergy.cpp
+sxlocalenergy_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxlocalenergy_LDADD     =  $(SXIMPORTLIBS)
+sxlocalenergy_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxlocalenergy_LDADD    +=  $(SXIMPORTOBJS)
+
+sxmeshline_SOURCES   = $(AUX_SRC)
+sxmeshline_SOURCES  += SxMeshLine.cpp
+sxmeshline_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmeshline_LDADD     =  $(SXIMPORTLIBS)
+sxmeshline_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxmeshline_LDADD    +=  $(SXIMPORTOBJS)
+
+sxmeshtrace_SOURCES   = $(AUX_SRC)
+sxmeshtrace_SOURCES  += SxMeshTrace.cpp
+sxmeshtrace_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmeshtrace_LDADD     =  $(SXIMPORTLIBS)
+sxmeshtrace_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxmeshtrace_LDADD    +=  $(SXIMPORTOBJS)
+
+sxmies_SOURCES   = $(AUX_SRC)
+sxmies_SOURCES  += SxMIES.cpp
+sxmies_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmies_LDADD     =  $(SXIMPORTLIBS)
+sxmies_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxmies_LDADD    +=  $(SXIMPORTOBJS)
+
+sxmulliken_SOURCES   = $(AUX_SRC)
+sxmulliken_SOURCES  += SxMulliken.cpp
+sxmulliken_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmulliken_LDADD     =  $(SXIMPORTLIBS)
+sxmulliken_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxmulliken_LDADD    +=  $(SXIMPORTOBJS)
+
+sxpdos_SOURCES   = $(AUX_SRC)
+sxpdos_SOURCES  += SxPDOS.cpp
+sxpdos_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxpdos_LDADD     =  $(SXIMPORTLIBS)
+sxpdos_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxpdos_LDADD    +=  $(SXIMPORTOBJS)
+
+sxpespectrum_SOURCES   = $(AUX_SRC)
+sxpespectrum_SOURCES  += SxPESpectrum.cpp
+sxpespectrum_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxpespectrum_LDADD     =  $(SXIMPORTLIBS)
+sxpespectrum_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxpespectrum_LDADD    +=  $(SXIMPORTOBJS)
+
+sxposmatel_SOURCES   = $(AUX_SRC)
+sxposmatel_SOURCES  += SxPosMatEl.cpp
+sxposmatel_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxposmatel_LDADD     =  $(SXIMPORTLIBS)
+sxposmatel_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxposmatel_LDADD    +=  $(SXIMPORTOBJS)
+
+sxprintocc_SOURCES   = $(AUX_SRC)
+sxprintocc_SOURCES  += SxPrintOcc.cpp
+sxprintocc_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxprintocc_LDADD     =  $(SXIMPORTLIBS)
+sxprintocc_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxprintocc_LDADD    +=  $(SXIMPORTOBJS)
+
+sxrho2dx_SOURCES   = $(AUX_SRC)
+sxrho2dx_SOURCES  += SxRho2DX.cpp
+sxrho2dx_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxrho2dx_LDADD     =  $(SXIMPORTLIBS)
+sxrho2dx_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxrho2dx_LDADD    +=  $(SXIMPORTOBJS)
+
+sxrhodiff_SOURCES   = $(AUX_SRC)
+sxrhodiff_SOURCES  += SxRhoDiff.cpp
+sxrhodiff_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxrhodiff_LDADD     =  $(SXIMPORTLIBS)
+sxrhodiff_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxrhodiff_LDADD    +=  $(SXIMPORTOBJS)
+
+sxrhograd_SOURCES   = $(AUX_SRC)
+sxrhograd_SOURCES  += SxRhoGrad.cpp
+sxrhograd_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxrhograd_LDADD     =  $(SXIMPORTLIBS)
+sxrhograd_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxrhograd_LDADD    +=  $(SXIMPORTOBJS)
+
+sxrhorep_SOURCES   = $(AUX_SRC)
+sxrhorep_SOURCES  += SxRhoRep.cpp
+sxrhorep_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxrhorep_LDADD     =  $(SXIMPORTLIBS)
+sxrhorep_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxrhorep_LDADD    +=  $(SXIMPORTOBJS)
+
+sxrhosplit_SOURCES   = $(AUX_SRC)
+sxrhosplit_SOURCES  += SxRhoSplit.cpp
+sxrhosplit_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxrhosplit_LDADD     =  $(SXIMPORTLIBS)
+sxrhosplit_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxrhosplit_LDADD    +=  $(SXIMPORTOBJS)
+
+sxrictst_SOURCES   = $(AUX_SRC)
+sxrictst_SOURCES  += SxRicTst.cpp
+sxrictst_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxrictst_LDADD     =  $(SXIMPORTLIBS)
+sxrictst_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxrictst_LDADD    +=  $(SXIMPORTOBJS)
+
+sxsawtooth_SOURCES   = $(AUX_SRC)
+sxsawtooth_SOURCES  += SxSawTooth.cpp
+sxsawtooth_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxsawtooth_LDADD     =  $(SXIMPORTLIBS)
+sxsawtooth_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxsawtooth_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructcom_SOURCES   = $(AUX_SRC)
+sxstructcom_SOURCES  += SxStructCOM.cpp
+sxstructcom_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructcom_LDADD     =  $(SXIMPORTLIBS)
+sxstructcom_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructcom_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructdiff_SOURCES   = $(AUX_SRC)
+sxstructdiff_SOURCES  += SxStructDiff.cpp
+sxstructdiff_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructdiff_LDADD     =  $(SXIMPORTLIBS)
+sxstructdiff_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructdiff_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructjoin_SOURCES   = $(AUX_SRC)
+sxstructjoin_SOURCES  += SxStructJoin.cpp
+sxstructjoin_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructjoin_LDADD     =  $(SXIMPORTLIBS)
+sxstructjoin_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructjoin_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructparam_SOURCES   = $(AUX_SRC)
+sxstructparam_SOURCES  += SxStructParam.cpp
+sxstructparam_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructparam_LDADD     =  $(SXIMPORTLIBS)
+sxstructparam_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructparam_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructpatch_SOURCES   = $(AUX_SRC)
+sxstructpatch_SOURCES  += SxStructPatch.cpp
+sxstructpatch_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructpatch_LDADD     =  $(SXIMPORTLIBS)
+sxstructpatch_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructpatch_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructprint_SOURCES   = $(AUX_SRC)
+sxstructprint_SOURCES  += SxStructPrint.cpp
+sxstructprint_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructprint_LDADD     =  $(SXIMPORTLIBS)
+sxstructprint_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructprint_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructrel_SOURCES   = $(AUX_SRC)
+sxstructrel_SOURCES  += SxStructRel.cpp
+sxstructrel_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructrel_LDADD     =  $(SXIMPORTLIBS)
+sxstructrel_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructrel_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructrep_SOURCES   = $(AUX_SRC)
+sxstructrep_SOURCES  += SxStructRep.cpp
+sxstructrep_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructrep_LDADD     =  $(SXIMPORTLIBS)
+sxstructrep_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructrep_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructrot_SOURCES   = $(AUX_SRC)
+sxstructrot_SOURCES  += SxStructRot.cpp
+sxstructrot_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructrot_LDADD     =  $(SXIMPORTLIBS)
+sxstructrot_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructrot_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructshift_SOURCES   = $(AUX_SRC)
+sxstructshift_SOURCES  += SxStructShift.cpp
+sxstructshift_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructshift_LDADD     =  $(SXIMPORTLIBS)
+sxstructshift_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructshift_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructsort_SOURCES   = $(AUX_SRC)
+sxstructsort_SOURCES  += SxStructSort.cpp
+sxstructsort_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructsort_LDADD     =  $(SXIMPORTLIBS)
+sxstructsort_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructsort_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstructsym_SOURCES   = $(AUX_SRC)
+sxstructsym_SOURCES  += SxStructSym.cpp
+sxstructsym_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstructsym_LDADD     =  $(SXIMPORTLIBS)
+sxstructsym_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxstructsym_LDADD    +=  $(SXIMPORTOBJS)
+
+sxsym_SOURCES   = $(AUX_SRC)
+sxsym_SOURCES  += SxSym.cpp
+sxsym_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxsym_LDADD     =  $(SXIMPORTLIBS)
+sxsym_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxsym_LDADD    +=  $(SXIMPORTOBJS)
+
+sxtdos_SOURCES   = $(AUX_SRC)
+sxtdos_SOURCES  += SxTDOS.cpp
+sxtdos_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxtdos_LDADD     =  $(SXIMPORTLIBS)
+sxtdos_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxtdos_LDADD    +=  $(SXIMPORTOBJS)
+
+sxuniqdispl_SOURCES   = $(AUX_SRC)
+sxuniqdispl_SOURCES  += SxUniqDispl.cpp
+sxuniqdispl_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxuniqdispl_LDADD     =  $(SXIMPORTLIBS)
+sxuniqdispl_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxuniqdispl_LDADD    +=  $(SXIMPORTOBJS)
+
+sxwaveh5tosxb_SOURCES   = $(AUX_SRC)
+sxwaveh5tosxb_SOURCES  += SxWaveH5ToSxb.cpp
+sxwaveh5tosxb_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxwaveh5tosxb_LDADD     =  $(SXIMPORTLIBS)
+sxwaveh5tosxb_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxwaveh5tosxb_LDADD    +=  $(SXIMPORTOBJS)
+
+sxwavesym_SOURCES   = $(AUX_SRC)
+sxwavesym_SOURCES  += SxWaveSym.cpp
+sxwavesym_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxwavesym_LDADD     =  $(SXIMPORTLIBS)
+sxwavesym_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxwavesym_LDADD    +=  $(SXIMPORTOBJS)
+
+sxwavetransfer_SOURCES   = $(AUX_SRC)
+sxwavetransfer_SOURCES  += SxWaveTransfer.cpp
+sxwavetransfer_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxwavetransfer_LDADD     =  $(SXIMPORTLIBS)
+sxwavetransfer_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxwavetransfer_LDADD    +=  $(SXIMPORTOBJS)
+
+sxzdos_SOURCES   = $(AUX_SRC)
+sxzdos_SOURCES  += SxZDOS.cpp
+sxzdos_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxzdos_LDADD     =  $(SXIMPORTLIBS)
+sxzdos_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxzdos_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/add-ons -I$(top_srcdir)/add-ons
+AM_CPPFLAGS += -I$(top_builddir)/struct -I$(top_srcdir)/struct
+AM_CPPFLAGS += -I$(top_builddir)/dft -I$(top_srcdir)/dft
+AM_CPPFLAGS += -I$(top_builddir)/geom -I$(top_srcdir)/geom
+AM_CPPFLAGS += -I$(top_builddir)/exx -I$(top_srcdir)/exx
+AM_CPPFLAGS += -I$(top_builddir)/classic -I$(top_srcdir)/classic
+AM_CPPFLAGS += -I$(top_builddir)/dirac -I$(top_srcdir)/dirac
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/io
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/io
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/ipc
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/fs
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/math
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/util
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/util
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/nonstd
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/mpi
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/mpi
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

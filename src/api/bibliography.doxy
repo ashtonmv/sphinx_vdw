@@ -1,0 +1,36 @@
+/** \page page-biblio Bibliography
+
+\section Kresse93 [1]
+         G. Kresse,
+         <i> Ab-initio Molekular Dynamik für flüssige Metalle</i>,
+         PhD Thesis, 1993, TU Wien
+  
+\section Payne92 [2]
+         M. Payne et al.,
+         Rev. Mod. Phys. \b 64, 1045-1097 (1992)
+
+\section Perdew81 [3]
+         Perdew, Zunger
+         <a href="http://prola.aps.org/abstract/PRB/v23/i10/p5048_1">
+            Phys. Rev. B \b 23, 5048, (1981)
+         </a>
+
+\section Kresse96a [4]         
+         Kresse, Furthmüller,
+         <i> Efficient iterative schemes for ab initio total-energy
+            calculations using a plane-wave basis set</i>, 
+         <a href="http://prola.aps.org/abstract/PRB/v54/i16/p11169_1">
+            Phys. Rev. B \b 54, 11169 (1996)
+         </a>
+
+\section Kresse96b [5]
+         Kresse, Furthmüller,
+         <i> Efficiency of ab-initio total energy calculations for metals and
+             semiconductors using a plane-wave basis set</i>, 
+         Comp. Mat. Sci. (6), 15-50 (1996)
+
+\section Schleyer [6]
+         P. v. Rague Schleyer,
+         Enc. of Comp. Chemistry, \b 1,  1136-1156
+
+*/

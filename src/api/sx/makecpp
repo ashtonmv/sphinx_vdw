@@ -1,0 +1,12 @@
+#!/bin/sh
+
+mkdir -p cpp
+
+files=`ls *.h`
+for f in $files; do
+   echo $f
+   cpp -D_CPP_MODE -include definitions -C -P  $f > cpp/$f
+   indent cpp/$f
+done
+
+rm cpp/*.h~

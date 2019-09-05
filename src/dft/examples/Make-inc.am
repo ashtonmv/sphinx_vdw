@@ -1,0 +1,30 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = sxatomorb 
+
+sxatomorb_SOURCES   = $(AUX_SRC)
+sxatomorb_SOURCES  += sxatomorb.cpp 
+sxatomorb_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxatomorb_LDADD     =  $(SXIMPORTLIBS)
+sxatomorb_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxatomorb_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/dft -I$(top_srcdir)/dft
+AM_CPPFLAGS += -I$(top_builddir)/geom -I$(top_srcdir)/geom
+AM_CPPFLAGS += -I$(top_builddir)/dirac -I$(top_srcdir)/dirac
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/io
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/io
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/fs
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/ipc
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/math
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/util
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/util
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

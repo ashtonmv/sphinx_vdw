@@ -1,0 +1,971 @@
+/* ---------------------------------------------------------------------------
+//
+//      The ab-initio based multiscale library
+//
+//                  S / P H I / n X
+//
+//      Copyright:  Max-Planck-Institute for Iron Research
+//                  40237 Duesseldorf, Germany
+//
+//      Contact:    https://sxlib.mpie.de
+//      Authors:    see sphinx/AUTHORS
+//      License:    see sphinx/LICENSE
+//
+// ---------------------------------------------------------------------------
+// Compile with flex option -PSxParser_ ...
+// --------------------------------------------------------------------------*/
+
+%{
+#include <string.h>
+#include <stdio.h>
+#include <SxSymbolTable.h>
+#include <SxParser.tab.hpp>
+#include <SxParser.h>
+#include <SxUniqueList.h>
+#include <SxConfig.h>
+#include <SxFSAction.h>
+#include <SxFileIO.h>
+//#ifdef WITH_COM
+//#  include <SxSSL.h>
+//#endif /* WITH_COM */
+
+#define SX_PARSER_MAX_INCLUDES     20
+#define YY_ALWAYS_INTERACTIVE      1
+
+// --- necessary variables
+int SxParser_pos = 0;  // We don't use YY_USER_ACTION to avoid conflicts with
+                       // yyless, unput, or similar commands, that modify the
+                       // stream buffer.
+int SxParser_lineNumber = 1;
+bool SxParser_isNewBuffer = true; // overcome the corrupt yyleng after
+                                  // swapping the buffer yyleng is corrupt
+int  SxParser_newPos      = 0;    // use this in combination with
+                                  // SxParser_isNewBuffer
+bool SxParser_verbose = false;
+
+SxList<SxString> SxParser_bufferStack;
+SxList<int>      SxParser_startIdxStack;
+SxList<int>      SxParser_endIdxStack;
+SxList<int>      SxParser_lineNumberStack;
+SxList<int>      SxParser_posStack;
+SxList<SxString> SxParser_filenameStack;
+SxList<SxString> SxParser_globalVars;
+SxList<SxFile>   SxParser_nestedFiles;
+
+SxMap<SxString,SxList<SxString> > SxParser_fileLookUp;
+SxMap<SxString,SxList<SxString> > SxParser_includeLookUp;
+
+SxUniqueList<SxString> SxParser_excludeGroups;
+
+int  SxParser_groupLevel     = 0;
+int  SxParser_includeLevel   = 0;
+bool SxParser_validationMode = false;  // if true, variables are always local!
+
+SxSymbol SxParser_Symbol;
+SxList<SxSymbol> SxParser_symbolStack;
+SxSymbol *tmpList=NULL;
+SxString tmpString;
+SxString SxParser_filename;
+bool SxParser_Error = false;
+bool SxParser_isParsing = false;
+SxList<SxString> SxParser_path;
+
+SxString SxParser_buffer;
+char const *SxParser_bufPtr;
+
+void SxParser_init ()
+{
+   // --- initParser
+   SxParser_isParsing = false;
+   SxParser_pos = 0;
+   SxParser_lineNumber = 1;
+   SxParser_isNewBuffer = true;
+   SxParser_newPos = 0;
+   SxParser_groupLevel   = 0;
+   SxParser_includeLevel = 0;
+   SxParser_validationMode = false;
+   SxParser_bufferStack.removeAll ();
+   SxParser_startIdxStack.removeAll ();
+   SxParser_endIdxStack.removeAll ();
+   SxParser_posStack.removeAll ();
+   SxParser_filenameStack.removeAll ();
+   SxParser_symbolStack.removeAll ();
+   SxParser_globalVars.removeAll ();
+   tmpList = NULL;
+   SxParser_path.removeAll ();
+   SxParser_fileLookUp.removeAll ();
+   SxParser_includeLookUp.removeAll ();
+}
+
+// function for reading contents of a file (may be replaced when using MPI)
+SxArray<char> (*SxParser_readFile)(const SxString &, int64_t) = SxFileIO::readBinary;
+
+SxString SxParser_read (const SxString &filename)
+{
+   SxParser_includeLevel++;
+   if (SxParser_includeLevel > SX_PARSER_MAX_INCLUDES)  {
+      SxParser_error ("Maximal include count reached");
+   }
+   if (filename.getSize() > 5 && filename.subString(0,5) == "ssl://")  {
+//#     ifdef WITH_COM
+//         SxSSL ssl;
+//         SxString cmdOut = ssl.get (filename);
+//         return cmdOut + '\n';
+//#     else
+         cout << SX_SEPARATOR;
+         cout << "| Error: Program was compiled without SSL support.\n";
+         cout << SX_SEPARATOR;
+         SX_QUIT;
+         return SxString();
+//#     endif /* WITH_COM */
+
+   }  else  {
+
+       SxFileInfo fileInfo(filename);
+       if (!fileInfo.exists ())  {
+          SxString msg = "File '" + filename + "' does not exist.";
+          if (SxParser_filename == filename)  {
+             cout << msg << endl;
+             SX_QUIT;
+          } else {
+             SxParser_error (msg.ascii ());
+          }
+       }
+       if (fileInfo.isDir ())  {
+          SxString msg = "File '" + filename + "' is a directory ?!";
+          if (SxParser_filename == filename)  {
+             cout << msg << endl;
+             SX_QUIT;
+          } else {
+             SxParser_error (msg.ascii ());
+          }
+       }
+      SxString res;
+      try {
+         res = (*SxParser_readFile)(filename, -1);
+      } catch (SxException e)  {
+         if (SxParser_filename == filename)  {
+            cout << e.getMessage() << endl;
+            SX_QUIT;
+         } else {
+            SxParser_error (e.getMessage());
+         }
+      }
+      return res + '\n'; // FIXME: newline not necessary?
+   }
+}
+
+/** Don't use this function for parsing. Call SxParser_parseFile instead. */
+int SxParser_parse ();
+
+void SxParser_parseFile (const SxString &filename,
+                         const SxString &path,
+                         const SxUniqueList<SxString> &excludeGroups)
+{
+   if (SxParser_isParsing)  {
+      sxprintf ("Internal Error: Parser is currently blocked.\n");
+      SX_EXIT;
+   }
+   SxParser_isParsing      = true;
+   SxParser_buffer         = SxParser_read (filename);
+   SxParser_bufPtr         = SxParser_buffer.ascii();
+   SxParser_filename       = filename;
+   SxParser_includeLevel   = 0;
+   SxParser_pos            = 0;
+   SxParser_lineNumber     = 1;
+   SxParser_isNewBuffer    = true;
+   SxParser_validationMode = false;
+
+   SxParser_excludeGroups = excludeGroups;
+
+   char separator = ':';
+   if (path != "")  {
+#     ifdef WIN32
+         separator = ';';
+#     endif
+      SxParser_path = SxString(path).tokenize(separator);
+      SxParser_path.prepend (".");  // first look in current directory
+   }
+   SxParser_parse ();
+   SxParser_isParsing      = false;
+   if (SxParser_groupLevel != 0)  {
+      cout << SX_SEPARATOR;
+      cout << "| Error: Parse error at end of" << endl
+           << "|    " << filename << endl
+           << "| Missing closing '}'." << endl;
+      cout << SX_SEPARATOR;
+      SX_QUIT;
+   }
+}
+
+
+SxList<SxString> SxParser_findInPath (const SxString &file,
+                                      const SxList<SxString> &pathList_)
+{
+   if (SxParser_fileLookUp.containsKey(file))
+      return SxParser_fileLookUp(file);
+
+   SxList<SxString> pathList = pathList_;
+#  ifdef WIN32
+      pathList.prepend ("C:"); // consider absolute paths
+#  else
+      pathList.prepend ("/"); // consider absolute paths
+#  endif /* WIN32 */
+   pathList.prepend (".");  // but *first* look in cwd
+
+   SxList<SxString> fullNames;
+
+   SxString fullName;
+   SxString searchPath;
+
+   SxList<SxFileInfo> items;
+   SxList<SxFileInfo>::Iterator infoIt;
+
+   // --- search in path
+   SxList<SxString>::ConstIterator it;
+   int i=1;
+   bool useWildCards = (file.contains("*") || file.contains("?"));
+   for (it  = pathList.begin();
+        it != pathList.end();
+        it++, i++)
+   {
+//#     ifdef WIN32
+//         fullName = *it + "/" + file;
+//#     else
+         fullName = *it + "/"  + file;
+//#     endif /* WIN32 */
+         try {
+            if (useWildCards)  {
+               items = SxFSAction::ls (fullName);
+               for (infoIt = items.begin(); infoIt != items.end(); ++infoIt)  {
+                  fullNames << infoIt->getAbsPath ();
+               }
+               if (items.getSize() > 0)  {
+                  SxParser_fileLookUp(file) = fullNames;
+                  return fullNames;
+               }
+            } else {
+               if (SxFile(fullName).exists()) {
+                  fullNames = SxList<SxString>() << fullName;
+                  SxParser_fileLookUp(file) = fullNames;
+                  return fullNames;
+               }
+            }
+         } catch (SxException e)  { e.print (); SX_QUIT; }
+
+         searchPath += "   " + SxString(i) + ": " + *it + "\n";
+   }
+
+   // --- is the file an absolute URI?
+   try {
+      if (useWildCards)  {
+         items = SxFSAction::ls (file);
+         for (infoIt = items.begin(); infoIt != items.end(); ++infoIt)  {
+            fullNames << infoIt->getAbsPath ();
+         }
+//       if (items.getSize() > 0)  {
+            SxParser_fileLookUp(file) = fullNames;
+            return fullNames;
+//       }
+      } else {
+         fullName = file;
+         if (SxFile(fullName).exists()) {
+            fullNames = SxList<SxString>() << fullName;
+            SxParser_fileLookUp(file) = fullNames;
+            return fullNames;
+         }
+      }
+   } catch (SxException e)  { e.print (); SX_QUIT; }
+
+   SxString msg;
+   msg += "Search path:\n" + searchPath;
+   msg += "File '" + file + "' not found";
+   SxParser_error ( msg.ascii() );
+   return SxList<SxString> ();
+}
+
+SxList<SxString> SxParser_findInPath (const SxString &file,
+                                      const SxString &path)
+{
+   SxList<SxString> pathList;
+   char separator = ':';
+#  ifdef WIN32
+      separator = ';';
+#  endif
+   pathList = SxString(path).tokenize(separator);
+   return SxParser_findInPath (file, pathList);
+}
+
+
+SxList<SxString> SxParser_findInPath (const SxString &file)
+{
+   return SxParser_findInPath (file, SxParser_path);
+}
+
+
+
+#define YY_INPUT(buf,result,max_size)                                          \
+{                                                                              \
+/*  sxprintf ("BUFFER: >%s<\n\n",SxParser_bufPtr); */                          \
+    if (SxParser_isNewBuffer)  {                                               \
+       SxParser_isNewBuffer = false;                                           \
+          SxParser_pos = SxParser_newPos;                                      \
+    }                                                                          \
+    char c;                                                                    \
+    size_t idx=0;                                                              \
+    while ( (c = *SxParser_bufPtr) != '\n' && c != '\0' && idx < max_size)  {  \
+       buf[idx++] = *SxParser_bufPtr++;                                        \
+    }                                                                          \
+    if (c == '\n')  buf[idx++] = '\n';                                         \
+    if (c == '\0' || idx >= max_size-1 )  {                                    \
+       result = YY_NULL;                                                       \
+    }  else  {                                                                 \
+       buf[idx++] = '\0';                                                      \
+       SxParser_bufPtr++;                                                      \
+       if (SxParser_verbose)                                                   \
+          sxprintf ("READ[%d]: %s", SxParser_lineNumber, buf);                 \
+       result = idx;                                                           \
+    }                                                                          \
+}
+
+
+// --- error handling
+void SxParser_error (const SxString &name)
+{
+   if (SxString(name) == "parse error")  {
+      sxprintf ("Syntax error in %s:%d.\n",
+              SxParser_filename.ascii(),
+              SxParser_lineNumber);
+   }  else  {
+      sxprintf ("%s in %s:%d.\n",
+              name.ascii(),
+              SxParser_filename.ascii(),
+              SxParser_lineNumber);
+   }
+   SxParser_Error = true;
+// SxSymbolTable::getGlobalPtr()->topLevel()->print();
+   SX_EXIT;
+}
+
+void SxParser_include (const SxString &file)
+{
+// sxprintf ("including file %s\n", file.ascii());
+   int startToken = SxParser_pos;  SxParser_pos += yyleng;
+   int endToken   = SxParser_pos;
+// sxprintf ("quotes: >%s<\n", SxString(SxParser_buffer).subString(startToken, endToken).ascii());
+// sxprintf ("text: >%s<\n", SxParser_text);
+
+   // --- push current buffer
+   SxParser_startIdxStack.append   (startToken);
+   SxParser_endIdxStack.append     (endToken);
+   SxParser_bufferStack.append     (SxParser_buffer);
+   SxParser_lineNumberStack.append (SxParser_lineNumber);
+   SxParser_filenameStack.append   (SxParser_filename);
+   SxParser_posStack.append        (SxParser_pos);
+
+   // sxprintf ("file: >%s<\n", fileIt->ascii());
+   // sxprintf ("diff: %d %d\n", fileIt->getSize(), endToken-startToken);
+
+   SxParser_filename = file;
+   SxParser_nestedFiles << file;
+
+   // --- start parsing from a new file
+   SxParser_buffer     = SxParser_read (file.ascii());
+   SxParser_bufPtr     = SxParser_buffer.ascii();
+
+   SxParser_pos = SxParser_newPos = 0;
+   SxParser_isNewBuffer = true;
+   SxParser_lineNumber = 1;
+
+   YY_FLUSH_BUFFER;
+}
+
+
+
+void SxParser_handleInclude ()
+{
+   SxList<SxString> files;
+
+   // --- retrieve filename
+   SxString file = SxString(SxParser_text).right("include").stripWhiteSpace();
+   if (!SxParser_includeLookUp.containsKey(file))  {
+      char delimiter = file(0);
+      // does a string contains the real filename?
+      if ( delimiter != '"' && delimiter != '<' )  {
+         // remove ';'
+         file = file.subString (0, file.getSize()-2);
+         if ( !SxSymbolTable::getGlobalPtr()->contains (file) )  {
+            SxString msg;
+            msg += "Undefined symbol '" + file + "'";
+            SxParser_error ( msg.ascii() );
+         }
+         file = SxSymbolTable::getGlobalPtr()->get(file)->toString();
+         delimiter = '\0';  // clean delimiter
+         if (file(0) == '<')  {
+            delimiter = '<';
+            file = file.subString (1, file.getSize()-2);
+         }
+      }  else  {
+         // remove '"' (or '<' and '>'), and ';'
+         file = file.subString (1, file.getSize()-3);
+      }
+      if (delimiter == '<')  {
+         files = SxParser_findInPath (file);
+      } else {
+         try {
+            // --- try to resolve wildcards
+            bool useWildCards = (file.contains("*") || file.contains("?"));
+            if (useWildCards)  {
+               SxList<SxFileInfo> items = SxFSAction::ls (file);
+               SxList<SxFileInfo>::Iterator itemsIt;
+               for (itemsIt = items.begin(); itemsIt != items.end(); ++itemsIt)  {
+                  files << itemsIt->getAbsPath ();
+               }
+            }  else  {
+               if (SxFile(file).exists()) {
+                  files << file;
+               } else {
+                  SxString msg = "File '" + file + "' not found";
+                  SxParser_error ( msg.ascii() );
+               }
+            }
+         } catch (SxException e)  { e.print (); SX_QUIT; }
+      }
+      SxParser_includeLookUp(file) = files;
+   }  else  {
+      files = SxParser_includeLookUp(file);
+   }
+
+   SxList<SxString>::Iterator fileIt;
+   for (fileIt = files.begin(); fileIt != files.end(); ++fileIt)  {
+      SxParser_include (*fileIt);
+      if (files.getSize() > 0)  yyleng = 0;    // only if wildcards were used
+   }
+
+   if (files.getSize() == 0)  { // e.g., wildcards with no match
+      SxParser_pos += yyleng;
+      yyleng = 0;
+   }
+}
+
+
+// --- read string from file
+SxString sxReadFile (const SxString &file)
+{
+   SxList<SxString> files = SxParser_findInPath (file);
+   if (files.getSize() == 0)  {
+      SxString msg;
+      msg += "File '" + file + "' not found";
+      SxParser_error ( msg.ascii() );
+   }
+   return SxFileIO::readLines (files.first());
+}
+
+
+
+
+// --- multiply used targets
+//void SxParser_beginGroup ()  {   // {ID}{SPACE}"{"
+
+//#define YY_NO_UNPUT  /* suppress warning */
+%}
+
+DIGIT         [0-9]
+INTEGER       {DIGIT}+
+FLOAT         {DIGIT}*[\.]{DIGIT}*
+SCIENTIFIC    ({INTEGER}|{FLOAT})[e|E][\-|+]?{INTEGER}
+NUMBER        {INTEGER}|{FLOAT}|{SCIENTIFIC}
+ID            [A-Za-z0-9_\.]+
+SPACE         [ \t]*
+URL           ([A-Za-z0-9_=:\-+/\\~\.\@]+)
+FILEPATTERN   ([A-Za-z0-9_=:\-+/\\~\.\@\*]+)
+IDLIST        ([A-Za-z0-9_, \t]+)
+GROUP_OPEN    (\{)
+GROUP_CLOSE   (\}|\};)
+NEEDS         (needs{SPACE}{IDLIST};)
+REQUIRES      (requires{SPACE}{IDLIST};)
+GLOBAL        (global{SPACE}{IDLIST};)
+FORMAT        (format{SPACE}{URL}{SPACE};)
+VALIDATION    (set{SPACE}validation;)
+HERE_ID       [A-Za-z0-9_]+
+EXT_HERE_ID   ({HERE_ID}#{ID})
+HERE          ({HERE_ID}|{EXT_HERE_ID})
+INCL_STRING   (include{SPACE}{ID}{SPACE};)
+INCL_QUOTES   (include{SPACE}\"({URL}|{FILEPATTERN})\"{SPACE};)
+INCL_BRACKETS (include{SPACE}\<({URL}|{FILEPATTERN})\>{SPACE};)
+VERBOSE_ON    (verboseMode{SPACE}on;)
+VERBOSE_OFF   (verboseMode{SPACE}off;)
+
+
+%%
+{SPACE}         { SxParser_pos += yyleng; }
+[\r]*\n         { SxParser_pos+=yyleng;
+                  SxParser_lineNumber++; }
+{NUMBER}        { SxParser_pos += yyleng;
+                  SxSymbol sym;
+                  sym.parserFilename = SxParser_filename;
+                  sym.parserLineNumber = SxParser_lineNumber;
+                  sym.val = atof(SxParser_text);
+                  sym.type = VAR;
+                  SxParser_symbolStack.prepend (sym);
+                  SxParser_lval.sym = &SxParser_symbolStack.first ();
+                  return NUM; }
+{ID}{SPACE}{GROUP_OPEN}  {
+                  SxParser_pos += yyleng;
+                  size_t len = strlen (SxParser_text);
+                  // --- remove '{' from buffer
+                  for (size_t i=0; i < len; i++)
+                     if (SxParser_text[i]=='{') SxParser_text[i]=' ';
+
+                  char *buffer = new char [strlen(SxParser_text)];
+                  sscanf (SxParser_text, "%s", buffer);
+
+                  if (   SxParser_excludeGroups.getSize () > 0
+                      && SxParser_excludeGroups.contains (buffer))
+                  {
+                     // --- skip this group as if it is a comment
+                     //     "Max length is the size of flex token which is
+                     //     limited to the size of input buffer, typically 16K.
+                     // Flex & Bison: Text Processing Tools, Levine, 2009, p 40"
+                     int c;
+                     int excludeLevel = 0;
+
+                     for (;;)  {
+                        c = yyinput();
+                        if (c == EOF) { break; }
+                        else if (c == '\n') SxParser_lineNumber++;
+                        else if (c == '{') { excludeLevel++; SxParser_pos++; }
+                        else if (c == '}') {
+                           excludeLevel--;
+                           SxParser_pos++;
+                           if (excludeLevel < 0)  {
+                              break;
+                           }
+                        }  else SxParser_pos++;
+                     }
+                  }  else  {
+                     // --- create new symbol table layer
+                     //     (will be deleted in destructor of global table)
+                     SxParser_groupLevel++;
+                     SxSymbolTable::getGlobalPtr() = new SxSymbolTable (SxSymbolTable::getGlobalPtr(), buffer);
+                     SxSymbolTable::getGlobalPtr()->parserFilename = SxParser_filename;
+                     SxSymbolTable::getGlobalPtr()->parserLineNumber = SxParser_lineNumber;
+                  }
+                  delete [] buffer; }
+{ID}{SPACE}"("  { SxParser_pos += yyleng;
+//                  sxprintf ("NEWLINES: %d\n", SxString(SxParser_text).contains('\n'));
+                  size_t len = strlen (SxParser_text);
+                  // --- remove '(' from buffer
+                  for (size_t i=0; i < len; i++)
+                     if (SxParser_text[i]=='(') SxParser_text[i]='\0';
+
+                  char *buffer = new char [strlen (SxParser_text)+1];
+                  sscanf (SxParser_text, "%s", buffer);
+                  unput ('('); SxParser_pos--; // we need '(' for yacc
+                  SxSymbol *ptr = SxSymbolTable::getGlobalPtr()->get (buffer, false, false);
+                  if ( ptr )  {
+                     if (ptr->type != FUNC && ptr->type != STRFUNC)  {
+                        SxParser_error ("Found a symbol where a function was expected");
+                     }
+                     SxSymbol sym (*ptr);
+                     SxParser_symbolStack.prepend (sym);
+                     SxParser_lval.sym = &SxParser_symbolStack.first();
+                  }  else  {
+                     sxprintf ("FUNCTION: %s not found\n", buffer);
+                     SxParser_error ("Invalid statement\n");
+                  }
+                  delete [] buffer;
+                  return ptr->type;  // FUNC or STRFUNC
+                }
+{GROUP_CLOSE}   { SxParser_groupLevel--;
+                  SxParser_pos++;
+                  SxSymbolTable::getGlobalPtr() = SxSymbolTable::getGlobalPtr()->parent;
+                  if (!SxSymbolTable::getGlobalPtr() ) SxParser_error ("Unexpected '}'\n"); }
+"+"             { SxParser_pos++; return '+'; }
+"-"             { SxParser_pos++; return '-'; }
+"*"             { SxParser_pos++; return '*'; }
+"/"             { SxParser_pos++; return '/'; }
+"^"             { SxParser_pos++; return '^'; }
+"("             { SxParser_pos++; return '('; }
+")"             { SxParser_pos++; return ')'; }
+"["             { SxParser_pos++;
+                  dimension++;
+                  SxSymbol sym, emptyList ("emptyList", 0.);
+                  sym.valList->prepend (emptyList);
+                  sym.parserFilename = SxParser_filename;
+                  sym.parserLineNumber = SxParser_lineNumber;
+                  sym.type = LIST;
+                  sym.name = "list";
+                  SxParser_symbolStack.prepend (sym);
+                  SxParser_lval.sym = &SxParser_symbolStack.first ();
+                  //if (dimension > 2)  SxParser_error ("Tensors not allowed");
+                  //printStack ();
+                  return '['; }
+"]"             { SxParser_pos++; return ']'; }
+"="             { SxParser_pos++; return '='; }
+","             { SxParser_pos++; return ','; }
+";"             { SxParser_pos++; return ';'; }
+{ID}{SPACE}"="  { SxParser_pos += yyleng;
+                  SxString name = SxString(SxParser_text).left('=').trim();
+                  SxSymbol *sym = SxSymbolTable::getGlobalPtr()->get(name,
+                                                   true,
+                                                   false);
+
+                  // --- allow overwriting
+                  SxSymbolTable::getGlobalPtr()->remove (sym);
+
+                  if (SxParser_globalVars.contains(name))
+                     sym = SxSymbolTable::getGlobalPtr()->topLevel()->append (name);
+                  else
+                     sym = SxSymbolTable::getGlobalPtr()->append (name);
+
+                  sym->parserFilename = SxParser_filename;
+                  sym->parserLineNumber = SxParser_lineNumber;
+                  sym->val = -1;
+                  sym->initialized = false;
+                  SxParser_lval.sym = sym;
+                  unput ('='); SxParser_pos--;
+                  return sym->type; }
+{ID}            { SxParser_pos += yyleng;
+                  SxSymbol *sym = SxSymbolTable::getGlobalPtr()->get(SxParser_text,
+                                                   SxParser_validationMode,
+                                                   false);
+                  if (sym)  {
+                     SxParser_lval.sym = sym;
+                     //printf ("VARIABLE:"); sym->print();
+                     return VAR;
+                  }
+
+                  if (SxParser_globalVars.contains(SxParser_text))
+                     sym = SxSymbolTable::getGlobalPtr()->topLevel()->append (SxParser_text);
+                  else
+                     sym = SxSymbolTable::getGlobalPtr()->append (SxParser_text);
+
+                  sym->parserFilename = SxParser_filename;
+                  sym->parserLineNumber = SxParser_lineNumber;
+                  sym->setDefined (false);
+                  sym->val = -1;
+                  sym->initialized = false;
+                  SxParser_lval.sym = sym;
+                  return sym->type; }
+\"              { // strings
+                  SxParser_pos += yyleng;
+                  int i=0, length = 1024;
+                  char *buffer = new char [length];
+                  int c, cPrev;
+                  tmpString = "";
+                  buffer[0] = '\0';
+                  cPrev = '\0';
+                  // support quoting '\"'
+                  while ( ((c = yyinput()) != '"' || cPrev == '\\')
+                         && c != EOF)
+                  {
+                     SxParser_pos++;
+//                   if ( c != '\\')  {
+                        buffer[i++] = char(c); buffer[i] = '\0';
+//                   }
+                     if ( i == length-1 )  {
+                        tmpString += buffer; i=0; buffer[0] = '\0';
+                     }
+                     if (c == '\n')  SxParser_pos--;
+                     cPrev = c;
+                  }
+                  SxParser_pos++;
+                  if ( c == EOF )  {
+                     SxParser_error ("Unexpected end of file." );
+                  }
+
+                  tmpString += buffer;
+                  // unquote quotes
+                  tmpString  = tmpString.substitute ("\\\"", "\"");
+                  delete [] buffer;
+                  SxSymbol sym;
+                  sym.parserFilename = SxParser_filename;
+                  sym.parserLineNumber = SxParser_lineNumber;
+                  sym.str  = tmpString;
+                  sym.type = STR;
+                  SxParser_symbolStack.prepend (sym);
+                  SxParser_lval.sym = &SxParser_symbolStack.first ();
+                  return STR;
+                }
+\<              { // strings with search pathes, like  <string>
+                  SxParser_pos += yyleng;
+                  int i=0, length = 1024;
+                  char *buffer = new char [length];
+                  int c;
+                  tmpString = "";
+                  buffer[0] = '\0';
+                  while ( (c = yyinput()) != '>' && c != EOF)  {
+                     SxParser_pos++;
+                     buffer[i++] = char(c); buffer[i] = '\0';
+                     if ( i == length-1 )  {
+                        tmpString += buffer; i=0; buffer[0] = '\0';
+                     }
+                     if (c == '\n')  SxParser_pos--;
+                  }
+                  SxParser_pos++;
+                  if ( c == EOF )  { SxParser_error ("Unexpected end of file." ); }
+
+                  tmpString += buffer;
+                  delete [] buffer;
+                  SxSymbol sym;
+                  sym.parserFilename = SxParser_filename;
+                  sym.parserLineNumber = SxParser_lineNumber;
+                  sym.str  = SxParser_findInPath (tmpString)(0);
+                  sym.type = STR;
+                  SxParser_symbolStack.prepend (sym);
+                  SxParser_lval.sym = &SxParser_symbolStack.first ();
+                  return STR;
+                }
+"<<"{HERE}[;]*\n { // HERE documents
+                  int nr = SxParser_lineNumber;
+
+                  SxParser_pos += yyleng;
+                  SxParser_lineNumber++;
+
+                  SxString text = SxParser_text;
+                  char endToken = text.contains (';') ? ';' : '\n';
+
+                  SxString hereExtID = text.right("<<").left(endToken);
+                  SxString hereID = hereExtID.left('#');
+                  if (hereID == "")  hereID = hereExtID;
+
+                  SxList<SxString> hereBuffer;
+                  char c = '\0';
+                  for (;;) {
+                     SxList<char> lineBuffer;
+                     while ( (c = yyinput()) != '\n' && c != EOF)  {
+                        SxParser_pos++;
+                        if (c == '\0') continue;
+                        lineBuffer << c;
+                     }
+
+                     if ( c == EOF )  {
+                        SxString msg;
+                        msg  = "HERE document has no termination ";
+                        msg += "(opened in line ";
+                        msg += SxString(nr) + ", identified by '" + hereID + "'";
+                        msg += ").\n";
+                        msg += "Unexpected end of file.\n";
+                        SxParser_error( msg.ascii() );
+                        break;
+                     }
+
+                     SxString line = SxString (lineBuffer);
+                     ssize_t pos = line.findLast (hereID);
+                     if (pos >= 0 && line.getSize() == hereID.getSize() - pos)  { // end of HERE document found
+                        SxParser_lineNumber += 2;
+                        break;
+                     }
+                     hereBuffer << line;
+                  }
+                  unput (';');  //SxParser_pos--; // fake final ';' in statement
+
+                  SxParser_lineNumber += hereBuffer.getSize();
+
+
+                  SxSymbol sym;
+                  sym.parserFilename = SxParser_filename;
+                  sym.parserLineNumber = SxParser_lineNumber;
+                  sym.str  = SxString::join (hereBuffer, '\n');
+                  sym.type = STR;
+                  sym.binary = true;
+                  SxParser_symbolStack.prepend (sym);
+                  SxParser_lval.sym = &SxParser_symbolStack.first ();
+                  return STR;
+                }
+"/*"            { // eat up C comments
+                  //SxParser_pos += yyleng;
+                  int c, cNext;
+                  int nr = SxParser_lineNumber;
+                  SxParser_pos++;  // '/'
+                  SxParser_pos++;  // '*'
+
+                  cNext = yyinput();
+                  for (;;) {
+                     c = cNext;
+                     cNext = yyinput();
+                     while ( !(c == '*' && cNext == '/') && c != EOF)  {
+                        // eat up text of comment
+                        if ( c == '\n' )  SxParser_lineNumber++;
+                        else              SxParser_pos++;
+                        c     = cNext;
+                        cNext = yyinput();
+                     }
+
+                     if ( c == EOF )  {
+                        SxString msg;
+                        msg  = "Comment block (/* ... */) has no termination ";
+                        msg += "(opened in line ";
+                        msg += nr;
+                        msg += ").\n";
+                        msg += "Unexpected end of file.\n";
+                        SxParser_error( msg.ascii() );
+                        break;
+                     }
+                     break;
+                  }
+                  SxParser_pos++;   // '*'
+                  SxParser_pos++;   // '/'
+                }
+"//".*$         { // eat up C++ comments
+                  SxParser_pos += yyleng;
+                }
+"#".*$          { // eat up shell comments
+                  SxParser_pos += yyleng;
+                }
+"!".*$          { // eat up Fortran90 comments
+                  SxParser_pos += yyleng;
+                }
+"\0"            { // eat up terminator characters '\0'
+                }
+{FORMAT}        { // validation file
+                  SxString str  = SxString(SxParser_text).right("format").trim();
+                  str = str.left (";");
+                  // --- use only the first occurance of FORMAT,
+                  //     neglect any further FORMATs
+                  if (!SxSymbolTable::getGlobalPtr()->topLevel()->contains("validator"))  {
+                     str = "std/"+str+".std";
+                     SxSymbol *sym = SxSymbolTable::getGlobalPtr()->topLevel()->append ("validator");
+                     sym->type = STR; sym->str = str;
+                     sym->parserFilename = SxParser_filename;
+                     sym->parserLineNumber = SxParser_lineNumber;
+                  }
+                  SxParser_pos += yyleng; }
+{VALIDATION}    { // switch to validation mode (all vars are treated locally)
+                  SxParser_validationMode = true;
+                  SxParser_pos += yyleng; }
+{NEEDS}         { // --- retrieve variable name
+                  SxString vars = SxString(SxParser_text).right("needs")
+                                  .removeWhiteSpace();
+                  vars = vars.left (";");
+
+                  SxList<SxString> neededVars = vars.tokenize(',');
+                  SxList<SxString>::Iterator it;
+                  for (it  = neededVars.begin();
+                       it != neededVars.end();
+                       it++)
+                  {
+                     // --- check if variable has been defined already
+                     if ( !SxSymbolTable::getGlobalPtr()->contains (*it) )  {
+                        SxString msg;
+                        msg += "Variable '" + *it + "' is undefined";
+                        SxParser_error ( msg.ascii() );
+                     }
+                  }
+                  SxParser_pos += yyleng; }
+{REQUIRES}      { // --- retrieve variable name
+                  SxString vars = SxString(SxParser_text).right("requires")
+                                                         .removeWhiteSpace();
+                  vars = vars.left (";");
+
+                  SxList<SxString> neededVars = vars.tokenize(',');
+                  SxList<SxString>::Iterator it;
+                  for (it  = neededVars.begin();
+                       it != neededVars.end();
+                       it++)
+                  {
+                     // --- check if variable has been defined already
+                     if ( !SxSymbolTable::getGlobalPtr()->contains (*it) )  {
+                        SxString msg;
+                        msg += "Variable '" + *it + "' is undefined";
+                        SxParser_error ( msg.ascii() );
+                     }
+                  }
+                  SxParser_pos += yyleng; }
+{GLOBAL}        { SxString newGlobals;
+                  newGlobals = SxString(SxParser_text).right("global")
+                               .removeWhiteSpace();
+                  newGlobals = newGlobals.left (";");
+                  ssize_t n = newGlobals.getSize();
+                  if (n > 1)  {
+                     SxParser_globalVars << newGlobals.tokenize (',');
+                  }  else  {
+                     SxParser_error ("missing list of global variables");
+                  }
+                  SxParser_pos += yyleng; }
+{INCL_STRING}   { SxParser_handleInclude (); }
+{INCL_QUOTES}   { SxParser_handleInclude (); }
+{INCL_BRACKETS} { SxParser_handleInclude (); }
+{VERBOSE_ON}    { SxParser_pos += yyleng; SxParser_verbose = true;   }
+{VERBOSE_OFF}   { SxParser_pos += yyleng; SxParser_verbose = false;  }
+"@@"{SPACE}$    { yyterminate(); }
+<<EOF>>         { SxParser_includeLevel--;
+                  SxParser_globalVars.removeAll ();
+                  if (SxParser_bufferStack.getSize() == 0)  {
+
+                     yyterminate ();
+
+                  }  else  {
+
+                     SxString left, right, popBuffer;
+                     int startToken, endToken;
+
+                     // --- continue parsing of previous buffer
+                     popBuffer  = SxParser_bufferStack.last ();
+                     startToken = SxParser_startIdxStack.last ();
+                     endToken   = SxParser_endIdxStack.last ();
+
+                     // --- retrieve the current position
+                     SxParser_lineNumber = SxParser_lineNumberStack.last ();
+                     SxParser_filename = SxParser_filenameStack.last ();
+                     SxParser_newPos = SxParser_pos = SxParser_posStack.last();
+
+                     // --- delete the entries needed previously
+                     SxParser_bufferStack.removeLast ();
+                     SxParser_startIdxStack.removeLast ();
+                     SxParser_endIdxStack.removeLast ();
+                     SxParser_lineNumberStack.removeLast ();
+                     SxParser_filenameStack.removeLast ();
+                     SxParser_posStack.removeLast ();
+
+                     // --- concatenate resulting buffer
+                     ssize_t size   = popBuffer.getSize ();
+                     if (startToken > 0)
+                        left = popBuffer.subString(0, startToken-1);
+                     if (endToken < size-1)
+                        right = popBuffer.subString (endToken, size-1);
+
+                     // --- the last buffer has an additional '\n'
+                     //     (otherwise one could comment out statements in the
+                     //      current buffer)
+                     ssize_t offset = SxParser_buffer.getSize();
+                     SxParser_buffer = left + SxParser_buffer + " " + right;
+                     SxParser_bufPtr = SxParser_buffer.ascii()
+                                     + startToken + offset;
+                     SxParser_newPos = startToken + int(offset);
+                     SxParser_pos    += int(offset)-1;
+                     SxParser_isNewBuffer = true;
+                  }
+                }
+.               {
+                    char errormsg[1024];
+                    int c = *SxParser_text;
+
+                    if (c < 32)  {
+                       int idx = sprintf(errormsg, "Illegal character 0x%x "
+                                         "(maybe unicode?) at '%c",
+                                         (unsigned char)c,c);
+                       // --- copy next 10 characters of the line
+                       bool lineContinues;
+                       for (int i = 0; i < 10; ++i)  {
+                          c = yyinput ();
+                          if ((lineContinues = (c != EOF && c != '\n')))
+                             errormsg[idx++] = char(c);
+                          else
+                             break;
+                       }
+                       if (lineContinues)  {
+                          // add "..."
+                          for (int i = 0; i < 3; ++i) errormsg[idx++]='.';
+                       }
+                       errormsg[idx++]='\'';
+                       errormsg[idx]=0;
+                    } else {
+                       sprintf(errormsg, "Illegal character '%c'", c);
+                    }
+                    SxParser_error (errormsg);
+                }
+%%
+
+int SxParser_wrap () { return 1; }

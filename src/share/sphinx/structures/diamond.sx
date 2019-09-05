@@ -1,0 +1,22 @@
+// --------------------------------------------------------------------------
+// SFHIngX  -  diamond structure
+//
+// Christoph Freysoldt
+// 12/10/2002
+//
+//
+// --------------------------------------------------------------------------
+// Arguments:
+//    aLat                lattice parameter a [Bohr]
+//    species             filename of species file
+// --------------------------------------------------------------------------
+
+needs aLat;
+
+include <structures/fcc.sx>;
+
+species {
+   atom { coords = [0,0,0]; relative; }
+   atom { coords = [1/4,1/4,1/4]; relative; }
+}
+

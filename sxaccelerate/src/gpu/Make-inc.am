@@ -1,0 +1,24 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxGpu.h
+
+
+lib_LTLIBRARIES       = libsxgpu.la
+libsxgpu_la_SOURCES  = $(AUX_SRC)
+libsxgpu_la_SOURCES += SxGpu.cu 
+libsxgpu_la_LIBADD   = $(SXIMPORTLIBS)
+libsxgpu_la_LIBADD  += 
+libsxgpu_la_LIBADD  += $(SXIMPORTOBJS)
+libsxgpu_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxgpu_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/math -I$(top_srcdir)/math
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

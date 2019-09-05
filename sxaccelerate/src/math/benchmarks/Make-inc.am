@@ -1,0 +1,23 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = sxblocksizes 
+
+sxblocksizes_SOURCES   = $(AUX_SRC)
+sxblocksizes_SOURCES  += sxblocksizes.cpp
+sxblocksizes_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxblocksizes_LDADD     =  $(SXIMPORTLIBS)
+sxblocksizes_LDADD    +=  @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+sxblocksizes_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/math -I$(top_srcdir)/math
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(top_builddir)/mpi -I$(top_srcdir)/mpi
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

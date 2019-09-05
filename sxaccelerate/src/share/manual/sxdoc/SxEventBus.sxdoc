@@ -1,0 +1,215 @@
+h1. Event Bus, Communication By Events
+
+p1. The main target of the event bus is to allow for programmatically decoupled
+(e.g. no callbacks) broadcasting of data. Listeners are able to suspend until
+woken up by an event of interest. In order to use the event bus, include:
+
+{{{cpp(sxeventbus)
+#include <SxEventBus.h>
+}}}
+
+p1. Pivot elements of the event bus are @SxEventBus@, @SxEventListener@ and
+@SxEvent@. The @SxEventListener@ class is the component of an event system
+which will receive events after subscribing to events of certain name and type.
+
+p1. The @SxEventBus@ is a globally operating instance, therefore, events can be
+published from anywhere in the program.
+
+p1. An event constitutes of an event name alongside a layout for the data
+attached to the event. The number of items attached to an event is limited to
+six and can comprise only primitive types (for now): @SxString@ and @int64\_t@.
+ Event data will be stored and extracted from instances of @SxEvent@.
+
+p1. Subscribers, @SxEventListener@, will specify both the event name and the
+data layout. Potential publishers have to obey the layout described by the
+listeners. The event names are not actually used as strings but as their
+respective hashes, which will be evaluated at compile-time, therefore, introduce
+no runtime overhead with respect to hash calculations.
+
+h2. Compile-Time Hashing
+
+p1. Event identification is based on lookups of integers which are hashes of
+the human readable event names. The hashing takes place at compile time in order
+to reduce runtime overhead. Compile time hashing is performed by using a custom
+literal
+
+{{{cpp(sxeventbus.compileTimeHashing)
+uint32_t eventHash = "MyEventName"_SX;
+sxprintf ("'MyEventName' has the hash: 0x%X", eventHash);
+}}}
+{{{expect(stdout,sxeventbus.compileTimeHashing)
+'MyEventName' has the hash: 0x55582FB6
+}}}
+
+h2. Component Interplay
+
+p1. The event bus is an interplay of the aformentioned components. In the
+following a general process of setting up an event driven system is given in a
+small example.
+
+p1. Associating @SxEventListener@ with certain events has to happen before
+subscribing to any event. This is done either upon construction:
+
+{{{cpp(sxeventbus.listener)
+SxEventListener l =
+{
+   { "WindowOpened", "WindowOpened"_SX },
+   { "WindowClosed", "WindowClosed"_SX }
+};
+}}}
+
+p1. or with manual assignment:
+
+{{{cpp
+SxEventListener l;
+l.setEvents (
+   { "WindowOpened",    "WindowClosed" },
+   { "WindowOpened"_SX, "WindowClosed"_SX }
+);
+}}}
+
+p1. The association takes places by providing event names and their hashes. For
+debug purposes @SxEventListener@ can be named by:
+
+{{{cpp(sxeventbus.listener)
+l.setName ("WindowEventListener");
+}}}
+
+p1. Since an event constitutes of an event name alongside a layout for the data
+attached to the event, subscribing to an event requires specifying the layout:
+
+{{{cpp(sxeventbus.listener)
+SX_EVENT_BUS_SUB ("WindowOpened", sx::Int << sx::String, l);
+}}}
+
+p1. where the layout is provided by the list append syntax. Possible event data
+types are provided in @SxEventData.h@.
+
+p1. Subscribing to an event will set a subscribe tag in the @SxEventBus@ for
+debug purposes comprising the event hash, the listener's name and the line and
+file where the subscribing took place. After subscribing a @SxEventListener@
+instances to a certain event, every published event of that type will be
+received.
+
+p1. Publishing events on the event bus is done by calling:
+
+{{{cpp(sxeventbus.listener)
+SX_EVENT_BUS_PUB ("WindowOpened", 1430, "JohnDoe");
+SX_EVENT_BUS_PUB ("WindowClosed", 1630, "JaneDoe");
+}}}
+
+p1. Please notice, that the attributes in the publish call have to have the same
+layout (order and type) as the layout of the event specified when the listener
+subscribed for the event.
+
+p1. One of the events published above will not be received in this example,
+since no listener has subscribed to the event 'WindowClosed'. In order to print
+all current listeners and their associated events invoke:
+
+{{{cpp(sxeventbus.listener)
+cout << SxEventBus::getGlobalObj ();
+}}}
+{{{expect(stdout,sxeventbus.listener)
+Subscribed listener:
+0x699fdb55 | WindowOpened->WindowEventListener@SxEventBus.sxdoc:83:void sxeventbus_listener()
+Orphaned events:
+0xd2ff88b9 | WindowClosed@SxEventBus.sxdoc:99:void sxeventbus_listener()
+}}}
+
+p1. The printout shows the subscribed listeners with the event name and hash,
+their listeners name (if set) and the source file and line where they have been
+subscribed to the event. In this example, also a listing of orphaned events is
+printed. It shows that there have been events published which were not received
+by any listener. It shows the event name and hash and the source file and line
+number where the publishing happened.
+
+p1. Suspending a thread by waiting for events can be done in several ways.
+Waiting for a single event is done by:
+
+{{{cpp(sxeventbus.listener)
+bool stop = false;
+size_t nEvents = 1;   // for how many events of that type do I want to wait
+size_t sleepMS = 100; // sleep interval between checks
+l.waitForEvents<"WindowOpened"_SX> (&stop, nEvents, sleepMS);
+}}}
+
+p1. where the stop variable indicates whether a terminate signal was triggered
+on the event bus. It is also possible to wait for multiple events. Waiting for
+atleast one event for each event in the array is done by:
+
+{{{cpp
+l.waitForEvents_And ({ "WindowOpened"_SX, "WindowClosed"_SX }, &stop);
+}}}
+
+p1. and waiting for any event out of an array of events by calling:
+
+{{{cpp
+l.waitForEvents_Or ({"WindowOpened"_SX, "WindowClosed"_SX }, &stop);
+}}}
+
+p1. When the @waitForEvents@ call has been resolved . In order to get all events
+as a list of received events, invoke:
+
+{{{cpp
+SxList<SxEvent> events = l.getAll (); // the events in the listener are cleared
+}}}
+
+p1. A different way of fetching event data is to get them one by one. The
+@getSize@ function of the @SxEventListener@ will return the number of events
+stored. Obtaining the events then may happen iteratively:
+
+{{{cpp
+size_t nEvents = l.getSize ();
+for (size_t iEvent = 0; iEvent < nEvents; ++iEvent) {
+   SxEvent e = l.get (); // remove one event from the listener
+}
+}}}
+
+p1. If just the last event is of interest it can be fetched with:
+
+{{{cpp
+SxEvent e = l.getLast (); // every other event is discarded
+}}}
+
+p1. Please notice that when fetching the last event, every other event,
+independent of type, will be discarded.
+
+p1. The @SxEvent@ class is a read only instances which is used for
+extracting the data belonging to the event. Extraction of the event data has to
+be done in the same order of the layout and after reading from the @SxEvent@
+the data is cleared. Identification of the event is done by comparing the
+event's hash to an expectation value:
+
+{{{cpp(sxeventbus.listener)
+SxList<SxEvent> events = l.getAll (); // the events in the listener are cleared
+for (SxEvent &e : events)  {
+   if (e == "WindowClosed"_SX)  {
+      int64_t  time = e.shiftInt ();
+      SxString user = e.shiftString ();
+      cout << user << " closed the window at " << time << endl;
+   } else if (e.getHash () == "WindowOpened"_SX)  {
+      int64_t time;
+      SxString user;
+      e >> time >> user;
+      cout << user << " opened the window at " << time << endl;
+   }
+}
+}}}
+{{{expect(stdout,sxeventbus.listener)
+JohnDoe opened the window at 1430
+}}}
+
+p1. In the example above, two different ways of extracting the data from the
+@SxEvent@ are showed. The first is by invoking function calls and the other is
+by using stream operators.
+
+p1. Before deconstruction of a @SxEventListener@ it is mandatory to unsubscribe
+from all events:
+
+{{{cpp(sxeventbus.listener)
+SxEventBus::unsubscribeAll (&l);
+}}}
+
+p1. In order to initiate a shutdown sequence when there are still listeners
+waiting for events, call @SxEventBus::terminate()@ in order resolve
+@waitForEvents@ calls after their current sleeping period has expired.

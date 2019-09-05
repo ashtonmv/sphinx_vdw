@@ -1,0 +1,46 @@
+gsEXX                       { type="group"; optional;
+   maxSteps                 { type="int"; min=1; optional; }
+   dEnergy                  { type="real"; min=0; }
+   useGreensfunction        { type="flag"; optional; }
+   mimicVoglChi             { type="flag"; optional; }
+   useAbdullahSymmetry      { type="flag"; optional; }
+   useNonsymFock            { type="flag"; optional; }
+   fockStorage              { type="flag"; optional; }
+   withInterimResults       { type="flag"; optional; }
+                          
+   relaxRho                 { type="group";
+      include <std/elmin.std>;
+      noRhoStorage          { type="flag"; optional; }
+      noWavesStorage        { type="flag"; optional; }
+   }                     
+                         
+   fullDiag                 { type="group"; optional;
+      include <std/diag.std>;
+      include <std/bandstruct.std>;
+      //include <std/diis-ccg.std>;
+      noRhoStorage          { type="flag"; optional; }
+      noWavesStorage        { type="flag"; optional; }
+   }
+                          
+   relaxXPotential          { type="group";
+      maxRelaxXSteps        { type="int"; min=1; }
+      minRelaxXSteps        { type="int"; min=1; optional; }
+      epsX                  { type="real"; min=0; optional; }
+      xMixing               { type="real"; min=0; max=1; }
+      mixingMethod          { type="int"; min=0; }
+      nPulaySteps           { type="int"; min=0; optional; }
+      kerkerScaling         { type="real"; min=0; max=1; optional; }
+      kerkerDamping         { type="real"; min=0; max=1; optional; }
+      writeInnerSteps       { type="flag"; optional; }
+      writeFirstInnerSteps  { type="flag"; optional; }
+   }
+
+   Sternheimer              { type="group"; optional;
+      maxSternSteps         { type="int"; min=1; max=999999; optional; }
+      minSternSteps         { type="int"; min=1; max=999998; optional; }
+      epsResidue            { type="real"; min=0; optional; }
+      preconditioner        { type="int"; min=0; max=1; optional; }
+      method                { type="int"; min=1; max=3; optional; }
+      checkEquation         { type="flag"; optional; }
+   }
+}

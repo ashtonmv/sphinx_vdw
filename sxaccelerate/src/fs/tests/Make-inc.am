@@ -1,0 +1,57 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS =
+
+bin_PROGRAMS     = sxchmod sxfile sxfileinfo sxfileio sxfsaction sxfstest
+
+sxchmod_SOURCES   = $(AUX_SRC)
+sxchmod_SOURCES  += sxchmod.cpp
+sxchmod_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxchmod_LDADD     =  $(SXIMPORTLIBS)
+sxchmod_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxchmod_LDADD    +=  $(SXIMPORTOBJS)
+
+sxfile_SOURCES   = $(AUX_SRC)
+sxfile_SOURCES  += sxfile.cpp
+sxfile_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxfile_LDADD     =  $(SXIMPORTLIBS)
+sxfile_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxfile_LDADD    +=  $(SXIMPORTOBJS)
+
+sxfileinfo_SOURCES   = $(AUX_SRC)
+sxfileinfo_SOURCES  += sxfileinfo.cpp
+sxfileinfo_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxfileinfo_LDADD     =  $(SXIMPORTLIBS)
+sxfileinfo_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxfileinfo_LDADD    +=  $(SXIMPORTOBJS)
+
+sxfileio_SOURCES   = $(AUX_SRC)
+sxfileio_SOURCES  += sxfileio.cpp
+sxfileio_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxfileio_LDADD     =  $(SXIMPORTLIBS)
+sxfileio_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxfileio_LDADD    +=  $(SXIMPORTOBJS)
+
+sxfsaction_SOURCES   = $(AUX_SRC)
+sxfsaction_SOURCES  += sxfsaction.cpp
+sxfsaction_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxfsaction_LDADD     =  $(SXIMPORTLIBS)
+sxfsaction_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxfsaction_LDADD    +=  $(SXIMPORTOBJS)
+
+sxfstest_SOURCES   = $(AUX_SRC)
+sxfstest_SOURCES  += sxfstest.cpp
+sxfstest_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxfstest_LDADD     =  $(SXIMPORTLIBS)
+sxfstest_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxfstest_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/fs -I$(top_srcdir)/fs
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

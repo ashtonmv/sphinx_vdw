@@ -1,0 +1,72 @@
+basis                { type="group"; xor="basis,tbBasis,forstDB,stilWeb,eamPot,taylorExpPotential";not="tbInitialGuess";
+   eCut              { type="real"; min=0; /*max=120;*/ }
+   gCut              { type="real"; min=5; max=1000; optional;}
+   eCutChi           { type="real"; min=0.3; optional; }
+   kPoint            { type="group"; minItems=1; 
+                       xor="kPoint,kPoints";
+      coords         { type="vector"; dim=3; }
+      label          { type="string"; optional; }
+      weight         { type="real"; min=0; max=1; optional; }
+      relative       { type="flag"; optional; }
+   }
+   kPoints           { type="group"; minItems=1; 
+                       xor="kPoint,kPoints";
+      // relative may be given for all k-points
+      relative    { type="flag"; optional; } 
+      dK          { type="real"; optional; }
+      from           { type="group"; nItems=1;
+         coords      { type="vector"; dim=3; }
+         label       { type="string"; optional; }
+//       paths usually in cart. coords
+         relative    { type="flag"; optional; } 
+      }             
+      to             { type="group"; minItems=1;
+         coords      { type="vector"; dim=3; }
+         nPoints     { type="int"; optional; min = 0; xor="nPoints,dK"; }
+         dK          { type="real"; optional; xor="nPoints,dK"; }
+         label       { type="string"; optional; }
+//       paths usually in cart. coords
+         relative    { type="flag"; optional; } 
+      }             
+   }                
+   qPoint            { type="group"; minItems=1; optional; 
+      coords         { type="vector"; dim=3; }
+      relative       { type="flag"; optional; }
+   }
+   folding           { type="vector"; dim=3; optional; }
+   mesh              { type="vector"; dim=3; optional; }
+   meshAccuracy      { type="real"; optional; }
+   saveMemory        { type="flag"; optional; }
+}          
+
+tbBasis              { type="group"; xor="basis,tbBasis,forstDB,stilWeb,eamPot,taylorExpPotential";not="initialGuess";
+   kPoint            { type="group"; minItems=1;xor="kPoint,kPoints";
+      coords         { type="vector"; dim=3; }
+      label          { type="string"; optional; }
+      weight         { type="real"; min=0; max=1; }
+      relative       { type="flag"; optional; }
+   }                 
+   kPoints           { type="group"; minItems=1; 
+                       xor="kPoint,kPoints"; not="folding";
+      from           { type="group"; nItems=1;
+         coords      { type="vector"; dim=3; }
+         label       { type="string"; optional; }
+         relative    { type="flag"; optional; } 
+      }             
+      to             { type="group"; minItems=1;
+         coords      { type="vector"; dim=3; }
+         nPoints     { type="int"; }
+         label       { type="string"; optional; }
+         relative    { type="flag"; optional; } 
+      }             
+   }                
+   folding           { type="vector"; dim=3; optional; }
+}
+
+forstDB               { type="group"; xor="basis,tbBasis,forstDB,stilWeb,eamPot,taylorExpPotential";
+                       not="initialGuess"; 
+}
+stilWeb               { type="group"; xor="basis,tbBasis,forstDB,stilWeb,eamPot,taylorExpPotential";
+                       not="initialGuess"; 
+}
+

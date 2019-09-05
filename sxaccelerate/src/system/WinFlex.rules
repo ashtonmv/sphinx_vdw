@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VisualStudioToolFile
+	Name="WinFlex"
+	Version="8.00"
+	>
+	<Rules>
+		<CustomBuildRule
+			Name="WinFlex"
+			DisplayName="WinFlex"
+			CommandLine="echo // Empty file to make flex work &gt; unistd.h &amp; $(MSYSDIR)\usr\bin\flex -P$(InputName)_ -t $(InputName).lpp &gt; $(IntDir)\$(InputName).yy.cpp"
+			Outputs="$(IntDir)\$(InputName).yy.cpp"
+			FileExtensions="*.lpp"
+			>
+			<Properties>
+			</Properties>
+		</CustomBuildRule>
+	</Rules>
+</VisualStudioToolFile>

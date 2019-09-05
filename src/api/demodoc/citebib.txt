@@ -1,0 +1,5 @@
+/** \brief shows how entries from the bibliography can be cited
+
+    To cite publication like for example \ref Payne92 the corresponding
+    entry has to be added to the file src/api/bibliography.doxy.  */
+    void biblio ();

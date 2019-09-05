@@ -1,0 +1,293 @@
+h2. @SxFSAction@
+
+p1. @SxFSAction@ provides a set of static functions to perform basic file system
+    related Unix commands with cross-platform support. These functions are given
+    similar names as the corresponding Unix command in order to make it easy to
+    remember and use.
+
+h3. Change authorization @chmod@ / @chgrp@ / @chown@
+
+p1. *@chmod@* function changes the access permissions of the file system element.
+    The corresponding file system element must exist in order to use this
+    function. The following code shows an example of it's usage:
+
+{{{cpp
+try {
+   if (SxFSAction::exists ("./testFile.txt"))
+      SxFSAction::chmod ("./testFile.txt", 0600);
+} catch (SxException e) {
+   e.print ();
+}
+}}}
+
+p1. *@chgrp@* is a function that changes the owner group of the file system
+    element. It expects the group ID and path as parameters. In order to use
+    this function the corresponding path must represent an existing file system
+    element. The following code shows an example of @chgrp@:
+
+{{{cpp
+try {
+   if (SxFSAction::exists ("./dirName/"))
+      SxFSAction::chgrp (177180112, "./dirName/");
+} catch (SxException e) {
+   e.print ();
+}
+}}}
+
+p1. *@chown@* function changes the owner of the file system element. It expects
+    the new owner ID and path as parameters. The example code is shown below:
+
+{{{cpp
+try {
+   if (SxFSAction::exists ("./sampleFile.dat"))
+      SxFSAction::chown (177180092, "./sampleFile.dat");
+} catch (SxException e) {
+   e.print ();
+}
+}}}
+
+h3. Create/update file system elements @touch@ / @ln\_sf@ / @createTmpFile@ / @mkdir@
+
+p1. @SxFSAction@ provides different functions to create or update the existing
+    file system elements. The *@touch@* function allows to update the access
+    and modification times of a file system element. If the file/directory does
+    not exist, it will be created. It expects the path to the file system
+    element and the permission mode as parameters. The second parameter is used
+    to set the access permissions when the FS element is being created by this
+    function. This function can be an easy way to create an empty file.
+    The following code snippet presents an example of it's usage:
+
+{{{cpp
+try {
+   SxFSAction::touch ("./newFile.dat", 0644);
+} catch (SxException e) {
+   e.print ();
+}
+}}}
+
+p1. *@ln\_sf@* function allows to create a symbolic link to a file system element.
+    This function requires two parameters where first is the path to the FS
+    element and the second is the name of the symbolic link.
+
+p1. *@createTmpFile@* is a function that provides the functionality to create a
+    temporary file with a unique name at the given directory. If the directory
+    is not provided then the file location is taken from the environment
+    variable @TMPDIR@. It requires two parameters which are the directory path
+    and buffer containing the data which is used to initialize the temporary
+    file. The temp file is returned as @SxFile@ object. The following code
+    snippet presents an example usage of this function:
+
+{{{cpp
+try {
+   SxFile file = SxFSAction::createTmpFile ("/tmp", "Hello, Good Morning!");
+   if (file.exists ())
+      std::cout << "File created successfully!" << std::endl;
+} catch (SxException e) {
+   e.print ();
+}
+}}}
+
+p1. *@mkdir@* function allows to create a new directory at the location present
+    in given directory path. All the directories in the specified path must
+    exist in order to use this function. It expects two parameters where first
+    one is the directory path where new directory must be created and the second
+    parameter specifies the permission flags.
+
+p1. *@mkdir\_p@* on the other hand, creates the required directory and
+    recursively creates any non-existing parent directories. This function
+    requires directory path and permission flags as parameters.
+
+h3. Remove file system elements @rm@ / @rmdir@ / @rm\_r@
+
+p1. @SxFSAction@ contains different functions to remove either file, directory
+    or symbolic link. The *@rm@* is used to remove a file present at the
+    specified path. In order to use this function, the given file must exist
+    and it must be a file. It expects the file path as parameter.
+
+p1. *@rmdir@* function allows to remove a directory present at the given path.
+    In order to use this function the given path must be a valid directory.
+    This function expects the directory path as parameter.
+
+p1. *@rm\_r@* function removes the given file, directory or symbolic link.
+    In case the given path points to a directory, it will delete any
+    sub-directories recursively. This function requires the path to the file
+    system element as parameter.
+
+h3. Copy or move a file system element @mv@ / @cp@
+
+p1. There are two functions available in @SxFSAction@ to copy @cp@ and
+    move @mv@ a file system element respectively. The *@mv@* function is used to
+    move a file system element from one location to another. It expects the
+    current path and new path of the file system element as parameters.
+    An example of this function is given below:
+
+{{{cpp
+try {
+   if (SxFSAction::exists ("./testFile.dat"))
+      SxFSAction::mv ("./testFile.dat", SxFSAction::getHome() + "/testFile.dat" );
+} catch (SxException e) {
+   e.print ();
+}
+}}}
+
+p1. *@cp@* allows to copy one file system element to another location. It
+    requires the current path and the copy location path as parameters. An
+    example of it's usage is shown below:
+
+{{{cpp
+try {
+   if (SxFSAction::exists ("./sampleFile.txt"))
+      SxFSAction::cp ("./sampleFile.txt", SxFSAction::getHome() + "/sampleFile.txt" );
+} catch (SxException e) {
+   e.print ();
+}
+}}}
+
+h3. Navigate directories @cd@ / @pushd@ / @popd@
+
+p1. @SxFSAction@ provides two ways to change directory, either to simply change
+    the directory or push the current working directory to the stack and then
+    change the directory. The second method also allows to later pop the old
+    working directory back when needed. These functions should be used carefully
+    because in case of multithreaded application, the working directory change
+    will be visible across all threads.
+
+p1. The *@cd@* function changes the current working directory to the specified
+    directory. This function requires that the target directory must be a valid
+    path. This function expects the target directory path as parameter. An
+    example usage is shown in the following code snippet:
+
+{{{cpp
+try {
+   SxFSAction::cd (SxFSAction::getHome ());
+} catch (SxException e) {
+   e.print ();
+}
+}}}
+
+p1. The *@pushd@* function changes the current working directory to the
+    specified directory and pushes the new working directory to the stack.
+    This function requires the new working directory path as parameter.
+
+p1. *@popd@* changes the current working directory to the previous one and
+    removes the current one from stack.
+
+h3. Fetch information @getHome@ / @getTmp@ / @pwd@ / @find@
+
+p1. These functions provide information such as about the home directory,
+    working directory or searching a given file. The *@getHome@* function
+    returns the user's home directory as @SxDir@ object.
+
+p1. The *@getTmp@* function returns the directory that is set for temporary
+    files as @SxDir@ object. The *@pwd@* function can be used to fetch the
+    current working directory as @SxDir@ object.
+
+p1. *@find@* function searches for the specified file in current directory. This
+    function expects two parameters, first being the file path to search and
+    second boolean @changeDir@. If the @changeDir@ parameter is true then the
+    function searches for the file recursively in all sub-directories starting
+    from current directory. It also supports wild-card characters '\*' in
+    the filename.
+
+h3. Fetch elements of a directory @ls@ / @getFiles@ / @getDir@ / @getSymLinks@
+
+p1. @SxFSAction@ provides various functions to list down elements of a directory
+    with respect to different details or orderings.
+
+p1. The *@ls@* function returns a list of file system elements contained at the
+    specified path. It also supports wild-card characters to search for a
+    certain pattern. It takes the @SxString@ object representing the path as
+    parameter. The following code snippet shows an example of the function usage:
+
+{{{cpp
+SxFileInfo dir (SxDir (".") / "*.{dat,txt}");
+SxList<SxFileInfo> elements;
+try {
+   elements = SxFSAction::ls (dir);
+} catch (SxException e) {
+   e.print ();
+}
+cout << "elements:" << endl;
+SxList<SxFileInfo>::Iterator itElem;
+for (itElem = elements.begin (); itElem != elements.end (); ++itElem) {
+   if (itElem == elements.begin ()) {
+      cout << itElem->getAbsPath ();
+   } else {
+      cout << endl << itElem->getAbsPath ();
+   }
+}
+}}}
+
+p1. The *@ls\_t@* returns all file system elements corresponding with the
+    specified path sorted by time. This function takes @SxString@ path
+    as parameter.
+
+p1. *@ls\_s@* returns all file system elements corresponding with the given
+    path sorted by size. It requires the path as an @SxString@ object.
+
+p1. *@getFiles@* returns all files in the given directory matching a name pattern
+    if provided. This function takes the directory path as parameter. The following
+    code shows an example of this function:
+
+{{{cpp
+SxFileInfo dir (SxDir (".") / "*{abc,def}");
+SxList<SxFile> files;
+try {
+   files = SxFSAction::getFiles (dir);
+} catch (SxException e) {
+   e.print ();
+}
+cout << "files:" << endl;
+SxList<SxFile>::Iterator itFiles;
+for (itFiles = files.begin (); itFiles != files.end (); ++itFiles) {
+   cout << itFiles->getAbsPath () << endl;
+}
+}}}
+
+p1. The *@getDir@* function returns a list of all directories present in the
+    specified directory that match a pattern (if provided). This function does
+    not search the sub-directories for the matching pattern. The following code
+    presents an example of this function's usage:
+
+{{{cpp
+SxFileInfo dir (SxDir (".") / "");
+SxList<SxDir> dirs;
+try {
+   dirs = SxFSAction::getDir (dir);
+} catch (SxException e) {
+   e.print ();
+}
+cout << "directories:" << endl;
+SxList<SxDir>::Iterator itDirs;
+for (itDirs = dirs.begin (); itDirs != dirs.end (); ++itDirs) {
+   cout << itDirs->getName () << endl;
+}
+}}}
+
+p1. The *@getSymLinks@* returns all the symbolic links that are present in the
+    specified directory. It searches for the symbolic links matching a pattern
+    if provided.
+
+h3. Check for existence @exists@ / @test\_f@ / @test\_d@ / @test\_L@
+
+p1. There are different functions available in @SxFSAction@ that allow to check
+    for existence of a generic file system element or a specific file, directory
+    or symbolic link. The *@exists@* function checks for the existence of the
+    file system element pointed by the specified path. An example usage of this
+    function is given below:
+
+{{{cpp
+try {
+   if (SxFSAction::exists ("./someFile.dat"))
+      SxFSAction::rm ("./someFile.dat");
+} catch (SxException e) {
+   e.print ();
+}
+}}}
+
+p1. *@test\_f@* function checks if the specified file system element exists
+    and it is a file.
+
+p1. The *@test\_d@* function checks if the file system element represented by
+    the path exists and it is a directory. Whereas *@test\_L@* function tests
+    if the file system element at the given path exists and it is a symbolic link.

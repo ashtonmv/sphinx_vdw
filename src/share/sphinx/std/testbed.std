@@ -1,0 +1,28 @@
+set validation;
+
+test {                 { type = "group"; minItems=1; 
+   title               { type = "string"; }
+   folder              { type = "string"; }
+   cmd                 { type = "string"; }
+   args                { type = "string"; optional; }
+   diff                { type = "group"; optional;
+      file             { type = "string"; }
+   }                  
+// table               { type = "group"; optional;
+//    file             { type = "string"; }
+// }                  
+   xyPlot              { type = "group"; optional; 
+      xLabel           { type = "string"; }
+      yLabel           { type = "string"; }
+      file             { type = "string"; }
+      warning          { type = "real"; min = 0; max = 1; }
+      error            { type = "real"; min = 0; max = 1; }
+   }                  
+   nxyPlot             { type = "group"; optional; 
+      xLabel           { type = "string"; }
+      yLabel           { type = "string"; }
+      file             { type = "string"; }
+      warning          { type = "real"; min = 0; max = 1; }
+      error            { type = "real"; min = 0; max = 1; }
+   }
+}

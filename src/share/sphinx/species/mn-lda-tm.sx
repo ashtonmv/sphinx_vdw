@@ -1,0 +1,29 @@
+potential      = <potentials/mn-lda-23tspd-p1.1.cpi>;
+name           = "Manganese";
+element        = "Mn";
+valenceCharge  = 7;
+lMax           = d;
+lLoc           = s;
+lcaoOrbitals   = [s,p,d];
+atomicRhoOcc   = [2,0,5];
+rGauss         = 1;
+reciprocalMass = 54.93804;
+dampingMass    = 0.7;
+ionicMass      = 54.93804;
+
+
+/* --- fhi98PP input file:
+25.00 5 3 8 1.1d0                   Z NC NV IEXC RNLC
+     1     0  2.0                   state N L occupied by F
+     2     0  2.0
+     2     1  6.0
+     3     0  2.0
+     3     1  6.0
+     3     2  5.0
+     4     0  2.0
+     4     1  0.0
+2 t
+0 2.3 0.0 t
+1 2.3 0.0 t
+2 2.3 0.0 t
+*/

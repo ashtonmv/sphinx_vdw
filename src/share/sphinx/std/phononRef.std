@@ -1,0 +1,25 @@
+set validation;
+topLevelDefs;
+
+// coords, forces and dTau from one calculation with all phonons displaced 
+// see also: src/SFHIngX/std/sfhingx.std
+
+pseudoPot            { type="group"; nItem=1;
+   species           { type="group"; minItem=1;
+      reciprocalMass { type="real"; min=0;}
+   } 
+}
+
+structure           { type="group"; nItems=1;
+   cell             { type="matrix"; optional; dims=[3,3];}
+   relative         { type="flag"; optional; }
+   species          { type="group"; minItem=1;
+      relative      { type="flag"; optional; }
+      atom          { type="group"; minItem=1;
+         coords     { type="vector"; dim=3; }
+         force      { type="vector"; dim=3; }
+         dTau       { type="vector"; dim=3; }
+         relative   { type="flag"; optional; }
+      }
+   }
+}

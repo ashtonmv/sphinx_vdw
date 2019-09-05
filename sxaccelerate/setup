@@ -1,0 +1,11 @@
+#!/bin/sh
+
+
+OS=`uname`
+
+autoreconf -vif
+
+if test $? -ne 0; then
+   echo "ERROR: Could not generate configure environment."
+   exit 1
+fi

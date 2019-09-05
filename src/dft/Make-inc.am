@@ -1,0 +1,176 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxAOBasis.h \
+                  SxAtomicOrbitals.h \
+                  SxAtomicOrbitalsG.h \
+                  SxAtomicOrbitalsR.h \
+                  SxBlockDensityMatrix.h \
+                  SxBundle3.h \
+                  SxBundle3.hpp \
+                  SxDFT.h \
+                  SxDFTBFilesReader.h \
+                  SxDefectAlignUtil.h \
+                  SxDensity.h \
+                  SxDipoleCorrZ.h \
+                  SxEESGProj.h \
+                  SxFermi.h \
+                  SxFourierInterpol.h \
+                  SxGBasis.h \
+                  SxGauss.h \
+                  SxGkBasis.h \
+                  SxHamInit.h \
+                  SxHamSolver.h \
+                  SxHamiltonian.h \
+                  SxHubbardMO.h \
+                  SxHubbardU.h \
+                  SxInitKP.h \
+                  SxInitPAW.h \
+                  SxInitPW.h \
+                  SxKFinDiffs.h \
+                  SxKGrid.h \
+                  SxKPoints.h \
+                  SxKdotP.h \
+                  SxKdotP8x8.h \
+                  SxLaplacian.h \
+                  SxLatticeShells.h \
+                  SxLocpot.h \
+                  SxMuPW.h \
+                  SxOrbital.h \
+                  SxPAWBasis.h \
+                  SxPAWExchange.h \
+                  SxPAWHamiltonian.h \
+                  SxPAWOverlap.h \
+                  SxPAWPot.h \
+                  SxPAWRho.h \
+                  SxPAWSet.h \
+                  SxPBExHole.h \
+                  SxPW.h \
+                  SxPWHamiltonian.h \
+                  SxPWOverlap.h \
+                  SxPWSet.h \
+                  SxPartialWaveBasis.h \
+                  SxPerturbK.h \
+                  SxPreconditioner.h \
+                  SxProjector.h \
+                  SxPseudoPot.h \
+                  SxPsiSet.h \
+                  SxQuantumNumbers.h \
+                  SxRBasis.h \
+                  SxRSProj.h \
+                  SxRadBasis.h \
+                  SxRadGBasis.h \
+                  SxRadMat.h \
+                  SxRadRBasis.h \
+                  SxRadialAtom.h \
+                  SxRadialMesh.h \
+                  SxRho.h \
+                  SxRhoFilter.h \
+                  SxRhoMixer.h \
+                  SxSpaceSeparator.h \
+                  SxSpectrum.h \
+                  SxSpinConstraint.h \
+                  SxStars.h \
+                  SxStrain.h \
+                  SxTBAtomAtom.h \
+                  SxTBHamSolver.h \
+                  SxTBSpecies.h \
+                  SxTypes.h \
+                  SxXC.h \
+                  SxXCFunctional.h
+
+lib_LTLIBRARIES       = libsxdft.la
+libsxdft_la_SOURCES  = $(AUX_SRC)
+libsxdft_la_SOURCES += SxAOBasis.cpp \
+   SxAtomicOrbitals.cpp \
+   SxAtomicOrbitalsG.cpp \
+   SxAtomicOrbitalsR.cpp \
+   SxBlockDensityMatrix.cpp \
+   SxDefectAlignUtil.cpp \
+   SxDensity.cpp \
+   SxDFTBFilesReader.cpp \
+   SxDipoleCorrZ.cpp \
+   SxEESGProj.cpp \
+   SxFermi.cpp \
+   SxFourierInterpol.cpp \
+   SxGauss.cpp \
+   SxGBasis.cpp \
+   SxGkBasis.cpp \
+   SxHamiltonian.cpp \
+   SxHamInit.cpp \
+   SxHamSolver.cpp \
+   SxHubbardMO.cpp \
+   SxHubbardU.cpp \
+   SxInitKP.cpp \
+   SxInitPAW.cpp \
+   SxInitPW.cpp \
+   SxKdotP.cpp \
+   SxKdotP8x8.cpp \
+   SxKFinDiffs.cpp \
+   SxKGrid.cpp \
+   SxKPoints.cpp \
+   SxLatticeShells.cpp \
+   SxLocpot.cpp \
+   SxMuPW.cpp \
+   SxPartialWaveBasis.cpp \
+   SxPAWBasis.cpp \
+   SxPAWExchange.cpp \
+   SxPAWHamiltonian.cpp \
+   SxPAWOverlap.cpp \
+   SxPAWPot.cpp \
+   SxPAWRho.cpp \
+   SxPAWSet.cpp \
+   SxPBExHole.cpp \
+   SxPerturbK.cpp \
+   SxPreconditioner.cpp \
+   SxPseudoPot.cpp \
+   SxPW.cpp \
+   SxPWHamiltonian.cpp \
+   SxPWOverlap.cpp \
+   SxPWSet.cpp \
+   SxRadBasis.cpp \
+   SxRadGBasis.cpp \
+   SxRadialAtom.cpp \
+   SxRadMat.cpp \
+   SxRadRBasis.cpp \
+   SxRBasis.cpp \
+   SxRho.cpp \
+   SxRhoFilter.cpp \
+   SxRhoMixer.cpp \
+   SxRSProj.cpp \
+   SxSpaceSeparator.cpp \
+   SxSpectrum.cpp \
+   SxSpinConstraint.cpp \
+   SxStars.cpp \
+   SxStrain.cpp \
+   SxTBAtomAtom.cpp \
+   SxTBHamSolver.cpp \
+   SxTBSpecies.cpp \
+   SxXC.cpp \
+   SxXCFunctional.cpp
+
+libsxdft_la_LIBADD   = $(SXIMPORTLIBS)
+libsxdft_la_LIBADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+libsxdft_la_LIBADD  += $(SXIMPORTOBJS)
+libsxdft_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxdft_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/geom -I$(top_srcdir)/geom
+AM_CPPFLAGS += -I$(top_builddir)/dirac -I$(top_srcdir)/dirac
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/io
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/io
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/fs
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/ipc
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/math
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/util
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/util
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/nonstd
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/mpi
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/mpi
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

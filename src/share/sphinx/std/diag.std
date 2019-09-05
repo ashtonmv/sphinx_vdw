@@ -1,0 +1,16 @@
+directDiag             { type="group"; optional;
+   maxSteps            { type="int"; min=1; optional; xor="exx,maxSteps"; }
+   printSteps          { type="int"; min=1; optional; xor="exx,printSteps"; }
+   dEnergy             { type="real"; min=0; optional; xor="exx,dEnergy"; }
+   exx                 { type="flag"; optional; xor="exx,maxSteps";
+                                                xor="exx,dEnergy"; }
+   noRhoStorage        { type="flag"; optional; }
+   noWavesStorage      { type="flag"; optional; }
+   keepOccFixed        { type="flag"; optional; }
+   rhoMixing           { type="real"; min=0; max=1; }
+   spinMixing          { type="real"; min=0; max=1; optional; }
+   mixingMethod        { type="int"; min=0; }
+   nPulaySteps         { type="int"; min=0; optional; }
+   kerkerScaling       { type="real"; min=0; max=1; optional; }
+   kerkerDamping       { type="real"; min=0; max=1; optional; }
+}

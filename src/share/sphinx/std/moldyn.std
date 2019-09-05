@@ -1,0 +1,102 @@
+molDyn                    { type="group"; optional;
+   initHistory            { type="group"; optional;
+      file         { type="string"; 
+                            xor ="file,randomVel,devAtoms"; }
+      randomVel           { type="group"; 
+                            xor ="file,randomVel,devAtoms";
+         seed             { type="int"; optional; }
+         noRandom         { type="bool"; optional; }
+         initEkin         { type="real"; xor="initEkin,fromTemperature"; }
+         fromTemperature  { type="flag"; xor="initEkin,fromTemperature"; }
+         initStructure    { type="group"; optional;
+            file { type="string"; }
+         }
+			
+         initHessian      { type="group"; optional;
+            initIdentity      { type="real";   xor="initIdentity,file"; }
+            file   { type="string"; xor="initIdentity,file"; }
+         }
+         
+         gas              { type="string"; }
+      }
+      devAtoms            { type="group";
+                            xor ="file,randomVel,devAtoms";
+         deltaE           { type="real"; min=0.; max=0.05; }
+         initStructure    { type="group";
+            file { type="string";}
+         }
+         initHessian      { type="group"; optional;
+            fromInit      { type="flag";   xor="fromInit,file"; }
+            file   { type="string"; xor="fromInit,file"; }
+         }
+         dof              { type="int"; }
+         gas              { type="string"; }
+      }
+   }
+	
+   thermostat             { type="group"; optional;
+      mass                { type="real"; xor="mass,rescale,gammaLD"; }
+      scheme              { type="string"; optional;  }
+      gammaLD             { type="real"; xor="mass,gammaLD,rescale"; }
+		temperature         { type="real"; xor="temperature,rescale,annealing"; }
+		rescale             { type="flag"; xor="temperature,rescale,annealing";
+	                                      xor="mass,rescale,gammaLD";	}
+		annealing {
+			type="group"; xor="temperature,rescale,annealing";
+			startTemp {type="real"; }
+			endTemp {type="real"; }
+			tempSteps {type="int";}
+			increment {type="string";}
+		}
+
+        harmonicEquSteps  { type="int"; optional;}
+
+   }
+	
+   integrator             { type="group";
+      scheme              { type="string"; }
+      order               { type="int"; optional; }
+      dt                  { type="real"; }
+      timeSteps           { type="int"; }
+   }
+   performance            { type="group"; optional;
+      freezeMode           { 
+         type="string"; type="enum";val="z,xyz,notr,trans"; 
+      }
+      extrapolateWaves    { type="flag"; optional; }
+      restart    { type="flag"; optional; }
+      constraints         { type="matrix"; dims=[3,3]; optional; }
+   }
+	perturbation            { type="group"; optional;
+		gas                 { type="string";}
+	 	dof                 { type="int"; }
+		interval            { type="int"; }
+	}
+   output                 { type="group"; optional;
+      saveWaves           { type="int"; optional; }
+		saveHistory         { type="bool"; optional;}
+                printSteps          { type="int"; optional;}
+                saveRestartInfo     { type="bool"; optional;}
+      printGFS { type = "group"; optional;
+         printSteps { type="int"; }
+         inSections { type="flag"; optional;}
+      }
+      printHessian { type = "group"; optional;
+         printSteps { type="int"; }
+         inSections { type="flag"; optional;}
+      }
+
+   }
+
+   include <std/elmin.std>;
+	bornOppenheimer { type="group";optional;
+      include <std/elmin.std>;
+   }
+
+   guessedPotential {
+      type = "group"; optional;
+      lambda { type = "real"; optional;}
+      include <std/taylorExpPotential.std>;
+   }
+}
+

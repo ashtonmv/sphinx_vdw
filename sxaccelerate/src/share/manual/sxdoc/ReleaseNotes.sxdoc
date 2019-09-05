@@ -1,0 +1,459 @@
+h1. Release Notes
+
+h2. SxAccelerate 2.10
+
+p1. With SxAccelerate 2.10 the new parser framework @SxParserKit@ is introduced
+    to SxAccelerate simplifying the development of data and language
+    parsers.
+
+p1. As of 2.10 a new version workflow is being introduced to SxAccelerate.
+    New features can be marked as _experimental_. As experimental features have
+    not yet matured, their API is still under development. As a consequence
+    patches can change corresponding API function calls in order to decrease
+    development cycles.
+
+h2. SxAccelerate 2.10.0
+
+p1. The following modifications are shipped with 2.10.0:
+
+    * @SxException@ uses @SxString@ now instead of @char \*@ allowing for
+      Unicoce characters in exception messages
+    * @SxSystemThread@ can be constructed from a lambda function now to avoid
+      the cumbersome creation of classes derived from @SxSystemThread@ in
+      case of very simple tasks.
+    * @SxRegex@ supports the @D@ flag now (dollar end only)
+    * @SxFileIO::write@ silently ignores write requests of empty container data
+    * @SxThreadPool::waitAll@ waits until all threads in pool have finished
+    * @SxArray::join@ concatenates arrays into a new array
+    * obsolete functions @SxString::read@ and @SxString::write@ have been
+      removed. Use @SxFileIO@ as introduced in 2.8 instead.
+
+p1. Experimental features:
+
+    * Parser Kit: framework for rapid development of language parsers
+    * JSON parser @SxJSONParser@
+    * Event bus system: @SxEventBus@
+    * N-API support allowing for seamless integration of SxAccelerate into
+      node.js
+
+
+p1. Besides the above mentioned changes 2.10 also introduces the following
+    fixes:
+
+    * remove obsolete @util/SxCalc.\*@
+    * made the internal reference counter of @SxPtr<T>@ thread-safe
+    * removed plenty of clang compiler warnings on MacOS
+    * fixed warnings arising from static code analysis
+
+
+h2. SxAccelerate 2.9
+
+p1. With the 2.9 branch a new event system @SxEventBus@ and @SxEventListener@
+    is introduced.
+
+h3. SxAccelerate 2.9.1
+
+p1. The 2.9.1 incorporates the hotfix of SxAccelerate 2.8.2
+
+h3. SxAccelerate 2.9.0
+
+p1. The initial version of the 2.9 branch provides a basic event bus and
+    fixes the elevation level of child processes launched with @SxProcess@.
+
+
+h2. SxAccelerate 2.8
+
+p1. The main focus of the 2.8 branch is the introduction of queries, 
+    selections, and set operations to SxAccelerate's containers.
+
+h3. SxAccelerate 2.8.2
+
+p1. This release fixes a bug which caused a miscalculated file size in
+    @SxFileIO@. It also introduces checks for working with update mode in
+    the @SxFileIO@.
+
+h3. SxAccelerate 2.8.1
+
+p1. This bug fix release solves a few minor compiler issues and fixes a
+    potential raise condition in @SxProcess::isRunning()@.
+
+h3. SxAccelerate 2.8.0
+
+p1. This version comes with the following modifications:
+
+    * Introduction of graph queries (@graph/SxGQ\*@, @SxN@).
+    * Modified API in @SxFileIO:read@ and @SxFileIO::write@ allowing
+      to also read from / write to the entire file by not providing 
+      the optional argument @nBytes@:
+
+      old := @SxFileIO::read (SxString \*);@
+      new := @SxFileIO::read (SxString \*, int64\_t nBytes=-1);@
+
+
+      old := @SxFileIO::write (const SxString &);@
+      new := @SxFileIO::write (const SxString &, int64\_t nBytes=-1);@
+
+    * @SxFileIO@ provides a new switch to control its buffering behavior.
+    * The formally global @SxThreadPool@ has been redesigned to allow
+      for multiple thread pool instances. The @::getGlobalObj@ function
+      has been removed.
+    * All SxAccelerate containers support initializer lists now. See
+      also the update chapter about containers.
+    * New function @SxTime::getEpoch@ returns number of second 
+      since 01/01/1970.
+    * Removed obsolete @SxTraceLog@ as well as related macros 
+      @SX\_TRACE\_D@ and @SX\_LOG{VDIWE}@
+    * @SxProcess::setHiddenWindow@ is a new Windows-only function to
+      avoid popping up the command prompt terminal
+    * Obsolete MSVC compiler flags have been updated
+
+h2. SxAccelerate 2.7
+
+p1. This branch improves the support of Unicode in SxAccelerate.
+    In particular, the @fs@ layer can now handle filenames containing
+    Unicode characters. Furthermore, logging has been improved.
+
+h3. SxAccelerate 2.7.3
+
+p1. This version fixes:
+
+   * the exception handling of @SxThreadPool@
+   * working SxFSAction on empty drives
+
+h3. SxAccelerate 2.7.2
+
+p1. This version fixes missing @wchar\_t@ to @uint16\_t@ migration on
+    Windows in the @fs/@ layer.
+
+h3. SxAccelerate 2.7.1
+
+p1. In 2.7.1 the UTF16 related function calls of @SxString@ if been slightly 
+    modified. The previously applied @wchar\_t@ was expected to be 2 bytes long
+    which is not true on Linux and MacOS systems. All @wchar\_t@ occurrences
+    have been replaced with @uint16\_t@.
+
+h3. SxAccelerate 2.7.0
+
+p1. Changes to the containers of SxAccelerate:
+
+    * new @SxGraph@ container class
+    * *Containers and iterators:*
+      @.append@, @.insert@, @.prepend@ return an iterator to the newly created
+      element instead of the container itself. All iterators provide convenient
+      functions for @.append@, @.insert@, and @.prepend@ in order to continue
+      supporting function chaining.
+
+p1. In SxFS layer has been upgraded to fully support Unicode filenames now.
+    That is, in particular, the public interface to SxFS, namely
+
+    * @SxFSAction@
+    * @SxFile@
+    * @SxDir@
+    * @SxFileInfo@
+
+p1. @SxFileIO::readRaw@ and @SxFileIO::writeRaw@ have been renamed to
+    @SxFileIO::readBuffer@ and @SxFileIO::writeBuffer@, respectively.
+
+p1. Changes related to logging and debugging
+
+    * new vim syntax file @sxlog.vim@ allowing for folding debug output
+    * call stacks can now also be printed on MacOS using @lldb@
+    * improvement of the signal-slot mechanism
+    * the @dbgMsg@ string of @SX\_TRACE(dbgMsg)@ is now shown behind the BEGIN
+      and END tag on the same output line
+
+p1. The @SxString::findLast@ function call has been changed. Before the search
+    started from the first character, or the specified character index, if it
+    was set, until it found the last instance of the string. Now the search
+    begins from last character, or the specified character index, if it is set,
+    until it finds the first instance of target string.
+
+    old := @ssize_t SxString::findLast (const SxString &str, ssize_t fromIdx);@
+    new := @ssize_t SxString::findLast (const SxString &str, ssize_t toChdx);@
+
+    old := @ssize_t SxString::findLast (const char \*str, ssize_t fromIdx);@
+    new := @ssize_t SxString::findLast (const char \*str, ssize_t toIdx);@
+
+p1. A new environment variable called @SX\_DEBUG\_COMP@ has been introduced
+    which allows to selectively enable the debug output for given list of
+    components.
+
+p1. The following environment variables have been renamed:
+
+    old := @SX\_DEBUG\_FUNCTION@
+    new := @SX\_DEBUG\_FUNC@
+
+h2. SxAccelerate 2.6
+
+p1. With the 2.6 version a new graph container @SxGraph@ is introduced into the
+    framework. Most of the existing containers will follow the API concepts
+    of @SxGraph@, in particular, dereferencing elements as well as the iterator
+    usage.
+
+p1. The development of the 2.6 branch also prepares the upcoming mobile support
+    of @SxAccelerate@. On mobile devices output on @stdout@/@sterr@ and
+    input via @stdin@ makes not much sense as on non-jailbroken devices a
+    terminal does not exist. Hence, support of @cout@ and @cerr@ has been
+    widely replaced with the new logging mechanism. It can be invoked using
+    the new macro @SX\_LOG@. Printing with @cout@ may yield scrambled output
+    when printed from different threads simultaneously. This is mainly
+    a problem on Windows. The macro @SX\_LOG@ ensures serializes its output
+    on all platforms.
+
+
+h3. SxAccelerate 2.6.0
+
+p1. The following changes have been introduced with the 2.6.0 version:
+
+* *@configure@*:
+    The new @SX\_LOG@ macro is enabled by default. For high-performance
+    applications (such as S/PHI/nX) when logging cannot be afforded
+    disable the new feature when configuring @SxAccelerate@ by providing
+    the optional @configure@ command line option @--disable-logging@.
+* *@SxFileIO:@*
+    The read function takes pointers rather than non-const references as
+    output argument.
+* *@SxCLI@:*
+    The command line parser @SxCLI@ provides a new default option for 
+    all executables: @--log-component@. Add a comma separated list of
+    components, i.e., shared library names, which should be included in
+    the log.
+* *@SxFOO::print@*:
+    The @print()@ functions used for debugging and printing an object's state
+    to @stdout@ or @stderr@ have been widely replaced with overwriting
+    @operator<< (ostream)@.
+* *@Makefile.am@*:
+    In all @Makefile.am@ files a new top-level variable
+    @NAME\_HASH@ has to be defined. For all shared objects please compute
+    the hash by invoking @sxloghash --id libname@ with @libname@ being
+    the string defined in variable @NAME@, for example @sxutil@, @sxipc@
+    and so on. For all folders containing executables the logging
+    should be switched on by default. In this case provide 0 as hash
+    value: @NAME\_HASH = 0@.
+* *@configure.ac@* / Clang support
+    The configure script is now scanning also for @clang@ and @clang++@.
+    Furthermore, warnings issued by Clang have been fixed.
+* *Mobile support*:
+    A new chapter about cross-compiling for Android and iOS devices has been
+    added.
+
+p1. The function *SxString::getLogo* has been removed as it is better placed
+    in the S/PHI/nX project itself.
+
+h2. SxAccelerate 2.5
+
+p1. The 2.5 branch improves the performance of common containers by implementing
+    move semantics. The move constructors/assignment operators are implemented
+    to be able to take advantage of r-value references, hence avoid excessive
+    creation of temporary variables.
+
+h3. SxAccelerate 2.5.3
+
+p1. All iterators have been extended to support move semantics as well.
+    The handling of class hierarchies with @SxPtr<T>@ has been improved.
+
+h3. SxAccelerate 2.5.2
+
+p1. The 2.5.2 version is a fix addressing the removal of the experimental
+    mobile support of SxAccelerate.
+
+h3. SxAccelerate 2.5.1
+
+p1. The 2.5.1 version provides a set of minor bug fixes. In particular,
+    @SxPtr<T>@ has been fixed with respect to a wrong pointer size when
+    using complex setups such as pointer to virtual member functions etc.
+
+h3. SxAccelerate 2.5.0
+
+p1. This version provides move constructors and assignment operators for the
+    common containers. This change provides performance improvements in cases
+    where r-value references are being used for object creation and assignment.
+    The containers that are changed are listed below:
+
+    * @SxArray@
+    * @SxList@
+    * @SxUniqueList@
+    * @SxSortedList@
+    * @SxMap@
+    * @SxString@
+    * @SxBitArray@
+
+p1. The following macros in @SxString@ are renamed to add
+    the @SX\_@ prefix:
+
+    * *Old*: SEPARATOR
+    * *New*: SX\_SEPARATOR
+    * *Old*: CLEARLINE
+    * *New*: SX\_CLEARLINE
+
+p1. Additionally, the following macros in @SxTimer@ are renamed to add
+    the @SX\_@ prefix:
+
+    * *Old*: START\_TIMER
+    * *New*: SX\_START\_TIMER
+    * *Old*: STOP\_TIMER
+    * *New*: SX\_STOP\_TIMER
+    * *Old*: CLOCK
+    * *New*: SX\_CLOCK
+
+p1. On Windows: Fixed a bug in @SxProcess@ suspend / resume mechanism.
+
+h2. SxAccelerate 2.4
+
+p1. The 2.4 branch improves the file I/O operations of @SxAccelerate@. It provides
+    a new low-level API for cross-platform file input/output operations. It provides
+    a general purpose file I/O layer as @SxFileIO@, which supports functions to
+    create, read and write/append a file. The documentation for @SxFileIO@ has also
+    been added.
+
+h3. SxAccelerate 2.4.1
+
+p1. This version provides a quick fix for windows compilation and @SxFileIO@ seek
+    function now requires int64\_t offset.
+
+h3. SxAccelerate 2.4.0
+
+p1. The @SxFileIO@ provides replacement for static file I/O functions of
+    @SxString@ class. These functions replace the original @SxString@
+    file I/O functions.
+
+    * *Old*: void SxString::write (const SxString &filename, int nElems)
+    * *New*: void SxFileIO::write (const SxString &data,
+                                   const SxString &filename, int nElems)
+    * *Old*: void SxString::appendToFile (const SxString &filename)
+    * *New*: void SxFileIO::appendToFile (const SxString &data,
+                                          const SxString &filename)
+    * *Old*: SxString SxString::read (const SxString &filename, int nLines)
+    * *New*: SxArray<char> SxFileIO::readLines (const SxString &filename,
+                                                int64\_t nLines)
+    * *Old*: SxString SxString::readBinary (const SxString &filename,
+                                            ssize\_t nBytes)
+    * *New*: SxArray<char> SxFileIO::readBinary (const SxString &filename,
+                                                 int64\_t nBytes)
+    * *Old*: SxString SxString::readTail (const SxString &filename, int nLines)
+    * *New*: SxArray<char> SxFileIO::readTail (const SxString &filename,
+                                               int64\_t nLines)
+
+p1. Furthermore, the following minor modifications have been introduced:
+
+    * @sx::sort/qsort@ now only accept the lambda function with required signature.
+    * Bug fix for @SxSystemThread@ regarding initialization of @running@ variable.
+    * New chapters on @SxFileIO@, @SxFSAction@, and @SxCLI@ have been added.
+
+h2. SxAccelerate 2.3
+
+p1. The 2.3 branch improves the debug and runtime tracing techniques of
+    SxAccelerate. Similar to call stacks a new SxException stack is provided
+    to keep track of exception contexts in different levels of the class
+    hierarchy.  Furthermore, new debugging techniques of bound pointers and
+    components which utilize the signal/slot of SxAccelerate have been
+    introduced.
+
+h3. SxAccelerate 2.3.1
+
+p1. The 2.3.1 provides minor changes such as:
+
+    * @SxProcess@ can now listen to STDOUT and STDERR individually.
+    * Updated documentation of containers @SxUniqList<T>@ and @SxSortedList<T>@.
+    * Added documentation about string handling, i.e., @SxString@, @SxRegex@, and @SxSed@.
+    * New windows build target "Publish" introduced which can be used
+      by derived projects to sign their outputs.
+
+h3. SxAccelerate 2.3.0
+
+p1. API changes of SxException:
+
+    * SxException handling:
+    ** Exception enums have been removed, use exception tags
+    ** @SX\_THROW@ is variadic now with the following calling convention:
+    ** @SX\_THROW(msg)@ - create a standard exception with message string
+    ** @SX\_THROW(e,msg)@ - chaining a new exception with message string
+    ** @SxException::toString (mode)@ prints an exception / exception stack
+    ** @SxException::hasTag@ and @SxException::findTag@ retrieve exception
+       tags
+    * Debug macros:
+    ** @\_\_SX\_FILE\_\_@ has been renamed to @SX\_FILE@
+    ** @\_\_SX\_PRETTY\_FUNCTION\_\_@ has been renamed to @SX\_FUNC@
+    ** new macro @SX\_TAG@ defining file and line number
+    ** @SX\_TRACE@ can now optionally attach a debug tag
+    * @SxBoundPtr<T>@:
+    ** Renamed to @SxFunction<T>@
+    ** Support of lambda functions and functors added
+    ** Debug tags can be attached to identify location of its creation
+    * Signal / Slots:
+    ** @sxconnect@ attaches debug tags to both @SxSignal@ and slots
+    ** Identify which slots are listening to individual signals
+    ** Identify which signal caused the execution of a slot
+
+p1. The documentation has been revised with
+
+    * a new chapter on exceptions and exception stacks,
+    * a documentation of bound pointers and inspecting new debug tags,
+    * a discussion on signal/slots and debugging of component-based program parts, and
+    * improvement of the existing container documentation.
+
+
+h2. SxAccelerate 2.2
+
+p1. The SxAccelerate 2.2 branch focusses on the introduction of general
+    iterators applicable to all relevant SxAccelerate containers. Furthermore,
+    SxAccelerate now supports SxPublisher to generate a manual along with
+    test cases to validate the functionality of the compiled SxAccelerate.
+
+p1. All containers now share a common API interface. Please refer to the new
+    section "Container" in this document.
+
+h3. SxAccelerate 2.2.3
+
+p1. Version 2.2.3 provides minor bug fixes and a change of the
+    container sort API: When providing a lambda function as explicit
+    sort callback both bubble and quick sort now use the same interface.
+
+h3. SxAccelerate 2.2.2
+
+p1. In 2.2.2 iterator directions and the sorting API have been fixed:
+
+    * @sort@ and @qsort@ take valid iterators as input instead of, e.g., @end@
+    * Iterators support directions now, @sx::Forward@ is the default.
+    * Iterator directions can be specified by:
+    ** @container.begin(..., dir)@
+    ** @it.forward()@
+    ** @it.backward()@
+    ** @it.reverse()@
+    * removed const warning in @SxFunctor@
+
+h3. SxAccelerate 2.2.1
+
+p1. The 2.2.1 revision introduces
+
+    * API change: SxArray<T>::sort uses the bubble sort defined in SxAlg.h,
+      call SxArray<T>::qsort for a quick sort.
+    * SxProcess returns correct exit code on Windows now,
+    * consistent iterator API for all containers,
+    * an update to support the latest version of sxpublisher,
+    * a new chapter about the DEBUG mode to the manual,
+    * various bug fixes.
+
+h3. SxAccelerate 2.2.0
+
+p1. This is the initial revision of the 2.2 branch introducing
+
+    * Supporting C++14 standard, in particular
+    ** ranges in for loops
+    ** standard iterators
+    ** lambda functions
+    * New class @SxRange<T>@ to support range-based @for@ loops
+    * Iterators for @SxList<T>@, @SxArray<T>@, and @SxRange<T>@
+    * Improved DEBUG mode which
+    ** prints full call stack on @SX\_EXIT@, @SX\_CHECK@
+    ** variadic @SX\_CHECK@ macro replaces @SX\_CHECK\_VAR@,
+       @SX\_CHECK\_VARS@, and @SX\_CHECK\_3VARS@
+    ** @SX\_BREAK@ can print current call stack when hitting @<t>@ for trace.
+    ** Output of @SX\_DBG\_MSG@ and @SX\_TRACE@ redirected to *stderr* rather
+       than *stdout*
+    * Major clean up of @src/util@
+    * Support of documentation driven development as well as
+      test driven development using SxPublisher.
+    * License changed from BSD to Apache 2.0
+
+

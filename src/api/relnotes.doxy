@@ -1,0 +1,30 @@
+/** \page relnotes                 Release Notes 1.1
+
+  The version 1.1 has been rewritten from scratch. There are multiple changes
+  across the entire code. However, it has been done a great effort to keep
+  the API as close as possible to 1.0.
+
+  \subsection rel                  New features
+
+  - Dirac notation
+  - all classes have the prefix Sx rather than Ng
+  - global objects "structure" and "control" removed
+  - no global "NgFFT" anymore
+  - many new convenient constructors added
+  - better support of symmetric matrices
+  - better runtime performance
+  - improved API documentation:
+      - source code browser
+      - many code examples
+      - developer's tutorial
+  - improved \ref page_debug allows optional \ref page_leak at runtime
+  - \ref page_make
+      - configure script
+      - static and dynamic library support
+      - FORTRAN language support
+  - new \ref page-names
+  - new \ref page_rules
+
+  \author Sixten Boeck
+ 
+ */

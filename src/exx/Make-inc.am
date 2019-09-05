@@ -1,0 +1,35 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxChi0.h SxExx.h SxExxSolver.h SxFockGk.h SxFockTimer.h SxRhoIndG.h SxRhoMixerG.h SxSymFockGk.h
+
+
+lib_LTLIBRARIES       = libsxexx.la
+libsxexx_la_SOURCES  = $(AUX_SRC)
+libsxexx_la_SOURCES += SxChi0.cpp SxExx.cpp SxExxSolver.cpp SxFockGk.cpp SxRhoIndG.cpp SxRhoMixerG.cpp SxSymFockGk.cpp 
+libsxexx_la_LIBADD   = $(SXIMPORTLIBS)
+libsxexx_la_LIBADD  += 
+libsxexx_la_LIBADD  += $(SXIMPORTOBJS)
+libsxexx_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxexx_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/dft -I$(top_srcdir)/dft
+AM_CPPFLAGS += -I$(top_builddir)/geom -I$(top_srcdir)/geom
+AM_CPPFLAGS += -I$(top_builddir)/dirac -I$(top_srcdir)/dirac
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/io
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/io
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/ipc
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/fs
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/math
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/util
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/util
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/nonstd
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/mpi
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/mpi
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

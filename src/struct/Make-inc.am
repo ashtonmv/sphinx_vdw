@@ -1,0 +1,66 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxDriftFilter.h \
+                  SxFrozenPhonon.h \
+                  SxHarmApprox.h \
+                  SxHarmonicPotential.h \
+                  SxHessian.h \
+                  SxHessianOps.h \
+                  SxLineFilter.h \
+                  SxMolDyn.h \
+                  SxRedundantCoords.h \
+                  SxSecondaryStructure.h \
+                  SxStickyFilter.h \
+                  SxStruct.h \
+                  SxStructOpt.h \
+                  SxSynchronousTransit.h \
+                  SxThermodynamics.h \
+                  SxTimeCorr.h \
+                  SxTrajectory.h
+
+lib_LTLIBRARIES       = libsxstruct.la
+libsxstruct_la_SOURCES  = $(AUX_SRC)
+libsxstruct_la_SOURCES += SxFrozenPhonon.cpp \
+   SxHarmApprox.cpp \
+   SxHarmonicPotential.cpp \
+   SxHessian.cpp \
+   SxHessianOps.cpp \
+   SxLineFilter.cpp \
+   SxMolDyn.cpp \
+   SxRedundantCoords.cpp \
+   SxSecondaryStructure.cpp \
+   SxStickyFilter.cpp \
+   SxStructOpt.cpp \
+   SxSynchronousTransit.cpp \
+   SxThermodynamics.cpp \
+   SxTimeCorr.cpp \
+   SxTrajectory.cpp
+
+libsxstruct_la_LIBADD   = $(SXIMPORTLIBS)
+libsxstruct_la_LIBADD  += 
+libsxstruct_la_LIBADD  += $(SXIMPORTOBJS)
+libsxstruct_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxstruct_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/dft -I$(top_srcdir)/dft
+AM_CPPFLAGS += -I$(top_builddir)/classic -I$(top_srcdir)/classic
+AM_CPPFLAGS += -I$(top_builddir)/geom -I$(top_srcdir)/geom
+AM_CPPFLAGS += -I$(top_builddir)/dirac -I$(top_srcdir)/dirac
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/io
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/io
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/ipc
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/fs
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/math
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/util
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/util
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/nonstd
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/mpi
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/mpi
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

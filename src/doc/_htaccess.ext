@@ -1,0 +1,6 @@
+AuthName "S/PHI/nX"
+AuthType Basic
+AuthUserFile /home/boeck/sfhingx.upb.de/.auth/auth.sfhingx
+
+require valid-user
+

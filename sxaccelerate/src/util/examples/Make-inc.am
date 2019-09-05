@@ -1,0 +1,77 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = sxalg sxautoptr sxboundptr sxhashfunction sxlistnarray sxmetadata sxsigslots sxstrings sxtree 
+
+sxalg_SOURCES   = $(AUX_SRC)
+sxalg_SOURCES  += sxalg.cpp
+sxalg_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxalg_LDADD     =  $(SXIMPORTLIBS)
+sxalg_LDADD    +=  
+sxalg_LDADD    +=  $(SXIMPORTOBJS)
+
+sxautoptr_SOURCES   = $(AUX_SRC)
+sxautoptr_SOURCES  += sxautoptr.cpp
+sxautoptr_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxautoptr_LDADD     =  $(SXIMPORTLIBS)
+sxautoptr_LDADD    +=  
+sxautoptr_LDADD    +=  $(SXIMPORTOBJS)
+
+sxboundptr_SOURCES   = $(AUX_SRC)
+sxboundptr_SOURCES  += sxboundptr.cpp
+sxboundptr_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxboundptr_LDADD     =  $(SXIMPORTLIBS)
+sxboundptr_LDADD    +=  
+sxboundptr_LDADD    +=  $(SXIMPORTOBJS)
+
+sxhashfunction_SOURCES   = $(AUX_SRC)
+sxhashfunction_SOURCES  += sxhashfunction.cpp
+sxhashfunction_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxhashfunction_LDADD     =  $(SXIMPORTLIBS)
+sxhashfunction_LDADD    +=  
+sxhashfunction_LDADD    +=  $(SXIMPORTOBJS)
+
+sxlistnarray_SOURCES   = $(AUX_SRC)
+sxlistnarray_SOURCES  += sxlistnarray.cpp
+sxlistnarray_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxlistnarray_LDADD     =  $(SXIMPORTLIBS)
+sxlistnarray_LDADD    +=  
+sxlistnarray_LDADD    +=  $(SXIMPORTOBJS)
+
+sxmetadata_SOURCES   = $(AUX_SRC)
+sxmetadata_SOURCES  += sxmetadata.cpp
+sxmetadata_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmetadata_LDADD     =  $(SXIMPORTLIBS)
+sxmetadata_LDADD    +=  
+sxmetadata_LDADD    +=  $(SXIMPORTOBJS)
+
+sxsigslots_SOURCES   = $(AUX_SRC)
+sxsigslots_SOURCES  += sxsigslots.cpp
+sxsigslots_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxsigslots_LDADD     =  $(SXIMPORTLIBS)
+sxsigslots_LDADD    +=  
+sxsigslots_LDADD    +=  $(SXIMPORTOBJS)
+
+sxstrings_SOURCES   = $(AUX_SRC)
+sxstrings_SOURCES  += sxstrings.cpp
+sxstrings_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxstrings_LDADD     =  $(SXIMPORTLIBS)
+sxstrings_LDADD    +=  
+sxstrings_LDADD    +=  $(SXIMPORTOBJS)
+
+sxtree_SOURCES   = $(AUX_SRC)
+sxtree_SOURCES  += sxtree.cpp
+sxtree_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxtree_LDADD     =  $(SXIMPORTLIBS)
+sxtree_LDADD    +=  
+sxtree_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

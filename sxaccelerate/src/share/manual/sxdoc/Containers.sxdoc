@@ -1,0 +1,54 @@
+h1. Containers
+
+p1. SxAccelerate provides various container classes to manage memory 
+    dynamically. The provided containers are:
+
+    @SxArray<T>@      := A continuous vector of elements of type @T@. The
+                         elements are stored non-fragmenented in memory. Use
+                         this container for efficient direct access of
+                         individual elements.  Growing / shrinking is rather
+                         inefficient although the resize method is implemented
+                         in terms of memory chunks rather than single elements.
+    @SxList<T>@       := A doubly linked list of elements of type @T@. The 
+                         elements are fragmented in memory. This container is
+                         useful in particular when the data field needs to 
+                         grow / shrink frequently.
+    @SxMap<K,V>@      := A key-value store with keys of type @K@ and values of
+                         type @V@. Direct access is efficient due to a
+                         hashtable-based lookup. In contrast to common
+                         key-value maps, @SxMap@ honours the order in which
+                         keys are stored.  When iterating over all keys the
+                         resulting values are in the original storage order.
+                         Common maps often return an arbitrary / unpredictable
+                         order.
+    @SxSortedList<T>@ := A list container similar to @SxList<T>@ but all values
+                         are stored in a sorted order.
+    @SxUniqueList<T>@ := A list of ensuring all values are unique. Insertion
+                         of elements already existing in the list is silently
+                         ignored.
+ 
+p1. Besides the above mentioned containers SxAccelerate also provides a meta
+    container to create ranges:
+
+    @SxRange<B,E,S>@ := A meta container which generates intervals from begin
+                        @B@ to end @E@ with a step width of @S@. This
+                        container is typically used in order to work with
+                        range-based for loops.
+
+p1. The SxAccelerate containers share a common API:
+
+    @.begin()@        := Return an iterator to the first element.
+    @.end()@          := Return an end iterator.
+    @.contains()@     := Check whether the container provides a specific
+                         element.
+    @.getSize()@      := Return the number of elements stored in the container.
+    @.resize()@       := Grow / shrink the container to the provided number of
+                         elements
+
+p1. The following sections discuss various use cases of the individual
+    container classes.
+
+include <SxList.sxdoc>
+include <SxArray.sxdoc>
+include <SxMap.sxdoc>
+include <SxSelection.sxdoc>

@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <PropertyPageSchema
+      Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml" />
+    <AvailableItemName
+      Include="WinBison">
+      <Targets>_WinBison</Targets>
+    </AvailableItemName>
+  </ItemGroup>
+  <UsingTask
+    TaskName="WinBison"
+    TaskFactory="XamlTaskFactory"
+    AssemblyName="Microsoft.Build.Tasks.v4.0">
+    <Task>$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml</Task>
+  </UsingTask>
+  <Target
+    Name="_WinBison"
+    BeforeTargets="$(WinBisonBeforeTargets)"
+    AfterTargets="$(WinBisonAfterTargets)"
+    Condition="'@(WinBison)' != ''"
+    DependsOnTargets="$(WinBisonDependsOn);ComputeWinBisonOutput"
+    Outputs="%(WinBison.Outputs)"
+    Inputs="%(WinBison.Identity);%(WinBison.AdditionalDependencies);$(MSBuildProjectFile)">
+    <ItemGroup
+      Condition="'@(SelectedFiles)' != ''">
+      <WinBison
+        Remove="@(WinBison)"
+        Condition="'%(Identity)' != '@(SelectedFiles)'" />
+    </ItemGroup>
+    <ItemGroup>
+      <WinBison_tlog
+        Include="%(WinBison.Outputs)"
+        Condition="'%(WinBison.Outputs)' != '' and '%(WinBison.ExcludedFromBuild)' != 'true'">
+        <Source>@(WinBison, '|')</Source>
+      </WinBison_tlog>
+    </ItemGroup>
+    <Message
+      Importance="High"
+      Text="%(WinBison.ExecutionDescription)" />
+    <WriteLinesToFile
+      Condition="'@(WinBison_tlog)' != '' and '%(WinBison_tlog.ExcludedFromBuild)' != 'true'"
+      File="$(ProjectName).write.1.tlog"
+      Lines="^%(WinBison_tlog.Source);@(WinBison_tlog-&gt;'%(Fullpath)')" />
+    <WinBison
+      Condition="'@(WinBison)' != '' and '%(WinBison.ExcludedFromBuild)' != 'true'"
+      CommandLineTemplate="%(WinBison.CommandLineTemplate)"
+      AdditionalOptions="%(WinBison.AdditionalOptions)"
+      Inputs="%(WinBison.Identity)" />
+  </Target>
+  <PropertyGroup>
+    <ComputeLinkInputsTargets>
+            $(ComputeLinkInputsTargets);
+            ComputeWinBisonOutput;
+          </ComputeLinkInputsTargets>
+    <ComputeLibInputsTargets>
+            $(ComputeLibInputsTargets);
+            ComputeWinBisonOutput;
+          </ComputeLibInputsTargets>
+  </PropertyGroup>
+  <Target
+    Name="ComputeWinBisonOutput"
+    Condition="'@(WinBison)' != ''">
+    <ItemGroup>
+      <WinBisonDirsToMake
+        Condition="'@(WinBison)' != '' and '%(WinBison.ExcludedFromBuild)' != 'true'"
+        Include="%(WinBison.Outputs)" />
+      <Link
+        Include="%(WinBisonDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+      <Lib
+        Include="%(WinBisonDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+      <ImpLib
+        Include="%(WinBisonDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+    </ItemGroup>
+    <MakeDir
+      Directories="@(WinBisonDirsToMake-&gt;'%(RootDir)%(Directory)')" />
+  </Target>
+</Project>

@@ -1,0 +1,263 @@
+// ---------------------------------------------------------------------------
+//
+//      The ab-initio based multiscale library
+//
+//                  S / P H I / n X
+//
+//      Copyright:  Max-Planck-Institute for Iron Research
+//                  40237 Duesseldorf, Germany
+//
+//      Contact:    https://sxlib.mpie.de
+//      Authors:    see sphinx/AUTHORS
+//      License:    see sphinx/LICENSE
+//
+// ---------------------------------------------------------------------------
+// Rather strict input file format definitions:
+//    * variables may be defined only in top level node
+//    * k-Points for bandstructures (path through the Brillouin zone) are
+//      expected in cartesion coordinates
+//    * k-Points used in the Monkhorst-Pack folding are expected in 
+//      relative coordinates
+//    * energy-cutoff limited 
+// --------------------------------------------------------------------------
+set validation;
+
+
+topLevelDefs;
+
+// Declare global "skipUnexpectedGroups". See also footer of this file.
+skipUnexpectedGroups;
+
+include <std/structure.std>;
+include <std/taylorExpPotential.std>;
+
+synchronize          { type="group"; maxItems=1; optional;
+   leaveOnRemote     { type="group"; optional;
+      file           { type="string"; }
+   }
+}
+
+include <std/basis.std>;
+
+PWHamiltonian        { type="group"; nItems=1; optional;
+   nEmptyStates      { type="int"; min=0; optional; }
+   nEmptyStatesChi   { type="int"; min=0; optional; }
+   vExt              { type="group"; optional; 
+      file           { type="string"; }
+      actOnNuclei    { type="flag"; optional; }
+   }
+   nExcessElectrons  { type="real"; min=-1000; max=1000; optional; }
+   ekt               { type="real"; min=0; }
+   MethfesselPaxton  { type="int"; min=0; optional; }
+   xc                { type="int"; min=0; max=10; }
+   xcMesh            { type="group"; optional;
+      eCut              { type="real"; min=5; xor="eCut,mesh,meshAccuracy";}
+      mesh              { type="vector"; dim=3; xor="eCut,mesh,meshAccuracy";}
+      meshAccuracy      { type="real"; xor="eCut,mesh,meshAccuracy";}
+   }
+   spinPolarized     { type="flag"; optional; }
+   hContrib          { type="int"; optional; }
+   nlBlockSize       { type="int"; optional; min=1; }
+   dipoleCorrection  { type="flag"; optional; }
+   zField            { type="real"; optional; }
+   nlEES             { type="group"; optional;
+      mesh           { type="vector"; dim=3; optional; }
+      meshAccuracy   { type="real"; min=0.5; optional; }
+      splineOrder    { type="int"; min=2; }
+   }
+   rsProj            { type="group"; optional; xor="nlEES,rsProj";
+      mesh           { type="vector"; dim=3; optional; }
+      meshAccuracy   { type="real"; min=0.5; optional; }
+      beta           { type="real"; min=0.; }
+      rMax           { type="real"; min=1.; optional; }
+      dPhi           { type="real"; min=0.; }
+      dg             { type="real"; min=0.; }
+   }
+}
+
+include <std/kpHamiltonian.std>;
+include <std/strain.std>;
+include <std/kpParameters.std>;
+include <std/materialMap.std>;
+
+KP8x8Hamiltonian     { type="group"; nItems=1; optional;
+   composition       { type="real"; min=0; max=1; optional;}
+   bowing            { type="real"; optional;}
+   ekt               { type="real"; min=0; }
+   nEmptyStates      { deprecate; type="int"; min=0; optional; }
+   AHi               { type="vector"; dim=7; optional; }
+   ALo               { type="vector"; dim=7; optional; }
+   mOHi              { type="real"; optional; }
+   mOLo              { type="real"; optional; }
+   mPHi              { type="real"; optional; }
+   mPLo              { type="real"; optional; }
+   eP1Hi             { type="real"; optional; }
+   eP2Hi             { type="real"; optional; }
+   eP1Lo             { type="real"; optional; }
+   eP2Lo             { type="real"; optional; }   
+   deltaHi           { type="vector"; dim=3; optional; }
+   deltaLo           { type="vector"; dim=3; optional; }
+   luttingerHi       { type="vector"; dim=3; optional; }
+   luttingerLo       { type="vector"; dim=3; optional; }
+   vbOffsetHi        { type="real";}
+   vbOffsetLo        { type="real";}
+   cbOffsetHi        { type="real";}
+   cbOffsetLo        { type="real";}
+   eTrial            { type="real"; optional; }
+   soHi              { type="real"; optional; }
+   soLo              { type="real"; optional; }
+   precondFactor     { type="real"; optional; }
+   cbMassLo          { type="real"; optional; }
+   cbMassHi          { type="real"; optional; }
+   ePHi              { type="real"; optional; }
+   ePLo              { type="real"; optional; }
+   electrons         { type="flag"; optional;}
+   bandstructure     { type="flag"; optional;}   
+   position          { type="vector"; dim=3; optional; }
+   vExt              { type="group"; 
+                       file { type="string"; }
+		     }
+		     
+   strain            { type="group"; optional;
+      factor         { type="real"; }
+      aHi            { type="vector"; dim=2; optional; }
+      aLo            { type="vector"; dim=2; optional; }
+      DHi            { type="vector"; dim=6; optional; }
+      DLo            { type="vector"; dim=6; optional; }
+      sigmaXX        { type="string"; }
+      sigmaXY        { type="string"; }
+      sigmaXZ        { type="string"; }
+      sigmaYY        { type="string"; }
+      sigmaYZ        { type="string"; }
+      sigmaZZ        { type="string"; }
+      acHi           { type="real"; optional;}
+      avHi           { type="real"; optional;}
+      bHi            { type="real"; optional;}
+      dHi            { type="real"; optional;}
+      acLo           { type="real"; optional;}
+      avLo           { type="real"; optional;}
+      bLo            { type="real"; optional;}
+      dLo            { type="real"; optional;}
+   }
+   externalField     { type="group"; optional;
+      file           { type="string"; }
+   }
+   peField           { type="group"; optional;
+      file           { type="string"; }
+		     }
+
+}
+
+
+StilWeb              { type="group"; nItems=1; optional;
+   // empty
+}
+
+initialGuess         { type="group"; nItems=1; optional;
+                       xor="initialGuess,tbInitialGuess,forstDB,stilWeb,eamPot,taylorExpPotential"; 
+   waves             { type="group"; nItems=1; optional;
+      random         { type="flag";            xor="file,random,lcao"; }
+      file           { type="string";          xor="file,random,lcao"; }
+      lcao           { type="group"; nItems=1; xor="file,random,lcao";
+         maxSteps    { type="int"; min=1; }
+         rhoMixing   { type="real"; min=0; max=1; }
+         foccMixing  { type="real"; min=0.; max=1.; optional; }
+         file        { type="string"; optional; }
+      }             
+      keepWavesOnDisk { type="flag"; optional; }
+   }                 
+   rho               { type="group"; nItems=1; optional;
+      file           { type="string"; 
+                       xor="file,atomicOrbitals,fromWaves,random"; }
+      atomicOrbitals { type="flag";  
+                       xor="file,atomicOrbitals,fromWaves,random"; }
+      fromWaves      { type="flag";  
+                       xor="file,atomicOrbitals,fromWaves,random"; }
+      random         { type="flag";  
+                       xor="file,atomicOrbitals,fromWaves,random";}                 
+      spinMoment     { type="real"; min=-100; max=100; optional; 
+                       and="atomicOrbitals"; }
+      charged { type="group"; optional;
+         charge { type="real"; }
+         beta   { type="real"; optional; }
+         z      { type="real"; xor="z,coords"; }
+         coords { type="vector"; dim=3; xor="z,coords"; }
+      }
+   }
+   xcPotential        { type="group"; nItems=1; optional;
+      file           { type="string";          xor="file,compute"; }
+      compute        { type="group"; nItems=1; xor="file,compute";
+         xc          { type="int"; min=0; max=2; }
+      }
+   }
+   ekt               { type="real"; min=0; max=5; optional; }
+   occupations { type="group"; nItems=1; optional;
+      values { type="vector"; xor="kPoints,spin,bands"; }
+      kPoints { type="group"; xor="kPoints,values"; optional;
+         range  { type="vector"; nItems=1; xor="values,range"; }
+         values { type="vector"; nItems=1; xor="values,range"; }
+         spin { type="group"; optional;
+            range  { type="vector"; nItems=1; xor="values,range"; }
+            values { type="vector"; nItems=1; xor="values,range"; }
+            bands { type="group";
+               range  { type="vector"; nItems=1; xor="values,range"; }
+               values { type="vector"; nItems=1; xor="values,range"; }
+               focc { type="real"; nItems=1; min=0.; max=2.; }
+            }
+         }
+         bands { type="group"; optional;
+            // all spins
+            range  { type="vector"; nItems=1; xor="values,range"; }
+            values { type="vector"; nItems=1; xor="values,range"; }
+            focc { type="real"; nItems=1; min=0.; max=2.; }
+         }
+      }
+      spin { type="group"; xor="values,spin"; optional;
+         range  { type="vector"; nItems=1; xor="values,range"; }
+         values { type="vector"; nItems=1; xor="values,range"; }
+         bands { type="group";
+            range  { type="vector"; nItems=1; xor="values,range"; }
+            values { type="vector"; nItems=1; xor="values,range"; }
+            focc { type="real"; nItems=1; min=0.; max=2.; }
+         }
+      }
+      bands { type="group"; xor="values,bands"; optional;
+         // all spins
+         range  { type="vector"; nItems=1; xor="values,range"; }
+         values { type="vector"; nItems=1; xor="values,range"; }
+         focc { type="real"; nItems=1; min=0.; max=2.; }
+      }
+   }
+
+}                
+
+tbInitialGuess       { type="group"; nItems=1; xor="initialGuess,tbInitialGuess,forstDB,stilWeb,eamPot,taylorExpPotential";
+   withoutERepulsive { type="flag"; optional;}
+      rhoFile        { type="string"; optional; } 
+}
+
+include <std/vdwCorrection.std>;
+main                 { type="group"; nItems=1;
+   Hirshfeld { type="flag"; optional; }
+   include <std/eam.std>;
+   include <std/elmin.std>;
+   include <std/gsexx.std>;
+   include <std/stexx.std>;
+   include <std/odp.std>;
+   include <std/qn.std>;
+   include <std/linqn.std>;
+   include <std/ricqn.std>;
+   include <std/moldyn.std>;
+   include <std/frozenPhonon.std>;
+   include <std/hSqrCG.std>;
+   include <std/diffEqtn.std>;
+   include <std/extControl.std>;
+   evalForces { type="group"; optional;
+      file { type="string"; optional; }
+   }
+}
+
+
+
+// --- Put value back to false. It might have been overwriten by included stds.
+skipUnexpectedGroups = false;

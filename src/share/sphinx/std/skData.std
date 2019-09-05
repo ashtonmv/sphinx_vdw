@@ -1,0 +1,22 @@
+skData              { type="group"; maxItems=1; optional; 
+  species           { type="group"; minItems=1; 
+     name           { type="string"; optional; }
+     element        { type="string"; }
+     skElementName  { type="string"; optional;}
+     valenceCharge  { type="real"; min=0; max=104; }
+     lMax           { type="int"; min=0; max=3; }
+     //atomicRhoOcc   { type="list"; minRank=0; maxRank=2; }
+     reciprocalMass { type="real"; min=0; }
+     dampingMass    { type="real"; min=0; }
+     ionicMass      { type="real"; min=0; }
+  }
+  skFilesPath       { type="string"; }
+  /*
+     skFilesFormat
+     1 = Frauenheim file format
+     2 = S/PHI/nX file format
+  */   
+  skFilesFormat     { type="int"; min=1; max=2; optional;}
+}
+
+

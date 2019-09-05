@@ -1,0 +1,120 @@
+#!/bin/bash
+
+if test -f Makefile; then :; else
+   if test -x "./setup"; then
+      echo "sxmake: Preparing autoconf"
+      ./setup
+      exit 0
+   else
+      echo "sxmake: Makefile not found in current directory."
+      exit 1
+   fi
+fi
+
+MAKE=make
+SEP="+--------------------------------------"
+SEP="${SEP}---------------------------------------"
+
+terminate()
+{
+   echo
+   echo $SEP
+   echo "| Compilation stopped due to user request."
+   echo $SEP
+   exit 127
+}
+trap "terminate" INT
+trap "terminate" TERM
+
+if test "$1" != "--report-only"; then
+   rm MAKE.log 2>/dev/null
+
+   set -o pipefail
+   ${MAKE} "$@" 2>&1 | tee MAKE.log 
+
+   status=$?
+
+   if test $status -ne 0; then
+      echo $SEP
+      echo "| Compilation error(s) occurred!"
+      echo $SEP
+      cat MAKE.log | grep error
+      echo
+      echo "PLEASE INSPECT MAKE.log"
+      exit $status
+   fi
+fi
+
+grep warning MAKE.log | sort -t: -k1,1 -k2,2g | uniq \
+ | sed -e'1i\' -e'--- WARNINGS ---' \
+ | awk -vFS=":" '{if ($1 != x) print ""; print; x=$1}'
+perl -f  - <<'PERLEND'
+sub fileNotFound();
+
+my $format = 'gcc';
+my $file;
+my ($dir) = `pwd` =~ /\/([^\/]+)$/; chomp ($dir);
+
+my %counter;
+
+open (FP, "<MAKE.log") || fileNotFound ();
+if ($format eq 'gcc')  {
+   while (<FP>)  {
+
+      # update directory
+      if (m/Entering directory `.*\/([^\/]+)'/)  {
+         $dir = $1;
+      }
+
+      # SxFileName.cpp:125: warning: unused parameter 'abc_'
+      if (/^(.+):\d+.*:\s*warning/)  {
+         $file = $1;
+         # strip line numbers
+         if ($file =~ /:/) { $file = $`; }
+         # strip unnecessary paths
+         if ($file =~ /([^\/]+)\/([^\/]+)$/) { $file = "$1/$2";      }
+         else                                { $file = "$dir/$file"; }
+
+         if (!(exists($counter{$file})))  { $counter{$file} = 0; }
+         $counter{$file}++;
+      }
+   }  
+} else {
+   die "Compiler format not supported.";
+}
+close (FP);
+
+# --- print statistics
+my $SEP="+--------------------------------------"
+       ."---------------------------------------";
+my @files = sort {
+   if ($counter{$a} == $counter{$b})  {
+      return $a cmp $b;
+   } else {
+      return $counter{$a} <=> $counter{$b};
+   }
+} keys %counter;
+if ($#files >= 0)  {
+   print "\n";
+   print "$SEP\n";
+   print "|  Compiler Warnings:\n";
+   print "$SEP\n";
+   foreach $k (@files) {
+      next if ($k =~ /-main.cpp/);
+      printf ("%-50s %d\n", $k.":", $counter{$k});
+   }
+}
+
+
+exit;
+
+sub fileNotFound ()
+{
+   print "MAKE.log not found. Warning statistics not available.\n";
+   exit 0;
+}
+
+PERLEND
+echo $SEP
+echo "| Compilation successfully finished."
+echo $SEP

@@ -1,0 +1,56 @@
+# ----------------------------------------------------------------------------
+#
+#           The general purpose cross platform C/C++ framework
+#
+#                       S x A c c e l e r a t e
+#
+#           Home:       https://www.sxlib.de
+#           License:    Apache 2
+#           Authors:    see src/AUTHORS
+#
+# ----------------------------------------------------------------------------
+# SXBASE/system/make.am.apps
+# ----------------------------------------------------------------------------
+
+## --- define paths
+#SXINCL  = -I$(top_srcdir)/nonstd
+#SXINCL += -I$(top_srcdir)/util -I$(top_builddir)/util
+#SXINCL += -I$(top_srcdir)/math
+#SXINCL += -I$(top_srcdir)/ipc
+#SXINCL += -I$(top_srcdir)/io
+#SXINCL += -I$(top_srcdir)/fs
+#SXINCL += -I$(top_srcdir)/comm
+#SXINCL += -I$(top_srcdir)/dirac
+#SXINCL += -I$(top_srcdir)/geom
+#SXINCL += -I$(top_srcdir)/classic 
+#SXINCL += -I$(top_srcdir)/dft
+#SXINCL += -I$(top_srcdir)/struct
+#SXINCL += -I@NUMLIBS@/include
+#
+AM_CPPFLAGS  += -DSXDATE=`date +%s`
+# done here, since stuff in config header is always from sxbase
+AM_CPPFLAGS  += -DSXPACKAGE='"@PACKAGE_NAME@"'
+AM_CPPFLAGS  += -DSXRELEASE='"@PACKAGE_VERSION@"'
+#AM_CXXFLAGS += $(SXINCL)
+#
+##SXLIBS    = $(top_builddir)/struct/libsxstruct.la
+##SXLIBS   += $(top_builddir)/classic/libsxclassic.la
+##SXLIBS   += $(top_builddir)/dft/libsxdft.la
+##SXLIBS   += $(top_builddir)/geom/libsxgeom.la
+##SXLIBS   += $(top_builddir)/dirac/libsxdirac.la
+##SXLIBS   += $(top_builddir)/io/libsxio.la
+##SXLIBS   += $(top_builddir)/comm/libsxcomm.la
+##SXLIBS   += $(top_builddir)/math/libsxmath.la
+##SXLIBS   += $(top_builddir)/util/libsxutil.la
+#
+#NUMLIBDIR = @NUMLIBS@/lib
+##SXNUMLIBS = @SXNUMLIBS@
+#
+##XTRALIBS  = @XTRALIBS@ @SXFRAMEWORKS@
+#
+##SXLIB_LDFLAGS = @SXLIB_LDFLAGS@
+
+
+.PHONY: distclean
+distclean:
+	rm -f $(bin_PROGRAMS)

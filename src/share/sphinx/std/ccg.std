@@ -1,0 +1,25 @@
+CCG                { type="group"; optional;
+   maxSteps        { type="int"; min=1; optional; }
+   dEnergy         { type="real"; min=0; optional; }
+   dEnergyLow      { type="real"; min=0; optional; }
+   printSteps      { type="int"; min=0; optional; }
+   ekt             { type="real"; min=0; optional; }
+   keepOccFixed    { type="flag"; optional; }
+   noRhoStorage    { type="flag"; optional; }
+   noWavesStorage  { type="flag"; optional; }
+   kappa           { type="real"; optional; }
+   initialDiag     { type="flag"; optional; }
+   finalDiag       { type="flag"; optional; }
+   
+   xcMeshDensity   { type="int"; min=1; max=16; optional; }
+   xcMesh            { type="group"; optional;
+      eCut              { type="real"; min=5; xor="eCut,mesh,meshAccuracy";}
+      mesh              { type="vector"; dim=3; xor="eCut,mesh,meshAccuracy";}
+      meshAccuracy      { type="real"; xor="eCut,mesh,meshAccuracy";}
+   }
+   dipoleCorrection { type="flag"; optional; }
+   
+   testLineMinim   { type="flag"; optional; }
+   testLineStep    { type="real"; optional; }
+   trialStep0      { type="real"; optional; min = 0.; }
+}

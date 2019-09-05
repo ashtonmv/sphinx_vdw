@@ -1,0 +1,14 @@
+2.951    # aLat angstrom
+1.588    # c/a
+4.85     # cohesive energy eV
+1.55     # vacancy formation energy eV
+0        # stress component sigma11
+0        #                  sigma33
+1.0992   # elastic constant C11 eV angstrom^(-3)
+0.5424   #                  C12
+0.4263   #                  C13
+1.1891   #                  C33
+0.3171   #                  C44
+0.2812   #                  C66
+4.173061  # aLat Ang of fcc !
+1.4       # vacancy formation in eV in fcc

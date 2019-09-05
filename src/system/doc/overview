@@ -1,0 +1,70 @@
+This file gives an overview over the internals of the SFHIngX make environment.
+If you do not know much about make, or if you need some specific information,
+try
+
+info make
+
+That gives you very good documentation on make.
+
+Overview:
+* Files in system/
+* The configure/make hierarchy
+
+--------------------------------------------
+
+Files in system/:
+
+Files marked with (GENERATED) must NEVER EVER be edited. Rather edit the
+source and regenerate the file with "configure" (except for configure itself).
+
+* configure        (GENERATED) The real configure script (unreadable)
+* configure.in     source for configure
+* config.status    (GENERATED) configure output script
+* config.cache     generated, though editable: this stores the configure options
+                   in between calls. You can specificially remove single lines
+                   for options that are stored, but shouldn't (like CFLAGS) if 
+                   you want to change only a minor part of the option set. This
+                   is very useful during testing configure. Remove the file to
+                   discard all options from the previous configure.
+* make.conf        (GENERATED) configured system specific flags/vars
+* make.conf.in     source for make.conf.in
+* make.apps        rules for executables (except add-ons/)
+* make.libs        rules for libraries   (and executables in add-ons/ )
+* make.inc         rules not related to compiling/linking
+
+* depend.sh        (GENERATED) generate .d (dependency) files
+* depend.sh.in     source for depend.sh
+* sxallcomplete.sh runs sxcomplete for all add-ons
+* sxextract.sh     tool for extracting embedded example files
+* sxnightly.sh     script for nightly tests on the S/PHI/ngX server
+* sxphpwrap.sh     turns generated .html docu into .php (for web site)
+* sxstrip.sh       remove debugging info from executables
+* sxstylecheck.pl  checks for parts of the style guide
+* sxtee.sh         tool: get exit code AND redirect output
+* sxvimsyntax.sh   generates vim syntax file for source code
+* sxwrapper.sh     (GENERATED) creates wrapper scripts for executables
+* sxwrapper.sh.in  source for sxwrapper
+
+--------------------------------------------
+
+The configure/make hierarchy
+
+This is the basis of all:
+configure.in     --[autoconf]---> configure
+
+See "info autoconf" on how to write configure.in.
+
+Changes in configure.in will in general require some additions here:
+make.conf.in     --[configure]--> make.conf    (compiler and compiler flags)
+SxConfig.h.in    --[configure]--> SxConfig.h   (preparser macros #define)
+
+These two files need to be configured, but are unlikely to change.
+sxwrapper.sh.in  --[configure]--> sxwrapper.sh (needs mode/tracer/debugger)
+depend.sh.in     --[configure]--> depend.sh    (needs compiler)
+
+The files above are all that may contain system-specific stuff. All other
+files must not have it directly (but indirectly via make variables).
+All the compiling/linking/wrapping is then done by make. See the detailed
+information about the make in the other files (TODO: write that)
+
+

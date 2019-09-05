@@ -1,0 +1,44 @@
+#!/bin/sh
+
+OS=`uname`
+GLIBTOOLIZE=`which glibtoolize`
+
+if test x"$OS" = x"Darwin"; then
+   if test -n "${GLIBTOOLIZE}"; then
+      export LIBTOOLIZE=glibtoolize
+   fi
+   autoreconf -vif
+elif test x"$OS" = x"Linux"; then
+   autoreconf -vif
+elif test x"$OS" = x"MINGW32_NT-6.1"; then
+   system/sxdos2unix
+   autoreconf -vif
+else
+   echo "Unknown operating system. Please contact the S/PHI/nX developers."
+   exit -1
+fi
+
+if test $? -ne 0; then
+   echo "ERROR: Could not generate configure environment."
+   exit 1
+fi
+   
+
+echo
+echo "Please invoke \"configure*\" now in order to generate the "
+echo "S/PHI/nX make environment."
+echo 
+echo "Examples:"
+echo "./configure                   compile in debug mode, static linking"
+echo "./configure --disable-debug   compile in release mode, static linking"
+echo "./configure --enable-shared   enable dynamic linking (bad performance!)"
+echo
+
+if test -e $HOME/bin/m; then :; else
+   echo "Info:"
+   echo "   It is recommended to copy system/m to \$HOME/bin"
+   echo "   and invoke 'm' instead of (g)make"
+   echo "   Make sure that \$HOME/bin/m can be found in \$PATH."
+fi
+
+rm -f GNUmakefile

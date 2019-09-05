@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# --- create relationship pairs, e.g.
+#        RELEATE(basis,eCut.h)
+#     means: "basis" is a parent of "eCut"
+rm -f relate.inp
+files=`ls *.h`
+for f in $files; do
+   cpp -w -P -D_FILE=$f -D_GET_GROUPS -include "definitions" $f \
+     | grep RELATE                                              \
+     | tr ','  '\n'                                             \
+     | grep RELATE                                              \
+     | sed s/\ //g                                              \
+     | tr ';'  ','       >>   relate.inp
+done
+
+# --- create list of children for each group
+cpp -w -P -D_MAKE_GROUPS -include "definitions" relate.inp      \
+     | sed s/_/\./g                                             \
+     | sed s/'"'/'\\"'/g     > make-groups.sh  2>/dev/null
+source make-groups.sh
+
+
+# --- check that every group has children (i.e. *.inc files)
+files=`grep -l 'TYPE(group)' *.h`
+for f in $files; do
+   n=`echo $f | sed s/\.h$//g`
+   if ! test -e "$n.inc"; then 
+      echo "ERROR: Group \"$n\" has no children!"
+      exit 1
+   fi
+done;
+
+# --- check that every included group really exists (i.e. has *.h file)
+files=`ls *.inc`
+for f in $files; do
+   n=`echo $f | sed s/\.inc$//g`
+   if ! test -e "$n.h"; then 
+      echo "ERROR: Group \"$n\" is not defined!"
+      echo "       Requested by:"
+      cat $f | sed s/include//g | sed s/'"'//g | sed s/\#/"       -"/g
+      exit 1
+   fi
+done;
+
+# --- create working files
+mkdir -p work
+files=`ls *.h`
+for f in $files; do
+   n=`echo $f | sed s/\.h$//g`
+   echo $f
+   cp  $f         work/$f
+	if test -e $n.inc; then
+      cat $n.inc  >> work/$f
+      echo "}"    >> work/$f
+   fi
+done;
+
+# --- clean up 
+#rm *.inc make-groups.sh relate.inp

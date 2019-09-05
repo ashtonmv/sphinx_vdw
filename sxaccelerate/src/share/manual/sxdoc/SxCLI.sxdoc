@@ -1,0 +1,257 @@
+h1. Command line arguments parsing @SxCLI@
+
+p1. This class provides a command line option parser. The main purpose is to
+    declare the available options with the necessary help messages, and to use
+    this information for parsing the command line options and producing
+    a help message (usage).
+
+h2. Command line option
+
+p1. Each option has the following features:
+
+* one or several alternative marks to indicate which option is supplied (e.g. "--waves")
+* or no mark at all, so that the option (here called argument) is defined by its position
+* a short description of what is expected (e.g. "file")
+* a long description of the option (e.g. "the wave function used for...")
+* a default value (e.g. "waves.sxb")
+* for numbers: lower and upper bounds
+* an option can be set to be optional, or required
+* an option can be set to have no value, i.e. boolean options
+* an option can be a multiple-choice option
+
+p1. The whole parsing consists of three phases, which are described below:
+
+@First phase@  := The options are declared with an option or argument command,
+                  which returns them as objects of @CliArg@ class.
+@Second phase@ := The @CliArg@ objects from previous phase are used to convert
+                  the given argument to desired type. The optional behaviour is
+                  determined from the type and options without a default value
+                  are considered to be required.
+@Third phase@  := The @finalize@ function is called which completes the parsing.
+                  If unknown options are left or any errors in the parsing
+                  occurred, the help message is printed and the program exits.
+
+
+p1. The following code shows a simple example of it's usage:
+
+{{{cpp
+#include <SxCLI.h>
+#include <SxString.h>
+int main (int argc, char** argv)
+{
+   SxCLI cli (argc, argv); // Command Line Parsing
+   // init vars from options
+   int i      = cli.option ("-i|--integer",
+                            "number",
+                            "an integer number").toInt(0,0,100);
+   float f    = cli.option ("-f|--float",
+                            "number", 
+                            "a real number").toFloat (0.);
+   SxString s = cli.option ("-s", 
+                            "string",
+                            "some string").toString("string1");
+   bool sayHi = cli.option ("--hi", "prints hi").toBool ();
+   double d   = cli.option ("--double", 
+                            "number", 
+                            "a very exact number").toDouble (); 
+   // d is required, because no default is given 
+   // arguments are always last!
+   SxString command = cli.argument ("command", 
+                                    "some imaginary action").toString ();
+   
+   cli.finalize ();
+
+   cout << "Integer: " << i << endl; 
+   cout << "Float: "   << f << endl; 
+   cout << "Double: "  << d << endl; 
+   cout << "String: "  << s << endl; 
+   if (sayHi) cout << "Hi!" << endl;
+   cout << "Command: " << command << endl;
+   cout.flush ();
+}
+}}}
+
+p1. As shown in the above code the numerical options can be provided with
+    a min/max range for a validity check. An argument is an option without
+    a mark('--mark') and they must be given after all the options. The
+    @finalize@ method must be called after parsing all options/arguments,
+    which concludes the parsing procedure.
+
+h2. Declare an option @option@
+
+p1. The @option@ function allows to declare a new option. This function takes
+    three arguments, mark(@SxString@), short description(@SxString@) and long
+    description(@SxString@) respectively. The second argument can be omitted.
+
+h2. Declare an argument @argument@
+
+p1. The @argument@ member function provides a way to declare an argument. It
+    takes two parameters i.e. short description(@SxString@) and long
+    description(@SxString@).
+
+h2. Manual parsing of options/arguments
+
+p1. When an option is meant to be converted to a non-standard type from the
+    given C-string, the parsing must be done manually. If the parsing fails,
+    @setError@ function should be called instead of @exiting@ the program.
+    The @setError@ function sets the parse error in @SxCLI@ which would be
+    checked by @finalize@ method and the program will be exited properly.
+
+h2. Option groups
+
+p1. The command line options can be grouped into option groups. An option group
+    symbolizes a set of options that belong together in a certain category. One
+    group can be dependent on another group, alternative of a group or exist
+    independently. If any one of the options of a group is provided then all
+    required options of that group must be provided, otherwise if none of the
+    options of a group are present in the command line arguments then that
+    group is considered to be not available.
+
+h2. Create group @newGroup@
+
+p1. The @newGroup@ function allows to create a new option group. This function
+    takes two arguments, group name(@SxString@) and group description(@SxString@).
+    This function also sets the new group as current group, hence any options
+    declared after a call to this function are considered part of new group
+    unless current group is changed explicitly.
+
+h2. Exclude a group @excludeGroup@
+
+p1. The @excludeGroup@ allows to set current group as exclusive alternative
+    of another group. The group id of the other group is passed as parameter
+    to this member function.
+
+h2. Require a group @requireGroup@
+
+p1. This function allows to set a prior group as requirement/dependency
+    for the current group. The id of the required group is passed as parameter
+    to this member function.
+
+h2. Set current group @setGroup@
+
+p1. The @setGroup@ provides a way to change the current group. It takes the id
+    of the corresponding group as argument.
+
+h2. Check group availability @groupAvailable@
+
+p1. This function allows to check if any option of the specified group is
+    provided in the command-line arguments. It takes the id of the group as
+    argument and returns true if the group is available.
+
+p1. The following code snippet shows an example usage of option groups:
+
+{{{cpp
+int main (int argc, char** argv)
+{
+   SxCLI cli (argc, argv);
+   cli.preUsageMessage = 
+      "This program can be run in two modes: the INTEGER mode requires the"
+      "options -i and -j, the (default) REAL mode requires the option -f.";
+   
+   int intGroup = cli.newGroup("integer mode");
+   int i = cli.option ("-i", "integer", "a number").toInt ();
+   int j = cli.option ("-j", "integer", "a second number").toInt ();
+
+   int realGroup = cli.newGroup("real mode");
+   cli.excludeGroup (intGroup);
+   double f = cli.option ("-f", "real number", "the real number").toDouble (0.);
+   cli.setGroup(cli.generalGroup);
+   SxString format = cli.option ("--name","name","a name").toString ("");
+   cli.finalize ();
+   
+   bool intMode = cli.groupAvailable (intGroup);
+   if (intMode)
+      cout << "i = " << i << "; j = " << j << endl;
+   else
+      cout << "f = " << f;
+   if (name.getSize () > 0)
+      cout << "name = " << name << endl;
+}
+}}}
+
+p1. As shown in above code, the presence of an option group can be checked
+    by using @groupAvailable@ function. The @generalGroup@ is the default group
+    that is always available and it is used when no other group is specified.
+
+h2. Usage message @preUsageMessage@
+
+p1. The @preUsageMessage@ is a public variable of type @SxString@ which can be
+    set to describe a general usage message. This message is the first thing
+    that is printed when @printUsage@ function is called.
+
+h2. Print usage @printUsage@
+
+p1. This function prints the @preUsageMessage@ followed by usage help messages
+    for all options given so far. It takes two arguments errorCode(@int@) and
+    printLong(@bool@) respectively. The first parameter describes the error code
+    and second one specifies whether to print detailed description or not. The
+    default value of first parameter is -1, if any other value is given this
+    function will call @exit@ after printing the usage. The default value for
+    second parameter is @true@, in which case @printUsage@ prints complete
+    option list. In case @printLong@ is set to @false@, the abbreviated
+    option list is printed.
+
+h2. Built-in arguments
+
+p1. The @SxCLI@ also provides a list of built-in command line arguments that
+    can invoke certain functionalities or features of @SxCLI@. The important
+    arguments are explained below:
+
+h3. @--quiet@
+
+p1. When the @quiet@ option is provided, all output generated by the executable
+    to @Stdout@ will be ignored.
+
+h3. @--log <file>@
+
+p1. The @log@ option allows to create a log file and all output on @Stdout@
+    will also be copied to this log file. This option can also be enabled by
+    setting the environment variable @SX\_LOG\_STDOUT@. In that case the default
+    name for the log file would be used which is @ProgramName.log@.
+
+h3. @--log <file>@ and @--quiet@
+
+p1. When the @log@ option is used in combination with @quiet@ option, the
+    output to @Stdout@ is only directed to the log file and it's not
+    printed to @Stdout@.
+
+h3. @--about@
+
+p1. If the program is called with this option in command line arguments then
+    the description of the executable is printed and program exits.
+
+h3. @--completion@
+
+p1. When this flag is provided after partial options, the program will return
+    all possible options that can be further provided by considering the already
+    provided options. This function serves as an auto-complete feature for the
+    command line tools using @SxCLI@.
+
+h3. @--sxprintcli@
+
+p1. This option prints detail of command line interface and exits the program.
+
+h3. @--debug <core-file>@
+
+p1. This option invokes the debugger with given core file to be used in case of
+    program crash. Hence this option is only available in debug mode of @SxAccelerate@.
+
+h3. @--mem-check@
+
+p1. This command line option prints the details of memory utilization of the
+    program, which can be useful in finding memory leaks. 
+
+h3. @--no-exceptions@
+
+p1. This command line option results in replacing all/any exceptions that occur
+    during program execution with segmentation faults.
+
+h3. @--opts@
+
+p1. Whenever a program is executed with this command line option, the program
+    will print details about compilation and linkage of the program and exit.
+
+h3. @-h|--help|--usage@
+
+p1. All three options provide the same functionality, which is to print out the
+    correct usage of the given program.

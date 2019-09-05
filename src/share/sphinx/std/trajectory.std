@@ -1,0 +1,25 @@
+format trajectory;
+ step {
+    type = "group; minItems = 1;
+    time { type="real";}
+    ePot { type="real";}
+    eKin { type="real";}
+    eTot { type="real";}
+    T { type="real"; optional;}
+# todo: add further obserbales (thermostat parameters)
+    tau { 
+       include <std/structure.std>;
+    }
+    forces {
+       include <std/structure.std>;
+    }
+    velocities {
+       include <std/structure.std>;
+    }
+ }
+
+
+  
+
+
+

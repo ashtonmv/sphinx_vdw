@@ -1,0 +1,45 @@
+name           = "Gallium";
+potType        = "AbInit";
+element        = "Ga";
+potential      = <potentials/Ga_lda.paw>; 
+reciprocalMass = 69.723;
+dampingMass    = 0.7;
+ionicMass      = 69.723;
+valenceCharge  = 13;
+atomicRhoOcc   = [2,0,1,0,10,0];
+
+/* AtomPAW Generation File
+Ga 31
+LDA-PW loggrid 2000 
+4 4 3 0 0 0    ! Up to 4s, 4p and 3d
+4 1 1          ! Electronic configuration [Ar] 3d10 4s2 4p1
+0 0 0
+c              ! 1s core
+c              ! 2s core
+c              ! 3s core
+v              ! 4s valence
+c              ! 2p core
+c              ! 3p core
+v              ! 4p valence
+v              ! 3d core
+2              ! Basis contains s,p,d partial waves
+2.6            ! rpaw = rshape = rveff = rcore = 2.6
+y
+0.5
+n
+y
+0.5
+n
+y
+1.12
+n
+custom rrkj gramschmidthortho sinc
+3 1.0  
+2.6
+2.6
+2.6
+2.6
+2.6
+2.6
+0              ! END
+*/

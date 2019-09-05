@@ -1,0 +1,156 @@
+h1. Bound Pointers/Functors
+
+p1. Bound pointers allow to store or pass functions pointers. They are in
+    particular essential when implementing callback mechanisms. The @SxFunction@
+    class provides a generic way to store functions of a specific signature
+    independent of the actual type. The following types of function
+    pointers are supported:
+
+   * Global functions,
+   * Pointer to member functions,
+   * Functors, and
+   * Lambda functions.
+
+p1. The function signature is specified when creating an @SxFunction@ instance,
+    including the return type as well as individual parameter types.
+ 
+
+h2. Global functions
+
+p1. The @SxFunction@ is able to store any global function that is visible at
+    the point of creation of the @SxFunction@ object. In order to store a
+    pointer to global function, the return type followed by it's parameter
+    types have to be provided as template parameters. In order to use
+    @SxFunction@ following header must be included.
+
+{{{cpp(sxboundptr)
+#include <SxError.h>
+#include <SxFunction.h>
+}}}
+
+p1. Consider the following example:
+
+{{{cpp(sxboundptr.globalFunc)
+class A {
+public:
+   static long square(int val){
+      return val*val;
+   }
+};
+SxFunction<long, int> bptr = SxFunction<long, int>::create(&A::square);
+std::cout << "Square(5) is: " << bptr(5) << std::endl;
+}}}
+
+p1. The above code creates the @SxFunction@ object using @create@ static method.
+    The template arguments represent the signature of the corresponding function.
+    The first argument is the return type and rest of the arguments represent
+    the types of parameters required by the function. Later the function is
+    called through @SxFunction@ object. The above code results in following output:
+
+{{{expect(stdout,sxboundptr.globalFunc)
+Square(5) is: 25
+}}}
+
+h2. Pointer to member functions
+
+p1. The support for pointer to member function is similar to global function
+    where @SxFunction@ requires the return type and types of each parameter
+    if required. In addition, an @SxPtr@ object of the corresponding class is
+    required in order to be able to invoke the stored member function.
+
+{{{cpp(sxboundptr.memberFunc)
+class B {
+public:
+   void Foo() { std::cout << "Inside F::Foo()" << std::endl;}
+};
+SxPtr<B> fPtr = SxPtr<B>::create ();
+SxFunction<void, void> bptr = SxFunction<void, void>::create (fPtr, &B::Foo);
+bptr();
+}}}
+
+p1. The above example code shows how to store a pointer to member function
+    as @SxFunction@ and later call it. It results in the following output:
+
+{{{expect(stdout,sxboundptr.memberFunc)
+Inside F::Foo()
+}}}
+
+h2. Functors
+
+p1. Objects of a class that has overloaded the @operator()@ function, are
+    called the functors. As @operator()@ function name is not necessary to be
+    able to call it, @SxFunction@ only requires the object as parameter. The
+    signature provided to @SxFunction@ is used to call the correct overload of
+    @operator()@ function in case the class has multiple overloads of the
+    function. The following code shows an example of storing functor
+    as @SxFunction@ object:
+
+{{{cpp(sxboundptr.functionObj)
+class F {
+public:
+   void operator()() {
+      std::cout << "Inside F::operator()" << std::endl;
+   }
+   void operator()(int val) {
+      SX_UNUSED(val);
+      std::cout << "Inside F::operator()(int)" << std::endl;
+   }
+};
+F obj;
+SxFunction<void, void> bptr = SxFunction<void, void>::create(obj);
+bptr();
+}}}
+
+p1. The above code displays the following output when executed:
+
+{{{expect(stdout,sxboundptr.functionObj)
+Inside F::operator()
+}}}
+
+h2. Lambda/Anonymous functions
+
+p1. Lambda functions provide an intuitive way to define functions inline. They
+    can be very helpful when a function is only going to be needed once (or twice).
+    As lambda functions are handled by the compiler by defining an anonymous
+    functor class, the @SxFunction@ class also stores them similarly to
+    functors. The following code shows how to store a lambda function
+    as @SxFunction@ object.
+
+{{{cpp(sxboundptr.lambdaFunc)
+SxFunction<void, int> bptr = SxFunction<void, int>::create (
+                             [](int val){std::cout << "Value recieved: " << val;});
+bptr(30);
+}}}
+
+p1. The above code displays following output when executed:
+
+{{{expect(stdout,sxboundptr.lambdaFunc)
+Value recieved: 30
+}}}
+
+h2. Debug information
+
+p1. The @SxFunction@ provides a mechanism to track the creation of @SxFunction@
+    object. In order to log the debugging information the (optional) last
+    parameter can be provided as @SX\_TAG@. In order to print the debugging
+    information the object can be printed using @std::cerr@.
+
+{{{cpp
+class E {
+public:
+   void func() {
+      std::cout << "E::func() called" << std::endl;
+   }
+};
+SxPtr<E> ptr = SxPtr<E>::create ();
+SxFunction<void, void> bptr = SxFunction<void, void>::create (ptr, &E::func, SX_TAG);
+std::cerr << bptr << std::endl;
+}}}
+
+p1. The above code results in following output which shows the debug information
+    about the line where the corresponding @SxFunction@ object was created.
+
+{{{
+SxFunction : sxdemo.cpp:23:int main(int, char **)
+}}}
+

@@ -1,0 +1,124 @@
+subspaceDiag { type="group"; optional;
+   ekt               { type="real"; min=0; optional; }
+   fermiDistribution { type="flag"; optional; }
+}
+
+scfDiag             { type="group"; optional;
+   ekt              { type="real"; min=0; optional; }
+   keepRhoFixed     { type="flag"; optional; }
+   keepOccFixed     { type="flag"; optional; }
+   keepSpinFixed    { type="flag"; optional; not="keepOccFixed"; }
+   spinMoment       { type="real"; optional; not="keepOccFixed"; }
+   propagateWaves   { type="flag"; optional; }
+   useKS            { type="flag"; optional; not="keepRhoFixed";}
+   
+   dRelRes          { type="real"; min=0; optional; }
+   dSpinMoment      { type="real"; min=0; optional; } // for atomic spin constraints
+   maxSteps         { type="int"; min=1; optional; }
+   dEnergy          { type="real"; min=0; optional; }
+   dEnergyLow       { type="real"; min=0; optional; }
+   maxResidue       { type="real"; min=0; optional; }
+
+   printVarEnergy   { type="flag"; optional;}
+   
+   xcMesh           { type="group"; optional;
+      eCut             { type="real"; min=5; xor="eCut,mesh,meshAccuracy";}
+      mesh             { type="vector"; dim=3; xor="eCut,mesh,meshAccuracy";}
+      meshAccuracy     { type="real"; xor="eCut,mesh,meshAccuracy";}
+   }
+   dipoleCorrection { type="flag"; optional; }
+   calcForces       { type="flag"; optional; }
+
+   CCG { type="group"; optional;
+      dRelEps          { type="real"; min=0; max=1; optional; }
+      maxStepsCCG      { type="int"; optional; }
+      dEnergy          { type="real"; min=0; optional; }
+      xcMesh            { type="group"; optional;
+         eCut              { type="real"; min=5; xor="eCut,mesh,meshAccuracy";}
+         mesh              { type="vector"; dim=3; xor="eCut,mesh,meshAccuracy";}
+         meshAccuracy      { type="real"; xor="eCut,mesh,meshAccuracy";}
+      }
+   }
+   rmmDiis { type="group"; optional;
+      verbose          { type="flag"; optional; }
+      maxStepsCCG      { type="int"; optional; }
+      dRelR            { type="real"; min=0; optional; }
+      dEnergy          { type="real"; min=0; optional; }
+      xcMesh            { type="group"; optional;
+         eCut              { type="real"; min=5; xor="eCut,mesh,meshAccuracy";}
+         mesh              { type="vector"; dim=3; xor="eCut,mesh,meshAccuracy";}
+         meshAccuracy      { type="real"; xor="eCut,mesh,meshAccuracy";}
+      }
+   }
+   blockCCG { type="group"; optional;
+      dRelEps          { type="real"; min=0; max=1; optional; }
+      maxStepsCCG      { type="int"; optional; }
+      blockSize        { type="int"; min = 1; optional; }
+      verbose          { type="flag"; optional; }
+      numericalLimit   { type="flag"; optional; }
+      nSloppy          { type="int"; optional; }
+      dEnergy          { type="real"; min=0; optional; }
+      xcMesh            { type="group"; optional;
+         eCut              { type="real"; min=5; xor="eCut,mesh,meshAccuracy";}
+         mesh              { type="vector"; dim=3; xor="eCut,mesh,meshAccuracy";}
+         meshAccuracy      { type="real"; xor="eCut,mesh,meshAccuracy";}
+      }
+   }
+   blockRmmDiis { type="group"; optional;
+      verbose          { type="flag"; optional; }
+      maxStepsCCG      { type="int"; optional; }
+      blockSize        { type="int"; min = 1; optional; }
+      dRelR            { type="real"; min=0; optional; }
+      dEnergy          { type="real"; min=0; optional; }
+      xcMesh            { type="group"; optional;
+         eCut              { type="real"; min=5; xor="eCut,mesh,meshAccuracy";}
+         mesh              { type="vector"; dim=3; xor="eCut,mesh,meshAccuracy";}
+         meshAccuracy      { type="real"; xor="eCut,mesh,meshAccuracy";}
+      }
+   }
+   blockRmmCG { type="group"; optional;
+      verbose          { type="flag"; optional; }
+      maxStepsCCG      { type="int"; optional; }
+      blockSize        { type="int"; min = 1; optional; }
+      dRelR            { type="real"; min=0; optional; }
+      dEnergy          { type="real"; min=0; optional; }
+      xcMesh            { type="group"; optional;
+         eCut              { type="real"; min=5; xor="eCut,mesh,meshAccuracy";}
+         mesh              { type="vector"; dim=3; xor="eCut,mesh,meshAccuracy";}
+         meshAccuracy      { type="real"; xor="eCut,mesh,meshAccuracy";}
+      }
+   }
+
+   noRhoStorage     { type="flag"; optional; }
+   noWavesStorage   { type="flag"; optional; }
+   printSteps       { type="int"; min=0; optional; }
+   dumpTime { type="real"; optional; }
+
+   mixingMethod     { type="int"; min=0; max=2; optional; }
+   nPulaySteps      { type="int"; min=1; max=50; optional; }
+   spinMixing       { type="real"; min=0; max=1; optional; }
+   rhoMixing        { type="real"; min=0; max=1; optional; }
+   linearVacMixing  { type="flag"; optional; }
+   residueProfile   { type="flag"; optional; }
+   adaptiveScaling  {  type="flag"; optional; }
+   
+   preconditioner   { type="group"; optional;
+      type           { type="int"; min=0; max=5; }
+      scaling        { type="real"; optional; }
+      spinScaling    { type="real"; optional; }
+      dielecConstant { type="real"; optional; not="kerkerDamping"; }
+      kerkerDamping  { type="real"; optional; not="dielecConstant"; }
+      nonDiagonal    { type="group"; optional;
+         eCut           { type="real"; optional; }
+         update         { type="int"; optional; min=1; } 
+         noDiag         { type="flag"; optional; 
+                          not="avgEpsDiag,avgDensityDiag"; }
+         avgDensityDiag { type="flag"; optional; not="avgEpsDiag,noDiag"; }
+         avgEpsDiag     { type="flag"; optional; not="avgDensityDiag,noDiag"; }
+      }
+   }
+
+   filter { type="group"; optional;
+      gCut { type="real"; optional; min=0; }
+   }
+}

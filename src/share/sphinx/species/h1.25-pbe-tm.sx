@@ -1,0 +1,20 @@
+potential      = <potentials/h1.25-pbe-t20.cpi>;
+name           = "Hydrogen1.25";
+element        = "H";
+valenceCharge  = 1.25;
+lMax           = s;
+lLoc           = s;
+lcaoOrbitals   = [s];
+atomicRhoOcc   = [1];
+rGauss         = 1.0;
+reciprocalMass = 1.0;
+dampingMass    = 0.7;
+ionicMass      = 1.0;
+
+
+/* --- fhi98PP input file:
+1.25 0 1 6 0.00      : z nc nv
+    1  0   1.25      : n  l   f 
+0  t                 : lmax  s_pp_def 
+0  2.00  0.00  t     : lt  rct  et  s_pp_type
+*/

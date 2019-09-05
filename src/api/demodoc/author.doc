@@ -1,0 +1,5 @@
+/** \brief Adding of the author's name
+
+    \verbinclude author.txt
+    \author John Doe, johndoe@domain.org */
+    void author ();

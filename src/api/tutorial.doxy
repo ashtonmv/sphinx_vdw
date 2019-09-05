@@ -1,0 +1,331 @@
+/** \page       page_tutorial   The SPHInX API - Getting Started
+
+\section        tutor_prep      Preparations
+
+   Before compiling the package on some computer environments (e.g. Linux)
+   some numerical libraries have to be installed first. 
+   More information about compiling the package can be found in \ref page_make.
+   A list of required external software packages can be found at \ref page_req.
+
+   If the numerical libraries are installed properly the SPHInX package can
+   be configured:
+   
+   \verbatim
+      cd src
+      ./configure --with-examples 
+      (g)make
+   \endverbatim
+
+
+\section        tutor_hello     Hello SPHInX
+
+   The first step in our tutorial is to write a simple "hello SPHInX" 
+   program. To do so we go to the examples/ directory and create a file 
+   "hello.cpp"
+
+   \verbatim
+      cd examples
+      vi hello.cpp
+   \endverbatim
+
+   The hello.cpp should simply print a randomized vector with 10 elements.
+   The elements should be of type \em double:
+
+   \verbatim
+      #include <SFHIngXUT.h>
+      #include <SxVector.h>>
+
+      int main ()
+      {
+         // --- initialize SPHInX
+         initSFHIngXUT ();
+         initSFHIngXMath ();
+
+         // --- initialize a vector of 10 elements with random numbers
+         int nElem = 10;
+         SxVecttor<Double> vec(nElem);
+         vec.randomize ();
+
+         // --- print the vector
+         cout << vec << endl;
+
+         return 0;
+      }
+   \endverbatim
+
+   Type 
+   \verbatim
+      (g)make
+   \endverbatim
+
+   to compile the example. The make environment will create 2 executables,
+   the hello.x (the actual executable) and the hello shell script. The
+   shell script initialize some environment variables used by the executable.
+   Please always start the shell script (without the *.x extension):
+
+   \verbatim
+      ./hello
+   \endverbatim
+
+\section        tutor_vec       Using the Algebraic Library
+
+   The next step is to get aquainted with the algebra library of SPHInX.
+   Please inspect the files
+      -# <a href="vector_8cpp-example.html">vector.cpp</a>
+      -# <a href="matrix_8cpp-example.html">matrix.cpp</a>
+      -# <a href="eigen_8cpp-example.html">eigen.cpp</a>
+
+   When reading the files please also have a look at the Developer's API.
+   Use your favorite browser (netscape, mozilla, konquerer, ...), e.g.
+
+   \verbatim
+      cd src
+      netscape doc/html/index.html &
+   \endverbatim
+
+   More information about the Algebra Library can be found in \ref page_vector.
+
+\section        tutor_bugs      Using the DEBUG mode
+
+   Now it is time to learn how SPHInX deals with runtime errors. Please
+   add intentionally errors to the file %vector.cpp. Errors could be
+      - boundary violations of vectors
+      - wrong data types
+      - division of vectors by zero
+
+   As an example add a line
+   \verbatim
+      SxVector<Double> errorVector(5);
+      cout << errorVector(10) << endl;
+   \endverbatim
+
+   In this line the 11th element (the 1st element is 0!!!) of a vector which
+   contains only 5 elements should be printed. This is obviously an error.
+
+   Please compile %vector.cpp and execute it. It will prompt an error message
+   and creates a core file. Inspect it with
+
+   \verbatim
+      vector --debug core
+   \endverbatim
+
+   Note that the first argument is vector.x and not vector. The debugger needs
+   the actual executable! For more information please read \ref dbg_analysis.
+
+   The ddd window pops up with the a line indicator pointing to a line
+   somewhere in the vector class. In order to see from where the function has
+   bee called in a wrong way go to the ddd's menu item "Status->Backtrace". Go
+   one line up and the line pointer shows the intentionally added buggy line.
+   Many errors can be found in this way!
+
+   You should play with other errors you intentionally add to the file
+   %vector.cpp. By doing so you can get easily aquainted to the SPHInX DEBUG
+   environment and how to locate errors. For later developments such knowlegde
+   will help you enormeously.
+
+
+\section        tutor_utils     Utilities in SPHInX
+
+   SPHInX comes with many utilities which allow to write comfortable
+   user interfaces. In this section you will learn how those utility classes
+   can be used. We start with the demonstration of string handling. A
+   easy string handling is useful e.g. for write friendly user-interfaces.
+
+   Please inspect the file 
+      - <a href="strings_8cpp-example.html">strings.cpp</a>.
+
+   Compile it and execute "./strings".
+   All strings in SPHInX are of the type SxString. C-like strings shouldn't
+   be applied. The SxString class should offer all necessary manipulation
+   functions.
+
+
+   Another offen used utility is a timer. In order to estimate timing results
+   of parts of the code a timer can easily be used as stopwatch. This is
+   demonstrated in the example
+      - <a href="timer_8cpp-example.html">timer.cpp</a>.
+
+\section        tutor_parser    SPHInX Input File Parser
+
+   A very powerful utility in the SPHInX package is the input file parser.
+   Please start reading the demonstration file 
+      - <a href="parser_8cpp-example.html">parser.cpp</a>.
+
+   It requires an
+   input file parser.sx which should contain some input variables:
+   \verbatim
+      format parser.std;
+      i = 5 + 3;
+      d = 1e-2 * pi;
+      s = "hello " + "SPHInX";
+      v = 2*[pi, sqrt(2), exp(1/2)];
+      m = 1/2 * [v, 2*v, [1, 2, 3]];
+      structure {
+         atom { coords = [0,0,0];        label = "1st atom"; }
+         atom { coords = [1/2,1/3,1/4];  label = "2nd atom"; }
+         atom { coords = [2,3,4];        label = "2nd atom"; }
+      }
+   \endverbatim
+
+   The input file parser is capable of performing a simple validation of 
+   the input file. This is done in a SPHInX Type Definition (std) file.
+   Please create it in a subfolder std:
+   \verbatim
+      mkdir -p std
+      vi parser.std
+   \endverbatim
+   The file std/parser.std should look like:
+   \verbatim
+      set validation;
+      topLevelDefs;
+      structure         { type="group"; nItems=1; 
+         i              { type="int"; min=0; max=10; }
+         d              { type="real"; min=-1e5; max=1e5; }
+         s              { type="string"; }
+         doSomething    { type="flag"; optional; }
+         atom           { type="group"; minItems=1; 
+            coords      { type="vector"; dim=3; }
+            label       { type="string"; optional; }
+         }
+      }
+   \endverbatim
+
+   After compiling with (g)make please inspect the file to be parsed 
+   (parser.sx). It defines various input variables of different data types.
+   Some of the variables are arranged in a simple hierarchy of groups.
+   Such a input file can be read in within a few lines as shown in %parser.cpp.
+
+   Note the relationship between the input file, the grammar file, and
+   the source code! Feel free to play a bit and read more complicated
+   input structures. Don't forget that the type definition file must always
+   be consitent to the source file! 
+   Also make errors in the input file and check how the parser responds.
+
+   More information about the input parser can be found in SxSymbolTable.
+
+
+\section        tutor_sxb       SPHInX Binary Files
+
+   Besides handling ASCII files in scientific programs it is necessary to
+   handle binary files as well. Unfortunately, binary files are platform
+   dependent. An exchange of binary files between different computers would
+   not be possible.
+   SPHInX supports a crossplatform binary data format which allows the exchange
+   of data between different platforms. It is based on the netCDF library.
+   All SPHInX binary files have the extensions *.sxb. Please inspect the
+   example file 
+      - <a href="sxb_8cpp-example.html">sxb.cpp</a>.
+   
+   It creates several data arrays and writes them
+   to the disc. For demonstration purposes the data are then read in from disc
+   again.
+   After execution you will see a set of *.sxb files in your folder. You can
+   print them with the netCDF tool "ncdump". To get a help type
+   \verbatim
+      ncdump -help
+   \endverbatim
+   Try to extract the header information, e.g.
+   \verbatim
+      ncdump -h sxb-mesh3d.sxb
+   \endverbatim
+   or print the entire file with
+   \verbatim
+      ncdump sxb-mesh3d.sxb
+   \endverbatim
+   You also can print only a single variable, e.g.
+   \verbatim
+      ncdump -v cell sxb-mesh3d.sxb
+   \endverbatim
+   Three-dimensional meshes are saved in the PHInaX file format and can be
+   visualized with e.g. the pxviewer (http://www.phinax.de). If you have
+   installed PHInaX you can type
+   \verbatim
+      pxviewer -sxb sxb-mesh3d.sxb
+   \endverbatim
+   It shows a picture similar to
+
+      \image html  sxb-mesh3d.png
+      \image latex sxb-mesh3d.png width=5cm
+
+
+\section        tutor_dirac     Dirac notation
+
+   In the SPHInX package we have tried to support Dirac's notation style in
+   the source code level to a certain extend. This notation style allows
+   to separate definitions of operators and the numerical wavefunction 
+   representation from the Hamiltonian and hence, it makes the Hamiltonian
+   very small and transparent.
+
+   The SPHInX's Dirac style basically overloades the '|' operator and
+   replaces expressions like <a|b> to (a|b). Please study the example files
+      - <a href="dirac_8cpp-example.html">dirac.cpp</a>
+      - <a href="atomorb_8cpp-example.html">atomorb.cpp</a>
+
+   Read here more about \ref page_dirac.
+
+\section        tutor_dep       General remark on dependencies
+
+   Whenever "(g)make" is invoked first all dependency files (*.d) will be
+   created automatically.  Dependencies are necessary to save compilation 
+   time.  If the project was compiled and only one or a few files were modified
+   the make environment recompiles only those files which include the modified
+   sources.
+   It is possible that the developer tries to include a non-existing file
+   (for example due to some typos). In this case invalid dependency files
+   would be created and the make environment will do nothing but complain
+   about the missing dependency file.
+   The solution is to inspect the corresponding input file and to correct
+   the wrong #include statement. After that all *.d files can be removed 
+   with the command
+   \verbatim
+      configure -d
+      (g)make
+   \endverbatim
+
+\section        tutor_physics   Putting it all together
+
+   When the basic knowledge about the basis classes now you should learn
+   how to implement simply physics. Have a look at the following example
+   files:
+
+   - <a href="fermi_8cpp-example.html">fermi.cpp</a>
+   - <a href="mixer_8cpp-example.html">mixer.cpp</a>
+   - <a href="rho_8cpp-example.html">rho.cpp</a>
+
+\section        tutor_dft       Writing a simple DFT program
+
+   Now you know how to read in user input files and how to setup the DFT
+   basis. You also have learned about the algebra classes. Last but not least
+   you know how to apply the Dirac notation.
+   With this knowledge you now can write a simple Density Functional Theory
+   program. The example
+      - <a href="dft_8cpp-example.html">dft.cpp</a>
+   
+   can be used as a template.
+
+\section        tutor_doc       Using the API - Documentation
+
+   This API documentation you can easily be generated on your local machine.
+   To do so simply type
+   \verbatim
+      cd src
+      ./configure --with-doc
+      cd doc
+      (g)make doc
+   \endverbatim
+   In creates subfolders doc/html and doc/latex. The html documentation
+   can be displayed with your favorite web-browser (netscape, mozilla,
+   konquerer, ...) with 
+   \verbatim
+      konquerer doc/html/index.html
+   \endverbatim
+   The printable version can also be generated:
+   \verbatim
+      cd latex
+      (g)make
+      (g)make pdf
+      acroread latex/refman.pdf
+   \endverbatim
+
+  \author Sixten Boeck
+  */

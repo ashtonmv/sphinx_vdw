@@ -1,0 +1,23 @@
+/** \brief template for function documentation
+
+    \verbinclude functions.txt
+    Functions should exactly descibe the implemented algoriths. If possible
+    use ::lists, ::latex, ::biblio, and ::images. 
+
+    In addition the function arguments and return values have to be specified.
+    Lists or arrays have to specify the storage order, e.g.  (iSpecies)(iAtom)
+
+    \author John Doe, johndoe@domain.org
+    \param  iteration   current iteration number 
+    \param  eps         one particle energy value \f$ 
+                            \epsilon = \langle \Psi | H | \Psi \rangle 
+                        \f$
+    \param  atoms       (iSpecies)(iAtom), list of atoms
+    \return             converged total energy in Hartree
+    \sa     lists
+    \sa     latex
+    \sa     biblio
+    \sa     images */
+    double functions (int iteration, 
+                      double eps, 
+                      const SxArray<SxArray<double> > &atoms);

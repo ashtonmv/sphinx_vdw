@@ -1,0 +1,19 @@
+eamPot           { type="group"; maxItems=1; optional; 
+  species           { type="group"; minItems=1; 
+     name           { type="string"; }
+     element        { type="string"; }
+     skElementName  { type="string"; optional;}
+     ionicMass      { type="real"; min=0; }
+     rhoNucleus { type="real"; optional; }
+  }
+  params { type="group";
+     V {type = "list"; xor="V,VFile"; minRank = 2; maxRank = 3;}
+     VFile {type="string"; xor="V,VFile";}
+     RHO {type = "list"; xor="RHO,RHOFile"; minRank = 2; maxRank = 3;}
+     RHOFile {type="string"; xor="RHO,RHOFile";}
+     F {type = "list"; xor="F,FFile"; minRank = 2; maxRank = 3;}
+     FFile {type="string"; xor="F,FFile";}
+  }
+  noLinkCell { type="bool"; optional; }
+}
+

@@ -1,0 +1,249 @@
+%pure-parser
+%name-prefix="SxJSONParser_"
+%locations
+%defines
+%error-verbose
+%parse-param { SxJSONParser* parserPtr }
+%lex-param { void *scannerPtr }
+
+%{
+#  define YYDEBUG 1
+#  include <SxMacroLib.h>
+#  include <SxString.h>
+#  include <SxGProps.h>
+class SxJSONParser;
+#  include <SxJSONParser.tab.hpp>
+#  define SXPARSER_TYPE SxJSONParser
+#  include <SxJSONParser.h>
+#  define ast parserPtr
+
+
+%}
+
+// --- type of yylval
+%union {
+   ssize_t   intVal;
+   bool      boolVal;
+   double    floatVal;
+   SxString *strPtr;
+   SxGProps *nPtr;
+};
+
+// --- return types of expressions
+%type <nPtr> main object members member
+             array elements element value push pop
+
+// --- error recovery destructors
+%destructor { delete $$; } TK_STRING
+
+// --- tokens
+%token <intVal>    TK_INTEGER
+%token <floatVal>  TK_FLOAT
+%token <boolVal>   TK_BOOL
+%token <void>      TK_NULL
+%token <strPtr>    TK_STRING
+
+// --- traces
+%printer { fprintf (yyoutput, "TK_STRING, val='%s'", $$->ascii()); } TK_STRING;
+%printer { fprintf (yyoutput, "TK_INTEGER, val='%zd'", $$); } TK_INTEGER;
+%printer { fprintf (yyoutput, "TK_FLOAT, val='%f'", $$); } TK_FLOAT;
+%printer { fprintf (yyoutput, "TK_BOOL, val='%d'", $$); } TK_BOOL;
+
+%printer { fprintf (yyoutput, "main"); } main;
+%printer { fprintf (yyoutput, "object"); } object;
+%printer { fprintf (yyoutput, "members"); } members;
+%printer { fprintf (yyoutput, "member"); } member;
+%printer { fprintf (yyoutput, "array"); } array;
+%printer { fprintf (yyoutput, "elements"); } elements;
+%printer { fprintf (yyoutput, "element"); } element;
+%printer { fprintf (yyoutput, "value"); } value;
+%%
+
+main :         object {
+                  SX_DBG_YACC ("main#1");
+                  SxGProps *root = parserPtr->getRoot ();
+                  ast->addEdge (root, $$);
+               }
+               | array {
+                  SX_DBG_YACC ("main#2");
+                  SxGProps *root = parserPtr->getRoot ();
+                  ast->addEdge (root, $$);
+               }
+               ;
+
+object  :      push '{''}' pop {
+                  SX_DBG_YACC ("object#1");
+                  $$ = $1;
+                  $$->setProperty ("__sx_Key", "undefined");
+                  $$->getProperty ("__sx_Value").setTag (SXTAG_YACC(@2,@3));
+               }
+               | push '{' members '}' pop {
+                  SX_DBG_YACC ("object#2");
+                  $$ = $3;
+                  $$->setProperty ("__sx_Key", "undefined");
+                  $$->getProperty ("__sx_Value").setTag (SXTAG_YACC(@2,@4));
+               }
+               ;
+
+members :      member {
+                  SX_DBG_YACC ("members#1: " << $1);
+                  $$ = parserPtr->peek ();
+                  SxVariantType::DataType chT =
+                  (SxVariantType::DataType)$1->getProperty ("__sx_Value").getType ();
+
+                  if (!(chT == SxVariantType::List || chT == SxVariantType::Group))
+                  {
+                     $$->setProperty ($1->getProperty ("__sx_Key").getString (),
+                                      $1->getProperty ("__sx_Value"));
+                     ast->getAst ()->removeElement (*$1);
+                  } else {
+                     ast->addEdge ($$, $1);
+                  }
+               }
+               | members ',' member {
+                  SX_DBG_YACC ("members#2: " << $1 << "-" << $3);
+                  $$ = parserPtr->peek ();
+                  SxVariantType::DataType chT =
+                  (SxVariantType::DataType)$3->getProperty ("__sx_Value").getType ();
+
+                  if (!(chT == SxVariantType::List || chT == SxVariantType::Group)) {
+                     $$->setProperty ($3->getProperty ("__sx_Key").getString (),
+                                      $3->getProperty ("__sx_Value"));
+                     ast->getAst ()->removeElement (*$3);
+                  } else {
+                     ast->addEdge ($$, $3);
+                  }
+               }
+               ;
+
+member  :      TK_STRING ':' element {
+                  SX_DBG_YACC ("member#1");
+                  $$ = $3;
+                  if (!ast->validateKey (*$1))
+                     SxJSONParser_error (&@1, ast, SxString("Invalid key: ")+ *$1);
+                  $$->setProperty ("__sx_Key", *$1);
+                  $$->getProperty ("__sx_Value").setTag (SXTAG_YACC(@1,@3));
+                  delete $1;
+               }
+               ;
+
+array:         push '[' ']' pop {
+                  SX_DBG_YACC ("array#1");
+                  $$ = $1;
+                  $$->setProperty ("__sx_Key", "undefined");
+                  SxVariant v;
+                  v.setType ((int)SxVariantType::List);
+                  $$->setProperty ("__sx_Value", v);
+                  $$->getProperty ("__sx_Value").setTag (SXTAG_YACC(@2,@3));
+               }
+               | push '['  elements ']' pop {
+                  SX_DBG_YACC ("array#2");
+                  $$ = $1;
+                  $$->setProperty ("__sx_Key", "undefined");
+                  $$->getProperty ("__sx_Value").setTag (SXTAG_YACC(@2,@4));
+               }
+               ;
+
+elements :     element {
+                  SX_DBG_YACC ("elements#1: " << $1);
+                  $$ = parserPtr->peek ();
+                  if ($$->getProperty ("__sx_Value").getType () != SxVariantType::List) {
+                     SxVariant v;
+                     v.setType ((int)SxVariantType::List);
+                     v.set (SxList<SxVariant>());
+                     $$->setProperty ("__sx_Value", v);
+                  }
+                  SxVariantType::DataType chT =
+                  (SxVariantType::DataType)$1->getProperty ("__sx_Value").getType ();
+
+                  if (!(chT == SxVariantType::List || chT == SxVariantType::Group))
+                  {
+                     $$->getProperty ("__sx_Value").append ($1->getProperty ("__sx_Value"));
+                     ast->getAst ()->removeElement (*$1);
+                  } else {
+                     ast->addEdge ($$, $1);
+                  }
+               }
+               | elements ',' element {
+                  SX_DBG_YACC ("elements#2: " << $1 << "-" << $3);
+                  $$ = parserPtr->peek ();
+
+                  if ($$->getProperty ("__sx_Value").getType () != SxVariantType::List) {
+                     SxVariant v;
+                     v.setType ((int)SxVariantType::List);
+                     $$->setProperty ("__sx_Value", v);
+                  }
+
+                  SxVariantType::DataType chT =
+                  (SxVariantType::DataType)$3->getProperty ("__sx_Value").getType ();
+
+                  if (!(chT == SxVariantType::List || chT == SxVariantType::Group))
+                  {
+                     $$->getProperty ("__sx_Value").append ($3->getProperty ("__sx_Value"));
+                     ast->getAst ()->removeElement (*$3);
+                  } else {
+                     ast->addEdge ($$, $3);
+                  }
+               }
+               ;
+
+element        : value {
+                    SX_DBG_YACC ("element#1");
+                    $$ = $1;
+                 }
+               ;
+
+value          : object {
+                    SX_DBG_YACC ("value#1");
+                    $$ = $1;
+                 }
+               | array {
+                    SX_DBG_YACC ("value#2");
+                    $$ = $1;
+                 }
+               | TK_STRING {
+                    SX_DBG_YACC ("value#3");
+                    $$ = ast->addNode (SxVariantType::String);
+                    $$->setProperty ("__sx_Value", *$1);
+                    $$->getProperty ("__sx_Value").setTag (SXTAG_YACC(@1));
+                    delete $1;
+                 }
+               | TK_INTEGER {
+                    SX_DBG_YACC ("value#4");
+                    $$ = ast->addNode (SxVariantType::Int);
+                    $$->setProperty ("__sx_Value", $1);
+                    $$->getProperty ("__sx_Value").setTag (SXTAG_YACC(@1));
+                 }
+               | TK_FLOAT {
+                    SX_DBG_YACC ("value#5");
+                    $$ = ast->addNode (SxVariantType::Double);
+                    $$->setProperty ("__sx_Value", $1);
+                    $$->getProperty ("__sx_Value").setTag (SXTAG_YACC(@1));
+                 }
+               | TK_BOOL {
+                    SX_DBG_YACC ("value#6");
+                    $$ = ast->addNode (SxVariantType::Bool);
+                    $$->setProperty ("__sx_Value", $1);
+                    $$->getProperty ("__sx_Value").setTag (SXTAG_YACC(@1));
+                 }
+               | TK_NULL {
+                    SX_DBG_YACC ("value#6");
+                    $$ = ast->addNode (SxVariantType::String);
+                    $$->setProperty ("__sx_Value", SxString (""));
+                    $$->getProperty ("__sx_Value").setTag (SXTAG_YACC(@1));
+                 }
+               ;
+
+push           : /* empty */ {
+                    $$ = ast->push (SxVariantType::Group);
+                    $$->setProperty ("__sx_Key", "undefined");
+                    SX_DBG_MSG ("push: " << $$);
+                 }
+               ;
+
+pop            : /* empty */ {
+                    SX_DBG_MSG ("pop");
+                    $$ = parserPtr->pop ();
+                 }
+               ;
+

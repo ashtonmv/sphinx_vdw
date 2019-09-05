@@ -1,0 +1,248 @@
+/** \page page_cvs      CVS Guide
+
+\section cvs_toc        Contents     
+
+  -# \ref cvs_intro
+  -# \ref cvs_branches
+  -# \ref cvs_access
+  -# \ref cvs_cmds
+
+\section cvs_intro      Introduction
+
+   SPHInX is a program package that is being developed by many people.
+   In order to keep the code under control a revision control system is
+   required. We use 
+      <A HREF="http://www.cvshome.org">
+         CVS - the Concurrent Versions System.
+      </A>
+
+\section cvs_branches   CVS Branches
+
+   The SPHInX package is developed using 3 CVS branches:
+   -# HEAD    - the latest develpment version
+   -# STABLE  - a rather stable version that can be used for calculations
+   -# RELEASE - the SPHInX version which will be available from the web site
+
+   The rules are as follows:
+   -# HEAD:
+      - Commit only compiling versions!
+      - Communicate with the other developers! Keep in mind that every of your
+        modification can affect other projects.
+      - Follow strictly the \ref page-names and don't mess up the code. 
+        \b Otherwise the CVS maintainer reverts your commits!
+      - Update as often as possible, ideally daily.
+      - Commit as often as possible, at least weekly.
+      - Don't commit features which have nothing to do with each other. 
+        Commit single features and write useful logs when committing. But do
+        tests before you commit.
+      - Commit at least once a week.
+   -# STABLE:
+      - New STABLE branches will be created from the CVS maintainer.
+      - Only those new features will enter the STABLE branch which 
+        - are well documented (SxDemoDoc) 
+        - work with the testbed version
+        - provide useful new tests in the testbed
+      - No new features may enter in this branch, just bug fixes.
+   -# RELEASE:
+      - New RELEASE branches will be created from the CVS maintainer.
+      - Only those features will enter the RELEASE branch which are
+        - part of the STABLE version
+        - well documented in the user's guide
+      - No new features may enter in this branch, just bug fixes.
+   -# The CVS maintainer can enable/disable single features using simple
+      CVS_HEAD and CVS_STABLE macros. The developer is not allowed to
+      modify any of these information.
+
+   In order to protect the code from violations agains the \ref page-names
+   the CVS maintainer can restrict the access permissions for users.
+
+\section    cvs_access   Access to the CVS server
+
+   In order to access the SPHInX CVS server please follow these steps:
+   
+   -# Generating a new CVS password
+      -# choose a login identifier of your choice
+      -# encrypt a password with
+\verbatim
+   htpasswd -nb USERID PASSWORD
+\endverbatim
+         Replace USERID and PASSWORD with your new user id and password, resp.
+   -# Getting the public Open-SSH key
+      -# If you have already an Open-SSH key \b WITHOUT a passphrase change
+         it and enter a passphrase. This will not create a new key, it just
+         adds the passphrase tag (A safe and pass-free authorization is 
+         explained in the section \ref ssh_agent).
+\verbatim
+   ssh-keygen -p -f $HOME/.ssh/id_dsa
+\endverbatim
+         or if you have an RSA key instead of an DSA key use
+\verbatim
+   ssh-keygen -p -f $HOME/.ssh/id_rsa
+\endverbatim
+      -# If you don't have an Open-SSH key create one with
+\verbatim
+   ssh-keygen -t dsa
+\endverbatim
+   -# Send the data to info@sphinxlib.de
+      -# we need your public key ~/.ssh/id_dsa.pub or ~/.ssh/id_rsa.pub
+      -# and the output of htpasswd
+      -# Do not send your private key!!!
+   -# Once the account is enabled setup your tunnel:
+      -# create the shell script $HOME/bin/sxtunnel
+\verbatim
+#!/bin/sh
+
+xterm -geometry 26x3-0+0 -title "SPHInX CVS Tunnel" -e "ssh -L2401:volta.upb.de:2401 sshtunnel@volta.upb.de 'echo CVS TUNNEL active && cat -'" &
+\endverbatim
+      -# Make the script executable
+\verbatim
+   chmod u+rx sxtunnel
+\endverbatim
+      -# Add $HOME/bin to your search path
+         - (t)csh users add this statement to their $HOME/.(t)cshrc
+\verbatim
+   setenv PATH ${PATH}:${HOME}/bin
+\endverbatim
+         - bash users add this statement to their $HOME/.bashrc
+\verbatim
+   export PATH=$(PATH):$(HOME)/bin
+\endverbatim
+   -# Open a new shell and execute "sxtunnel". CVS commands can be executed
+      as long as this window remains open.
+   -# Download SPHInX
+      -# create a new empty folder, e.g.,
+\verbatim
+   cd $HOME
+   mkdir -p devel
+   cd devel
+\endverbatim
+      -# Inside of the new folder checkout the source tree
+\verbatim
+   setenv CVSROOT :pserver:USERID@localhost:2401/home/cvs/sphinx
+   cvs login
+   cvs checkout sphinx
+\endverbatim
+
+
+\section    cvs_sshagent  Using the SSH Agent for passphrase-free access
+
+   Whenever a tunnel is opened to our CVS server you have to authentify
+   yourself with a passphrase. If you wish to have a passphrase-free access
+   use the SSH agent. The usage is explained in the section \ref ssh_agent.
+
+\section    cvs_cmds     CVS Commands
+
+   <TABLE>
+      <TR>
+         <TD><B> CVS command </B></TD>
+         <TD><B> Description </B></TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvs login </TT></TD>
+         <TD> Login into the CVS server. Actually only once required. </TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvs logout </TT></TD>
+         <TD> Logout from the CVS server. Actually not necessary. </TD>
+      </TR>
+
+      <TR>
+         <TD><B> checkout </B></TD>
+         <TD>                 </TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvs checkout manual </TT></TD>
+         <TD> Copy the User's Guide into the current directory. 
+              Make sure that current directory is empty. <TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvs checkout numlibs </TT></TD>
+         <TD> Copy the numeric libraries (FFT, BLAS, LAPACK) into the 
+              current directory. Make sure that current directory 
+              is empty. <TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvs checkout -r head src </TT></TD>
+         <TD> Copy the latest developer version into the 
+              current directory. Make sure that current directory 
+              is empty. <TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvs checkout -r head -d tempsrc src </TT></TD>
+         <TD> Copy the latest developer version into the 
+              current directory. Make sure that current directory 
+              is empty.
+              The destination folder's name is 'tempsrc' instead of
+              src.  This feature allows to create several projects
+              with each project having a different folder name. <TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvs checkout -r stable-123 src </TT></TD>
+         <TD> Copy the stable version 123 into the 
+              current directory. Make sure that current directory 
+              is empty. <TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvs checkout -r release-123 src </TT></TD>
+         <TD> Copy the release version 123 into the 
+              current directory. Make sure that current directory 
+              is empty. <TD>
+      </TR>
+
+      <TR>
+         <TD><B> diff </B></TD>
+         <TD>                 </TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvsfullxdiff head src</TT></TD>
+         <TD> Perform a file-by-file diff between your local version and the
+              working version on the CVS server. 
+              Make sure you are in the subfolder src.<TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvsfullxdiff stable-123 src</TT></TD>
+         <TD> Perform a file-by-file diff between your local version and the
+              stable version 123 on the CVS server. 
+              Make sure you are in the subfolder src.<TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvsfullxdiff release-123 src</TT></TD>
+         <TD> Perform a file-by-file diff between your local version and the
+              release version 123 on the CVS server. 
+              Make sure you are in the subfolder src.<TD>
+      </TR>
+
+      <TR>
+         <TD><B> synchronize </B></TD>
+         <TD>                 </TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvs update</TT></TD>
+         <TD> Synchronize locally your copy with the CVS version of the
+              same branch you have checked out. The server's version remains
+              untouched.
+              Make sure you are in the subfolder src.<TD>
+      </TR>
+
+      <TR>
+         <TD><TT> cvs commit -r "Variable psPot renamed to pseudoPot" </TT></TD>
+         <TD> Commit your local modifications to the CVS server. Append
+              useful log entries with the -m option.
+              Make sure you are in the subfolder src.<TD>
+      </TR>
+
+   </TABLE>
+
+*/

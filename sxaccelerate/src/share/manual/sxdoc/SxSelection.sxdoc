@@ -1,0 +1,289 @@
+h2. @SxSelection<T>@
+
+p1. The selection container allows to filter elements of a container @T@ based
+    on given criteria. Each @SxAccelerate@ container provides a @where()@ 
+    function that receives the filter criteria as a bound pointer and it returns
+    the set of elements that satisfy the criteria as an @SxSelection@ object.
+    The bound pointer takes a @ConstIterator@ pointing to an element of the
+    container as parameter and returns true or false, if the element satisfies
+    the selection criteria.
+
+p1. In the following paragraphs the functionality and usage of @SxSelection@ is
+    described with the help of code snippets.
+
+p1. In order to use the @SxSelection@, the corresponding header file must be
+    included along with the respective container as shown below:
+
+{{{cpp(sxselection)
+#include <SxSelection.h>
+#include <SxArray.h>
+#include <SxList.h>
+}}}
+
+h3. Working with @SxArray@
+
+p1. The following example shows how to apply filter on an @SxArray@ object.
+    First create an @SxArray@ object.
+
+{{{cpp(sxselection.arrayFixture)
+SxArray<int> ary(10);
+for (ssize_t i = 0; i < 10; ++i) {
+   ary(i) = i;
+}
+}}}
+
+p1. The filter can be applied on the above @SxArray@ object as shown below:
+
+{{{cpp(sxselection.arrayFixture.sel)
+auto evenLambda = [](auto it)->bool {
+                     if (*it % 2 == 0)  return true;
+                     else               return false;
+                  };
+SxSelection<SxArray<int> > sel = ary.where (evenLambda);
+sel.foreach ([](auto &it) {
+               std::cout << *it << std::endl;
+            });
+}}}
+
+p1. The filter criteria in the above code selects all even numbers out of the
+    container, which results in the following selection output:
+
+{{{expect(stdout,sxselection.arrayFixture.sel)
+0
+2
+4
+6
+8
+}}}
+
+p1. In the same way, successive filters can be applied to an @SxSelection@
+    object, as shown below:
+
+{{{cpp(sxselection.arrayFixture.selFilter)
+auto evenLambda = [](auto it)->bool {
+                     if (*it % 2 == 0)  return true;
+                     else               return false;
+                  };
+SxSelection<SxArray<int> > sel = ary.where (evenLambda);
+auto rangeLambda = [](auto it)->bool {
+                        if (*it < 5)  return true;
+                        else          return false;
+                     };
+SxSelection<SxArray<int> > sel2 = sel.where (rangeLambda); 
+sel2.foreach ([](auto &it) {
+                std::cout << *it << std::endl;
+             });
+}}}
+
+p1. The above example yields the following output:
+
+{{{expect(stdout,sxselection.arrayFixture.selFilter)
+0
+2
+4
+}}}
+
+h3. Working with @SxList@
+
+p1. The filter can be applied to an @SxList@ object in the similar way.
+    First create and populate an @SxList@ object as shown below:
+
+{{{cpp(sxselection.listFixture)
+SxList<SxString> lst;
+lst.append ("morning"); lst.append ("gym");
+lst.append ("myth");    lst.append ("cloud");
+lst.append ("sky");
+}}}
+
+p1. Next, the following code snippet filters the words that do not contain
+    any vowels in them:
+
+{{{cpp(sxselection.listFixture.sel)
+auto noVowelFilter = [](auto it)->bool {
+                        if (it->contains("a")
+                         || it->contains("e")
+                         || it->contains("i")
+                         || it->contains("o")
+                         || it->contains("u"))
+                           return false;
+                        else
+                           return true;
+                     };
+SxSelection<SxList<SxString> > sel = lst.where (noVowelFilter);
+sel.foreach ([](auto &it) {
+                std::cout << *it << std::endl;
+             });
+}}}
+
+p1. The above code yields the following output:
+
+{{{expect(stdout,sxselection.listFixture.sel)
+gym
+myth
+sky
+}}}
+
+h3. Working with @SxMap@
+
+p1. The @SxMap@ container also supports the filter operation. In case of @SxMap@
+    the @SxSelection@ only stores the values of the selected items. The usage
+    can be described by the following example code:
+
+{{{cpp(sxselection.mapFixture.sel)
+SxMap<SxString,SxString> map;
+map("Albania") = "Tirana";    map("Algeria") = "Algiers";
+map("Belgium") = "Brussels";  map("China") = "Beijing";
+auto lambda = [](auto it)->bool {
+                  if (it.getKey().head(1) == "A")
+                     return true;
+                  else
+                     return false;
+               };
+auto sel = map.where (lambda);
+sel.foreach ([](auto &it) {
+                std::cout << *it << std::endl;
+             });
+}}}
+
+p1. The above code filters the countries that start with an 'A' and it yields
+    the following output:
+
+{{{expect(stdout,sxselection.mapFixture.sel)
+Tirana
+Algiers
+}}}
+
+h3. Set Operations
+
+p1. The @SxSelection@ object also provides set operations such as Union,
+    Intersection, Complement and Symmetric Complement. These operations are
+    individually described below. The set operations are only applicable to
+    selections belonging to the same object. As these are set operations,
+    the duplicate elements are ignored while computing the results.
+
+h4. Union Operation
+
+p1. The union operation is supported in @SxSelection@ by using @|@ operator.
+    This operator takes two selections of the same container object and computes
+    a set union. The duplicate elements are only considered in the process.
+    The following example shows usage of such operation:
+
+p1. In this example an @SxArray<int>@ object is divided between two selections
+    based on indices range. Then these two selections are used to compute a union.
+
+{{{cpp(sxselection.union)
+SxArray<int> ary(20);
+ary(0) = 1; ary(1) = 1; ary(2) = 1;
+ary(3) = 2; ary(4) = 2; ary(5) = 2;
+ary(6) = 3; ary(7) = 3; ary(8) = 3;
+// --- second part of array
+ary(9)  = 4; ary(10) = 4; ary(11) = 4;
+ary(12) = 3; ary(13) = 3; ary(14) = 3;
+ary(15) = 2; ary(16) = 2; ary(17) = 2;
+ary(18) = 1; ary(19) = 1;
+// --- divide array in two parts
+// --- array indices below 9
+auto lambda1 = [](auto it)->bool{
+                     if (it.getIdx () < 9)
+                        return true;
+                     else
+                        return false;
+                 };
+// --- array indices above 8
+auto lambda2 = [](auto it)->bool{
+                     if (it.getIdx () >= 9)
+                        return true;
+                     else
+                        return false;
+                };
+// --- generate selections
+auto sel1 = ary.where (lambda1);
+auto sel2 = ary.where (lambda2);
+// --- apply union
+auto unionSel = sel1 | sel2;
+}}}
+
+p1. The above computed @unionSel@ can be printed using the following code:
+
+{{{cpp(sxselection.union.display)
+unionSel.foreach ([](auto &it) {
+                    std::cout << *it << std::endl;
+                 });
+}}}
+
+p1. which yields the following output:
+
+{{{expect(stdout,sxselection.union.display)
+1
+2
+3
+4
+}}}
+
+h4. Intersection Operation
+
+p1. The intersection operation is supported in @SxSelection@ by using @&@
+    operator. This operator takes two selections as parameters and returns the
+    selection containing set intersection of the input selections. It's usage
+    is shown by the following code snippet. By using the selections computed
+    in previous section, we have:
+
+{{{cpp(sxselection.union.intersection)
+auto intersectSel = unionSel & sel1;
+}}}
+
+p1. The computed @intersectSel@ can be displayed as follows:
+
+{{{cpp(sxselection.union.intersection.display)
+intersectSel.foreach ([](auto &it) {
+                    std::cout << *it << std::endl;
+                 });
+}}}
+
+p1. yielding,
+
+{{{expect(stdout,sxselection.union.intersection.display)
+1
+2
+3
+}}}
+
+h4. Complement Operation
+
+p1. The complement operation is supported in @SxSelection@ by using @-@
+    operator. By using the selections from previous sections we have:
+
+{{{cpp(sxselection.union.comp)
+auto compSel = unionSel - sel1;
+compSel.foreach ([](auto &it) {
+                    std::cout << *it << std::endl;
+                 });
+}}}
+
+p1. The above code results in a selection consisting of elements, where all
+    elements that are common between @unionSel@ and @sel1@ are removed
+    from @unionSel@. It yields in the following output:
+
+{{{expect(stdout,sxselection.union.comp)
+4
+}}}
+
+h4. Symmetric Complement Operation
+
+p1. The @!=@ operator computes the symmetric complement of two selections.
+    It results in a selection with union of both selections except the common
+    elements are removed. The following code shows an example of
+    symmetric complement:
+
+{{{cpp(sxselection.union.symComp)
+auto symCompSel = sel1 != sel2;
+symCompSel.foreach ([](auto &it) {
+                    std::cout << *it << std::endl;
+                 });
+}}}
+
+p1. which yields,
+
+{{{expect(stdout,sxselection.union.symComp)
+4
+}}}

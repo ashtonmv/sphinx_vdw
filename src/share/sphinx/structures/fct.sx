@@ -1,0 +1,38 @@
+// --------------------------------------------------------------------------
+// SFHIngX  -  face centered tetragonal lattice
+//             fct, A6
+//
+// Sixten Boeck, boeck@fhi-berlin.mpg.de
+// 08/10/2002
+//
+// Reference: Landold-Bernstein
+//
+// --------------------------------------------------------------------------
+// Arguments:
+//    aLat                lattice parameter a [Bohr]
+//    cLat                lattice parameter c [Bohr]
+// --------------------------------------------------------------------------
+
+requires aLat;
+requires cLat;
+
+// --- definition of the primitive unit cell
+global a1, a2, a3;
+a1   = [     0,  aLat/2,  cLat/2];
+a2   = [aLat/2,       0,  cLat/2];
+a3   = [aLat/2,  aLat/2,       0];
+cell = [a1, a2, a3];
+
+
+// --- reciprocal space units
+global kx, ky, kz;
+kx = 2*pi/aLat;
+ky = kx;
+kz = 2*pi/cLat;
+
+// --- high symmetry k-points
+G  = [ kx* 0, ky*  0, kz*  0];
+X  = [ kx* 1, ky*  0, kz*  0];
+Z  = [ kx* 0, ky*  0, kz*  1];
+P  = [ kx* 1, ky*  0, kz*1/2];
+

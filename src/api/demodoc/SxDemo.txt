@@ -1,0 +1,33 @@
+// --- Do not edit the file SxDemoDoc.h!!!
+//     It is generated automatically from SxDemoDoc.doc
+
+
+/** \brief Template class to demonstrate the SFHIngX documentation standard
+
+    This is class demonstrates how SFHIngX classes should be documented. The
+    template is organized in pseudofunction that contain frequently used
+    doxygen commands.
+
+    Read also \ref names_api in the \ref page-names.
+
+    The complete documentation of doxygen can be found
+    <A HREF="http://www.stack.nl/~dimitri/doxygen/manual.html">
+       here
+    </A>.
+
+    \author Sixten Boeck  */
+class SxDemoDoc {
+   public:
+#  include "author.doc"
+#  include "enums.doc"   
+#  include "functions.doc"   
+#  include "lists.doc"   
+#  include "latex.doc"
+#  include "code.doc"
+#  include "citebib.doc"   
+#  include "images.doc"
+#  include "grouping.doc"   
+#  include "docgroup.doc"   
+#  include "setenv.doc"
+#  include "registry.doc"
+};

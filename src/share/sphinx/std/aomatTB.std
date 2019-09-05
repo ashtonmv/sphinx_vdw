@@ -1,0 +1,87 @@
+// ---------------------------------------------------------------------------
+//
+//      The ab-initio based multiscale library
+//
+//                  S / P H I / n X
+//
+//      Copyright:  Max-Planck-Institute for Iron Research
+//                  40237 Duesseldorf, Germany
+//
+//      Contact:    https://sxlib.mpie.de
+//      Authors:    see sphinx/AUTHORS
+//      License:    see sphinx/LICENSE
+//
+// ---------------------------------------------------------------------------
+
+aomatTB              { type="group"; maxItems=1;
+   symmetry          { type="group"; maxItems=1; optional; 
+      operator       { type="group"; minItems=1; maxItems=48; optional;
+         S           { type="matrix"; dims=[3,3]; }
+      }
+   }
+   species           { type="group";
+      name           { type="string"; }
+      element        { type="string"; }
+      valenceCharge  { type="real"; optional; }
+      reciprocalMass { type="real"; min=0; }
+      dampingMass    { type="real"; min=0; }
+      ionicMass      { type="real"; min=0; }
+      orbitalsPerL   { type="vector";}
+      matFile        { type="group"; optional;
+         file        { type="string"; }
+         iSpecies    { type="int"; min=0;}
+      }
+
+      onside         { type="group";
+         coords      { type="vector"; dim=3; }
+         atomType    { type="string"; } // type of neighbor
+         symmetries  { type="vector";optional;} // generate other neighbors
+         orientations{ type="vector"; } // generate other neighbors
+         matSyms     { type="list";optional;}
+         R           { type="matrix"; dims=[3,3]; optional;} // rotation Matrix to rotate z into bonding direction
+         S           { type="list"; minRank=2; maxRank=2; optional;} // Overlap Matrix z = bonding direction
+         H           { type="list"; minRank=2; maxRank=2; optional;} // Hamiltonian z = bonding direction
+         factor      { type="real"; optional;}
+      }     
+
+      neighbor       { type="group";
+         species     { type="int";}
+         coords      { type="vector"; dim=3; }
+         atomType    { type="string"; } // type of neighbor
+         symmetries  { type="vector"; } // generate other neighbors
+         matSyms     { type="list";optional;}
+         R           { type="matrix"; dims=[3,3]; optional;} // rotation Matrix to rotate z into bonding direction
+         S           { type="list"; minRank=2; maxRank=2; optional;} // Overlap Matrix z = bonding direction
+         H           { type="list"; minRank=2; maxRank=2; optional;} // Hamiltonian z = bonding direction
+         factor      { type="real"; optional;}
+      }
+   }
+   include <std/structure.std>;
+}
+
+basis             { type="group"; 
+   kPoint            { type="group"; minItems=1; xor="kPoint,kPoints";
+      coords         { type="vector"; dim=3; }
+      label          { type="string"; optional; }
+      weight         { type="real"; min=0; max=1; optional; }
+      relative       { type="flag"; optional; }
+   }
+   kPoints           { type="group"; minItems=1; xor="kPoint,kPoints"; not="folding";
+      // relative may be given for all k-points
+      relative    { type="flag"; optional; } 
+      from           { type="group"; nItems=1;
+         coords      { type="vector"; dim=3; }
+         label       { type="string"; optional; }
+         //       paths usually in cart. coords
+         relative    { type="flag"; optional; } 
+      }             
+      to             { type="group"; minItems=1;
+         coords      { type="vector"; dim=3; }
+         nPoints     { type="int"; min = 1;}
+         label       { type="string"; optional; }
+         //       paths usually in cart. coords
+         relative    { type="flag"; optional; } 
+      }             
+   }
+   folding           { type="vector"; dim=3; optional; }
+}

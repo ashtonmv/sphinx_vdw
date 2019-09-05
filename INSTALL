@@ -1,0 +1,67 @@
+INSTALLATION QUICK GUIDE for SPHInX
+
+* MINIMUM REQUIREMENTS
+- C++ compiler (gcc is our preferred choice)
+- BLAS/LAPACK library, either mkl or ATLAS+LAPACK
+- netcdf >3.5
+- FFT library (mkl or FFTW)
+
+* OPTIONAL FEATURES
+- pcre2 library
+- MPI compiler + library (with configure option --enable-mpi)
+- automake (to make changes in build system)
+- yacc/bison (to make changes in parsers)
+- NetCD4 + HDF5 (for MPI-parallel IO) 
+
+* INSTALLATION (GNU/Linux) FROM DISTRIBUTED SOURCE (sphinx-XXX.tar.xz)
+
+   configure --disable-debug [+ more options, see below] 
+   make all [-j N]
+   make install
+
+   Note: -j N invokes parallel make to reduce build time. N should be the number of CPU cores available.
+
+* BUILDING FROM git repository (developers only)
+   Note: requires automake, yacc/bison
+   # initialize build environment
+   ./setup
+   # optionally change to a build folder, then
+   <path_to_sphinx>/configure [options, see below]
+   # now build
+   make all [-j N]
+   # installation is optional, you can also run executables in build folder
+
+
+* CONFIGURE OPTIONS
+** to select apropriate 3rd-party libraries
+- for using mkl
+   --disable-atlas --disable-lapack --enable-mkl --enable-mklfft --disable-fftw --with-mklpath=<path-to-mkl>
+- for using mkl + FFTW with openmp
+   --disable-atlas --disable-lapack --enable-mkl --with-mklpath=<path-to-mkl> --enable-fftw --enable-openmp
+- for using FFTW (recommended for openmp runs)
+   --enable-fftw
+- for using ATLAS + LAPACK
+   --enable-atlas --enable-lapack
+
+** parallelism
+- for using openmp
+   --enable-openmp
+- for using MPI
+   --enable-mpi
+- for parallel IO on wavefunctions in MPI (requires MPI-parallel netcdf4)
+   --enable-hdf5 --enable-netcdf4 --enable-parnetcdf
+
+** others
+- for selecting the architecture/instruction set (see C++ compiler manual for details)
+   CXX_M_ARCH=-march=<cputype>
+- for using our fast AO projection kernel (requires AVX-capable CPU)
+   --enable-sxgemmm
+- for setting installation path
+   --prefix=<installation path>
+- for compiling in DEBUG mode: replace "--disable-debug" with
+   --enable-debug
+- use 3rd-party libraries in special locations PATH1 (and PATH2 and ...)
+  --with-numlibs=PATH1[:PATH2:...]
+  This configure options will add include/ subdirectory for inclusion search path and lib/ subdirectory to the linker search path.
+- if you set the CXX environment variable to select the compiler, you may need to set OBJCXX to the same compiler (used for linking)
+

@@ -1,0 +1,31 @@
+kpHamiltonian   {type="group"; optional; minItems=1;
+   speedOpt     {type="flag"; optional;}
+   simplifiedInterfaces     {type="flag"; optional;}
+   lessIO       {type="flag"; optional;}
+   eTrial       {type="real";}
+   nBands       {type="int";}
+   weight       {type="vector"; dim=3; optional;}
+   hamFile      {type="string"; optional;}
+   nEmptyStates {type="integer"; optional;}
+   polarization {type="string"; optional;}
+   extPotential {type="string"; optional;}
+   strain       {type="group"; optional;
+      eXX       {type="string";}
+      eYY       {type="string";}
+      eZZ       {type="string";}
+      eXY       {type="string";}
+      eXZ       {type="string";}
+      eYZ       {type="string";}
+   }
+   outputParameter {type="string";optional;}
+   bandstructure {type="group"; optional;
+      outFile   {type="string";}
+      onlyBS    {type="flag"; optional;}
+      rCoord    {type="vector"; dim=3;}
+      path      {type="group"; minitems=1;
+         from      {type="vector"; dim=3;}
+         to        {type="vector"; dim=3;}
+         steps     {type="integer";}
+      }
+   }
+}               

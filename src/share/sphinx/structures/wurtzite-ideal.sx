@@ -1,0 +1,33 @@
+// --------------------------------------------------------------------------
+// SFHIngX  -  Ideal Wurtzite structure
+//
+// Matthias Wahn, wahn@fhi-berlin.mpg.de
+// 26-August-2005
+//
+// --------------------------------------------------------------------------
+// Arguments:
+//    aLat                lattice parameter a [Bohr]
+//    species_1           filename of 1st species file
+//    species_2           filename of 2nd species file
+// --------------------------------------------------------------------------
+
+needs  aLat;
+global cLat;
+needs  species_1;
+needs  species_2;
+
+cLat = aLat * sqrt(8/3);  // ratio of the ideal Wurtzite structure
+
+include <structures/hcpRot.sx>;
+
+species  {
+   include species_1;
+   atom  { coords = [0,0,0]; relative; }
+   atom  { coords = [1/3,2/3,1/2]; relative; }
+}
+
+species  {
+   include species_2;
+   atom  { coords = [0,0,3/8]; relative; }
+   atom  { coords = [1/3,2/3,7/8]; relative; }
+}

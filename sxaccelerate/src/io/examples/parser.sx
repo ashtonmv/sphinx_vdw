@@ -1,0 +1,16 @@
+format parser;
+
+structure {
+   i = 10;
+   d = 1.23;
+   s = "structure1"
+   file = "cell";
+   ext = ".sx";
+   x = read (file + ext);
+   include "cell.sx"; 
+
+   doSomething = 8g7;
+
+   atom { coords = [0, 0, 0];       label = "Ga"; }
+   atom { coords = [1/4, 1/4, 1/4]; label = "As"; }
+}

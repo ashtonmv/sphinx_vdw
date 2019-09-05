@@ -1,0 +1,37 @@
+name           = "Nitrogen";
+potType        = "AbInit";
+element        = "N";
+potential      = <potentials/N_lda.paw>; 
+reciprocalMass = 14.007;
+dampingMass    = 0.7;
+ionicMass      = 14.007;
+valenceCharge  = 5;
+atomicRhoOcc   = [2,0,3,0];
+
+/* AtomPAW Generation File
+N 7
+LDA-PW loggrid 2000
+2 2 0 0 0       ! Up to 2s and 2p
+1 0 2
+2 0 2
+2 1 3
+0 0 0           ! end electronic configuration 
+c               ! 1s core
+v               ! 2s core
+v               ! 2p core
+1               ! Basis contains s,p partial waves
+1.3             ! rpaw = rshape = rveff = rcore = 1.3
+y
+0.2
+n
+y
+-0.4
+n
+custom rrkj gramschmidthortho sinc
+3 0.0
+1.3
+1.3
+1.3
+1.3
+0              ! END
+*/

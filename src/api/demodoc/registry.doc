@@ -1,0 +1,10 @@
+/** \brief Windows registry
+
+\verbinclude registry.txt
+
+   Assuming a function evaluates a an Windows Registry variable and reacts
+   on it the used variable should be mentioned in the documentation.
+
+   \registry HKCU/Software/SX/SFHIngX/SxIncludePath
+ */
+  void registry ();

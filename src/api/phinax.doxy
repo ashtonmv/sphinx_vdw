@@ -1,0 +1,45 @@
+/** \page  page_phinax   Writing PHInaX modules
+
+\section phinax_intro  Introduction
+
+    PHInaX (http://www.phinax.de) is the graphical user interface of SPHInX.
+    Its SDK (software developer's kit) allows to create user widgets 
+    (buttons, sliders, labels) as well as 3d visualization objects.
+    The widgets and input/output data ports can be connected to SPHInX 
+    add-on classes. The module builder's output is a shared object which can
+    be plugged in to PHInaX.
+
+\section phinax_install Installation of PHInaX
+
+    PHInaX modules can be compiled only if the PHInaX-SDK has been installed
+    before (see \ref make_phinax).
+
+    Please download PHInaX and install it as described in its installation
+    instructions. Once the installation is finished you should find a 
+    folder $HOME/PHInaX in your home directory.
+
+\section compile_sx  Compilation of PHInaX modules
+
+    Compile SPHInX as usual. After SPHInX has been compiled invoke 
+    <b>(g)make</b> in the subfolder src/modules. 
+    If the PHInaX modules should be created by default configure SPHInX
+    with the "--with-phinax" option, e.g.,
+    \verbatim
+       cd src
+       configure --with-phinax
+       (g)make
+    \endverbatim
+
+\section phinax_plugins  Install the modules
+
+    Once the PHInaX modules (*.so files) have been
+    compiled they can be used in PHInaX. Therefore they have to be copied
+    into the folder $HOME/PHInaX/plugins. This can be done by invoking
+\verbatim
+   (g)make install
+\endverbatim
+   in the subfolder modules/. In order to load the new modules PHInaX simply
+   restart PHInaX.
+
+    \author Sixten Boeck
+*/

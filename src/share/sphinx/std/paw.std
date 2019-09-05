@@ -1,0 +1,192 @@
+// ---------------------------------------------------------------------------
+//
+//      The ab-initio based multiscale library
+//
+//                  S / P H I / n X
+//
+//      Copyright:  Max-Planck-Institute for Iron Research
+//                  40237 Duesseldorf, Germany
+//
+//      Contact:    https://sxlib.mpie.de
+//      Authors:    see sphinx/AUTHORS
+//      License:    see sphinx/LICENSE
+//
+// ---------------------------------------------------------------------------
+// Rather strict input file format definitions:
+//    * variables may be defined only in top level node
+//    * k-Points for bandstructures (path through the Brillouin zone) are
+//      expected in cartesion coordinates
+//    * k-Points used in the Monkhorst-Pack folding are expected in 
+//      relative coordinates
+//    * energy-cutoff limited 
+// --------------------------------------------------------------------------
+set validation;
+
+
+deprecateFormat;
+topLevelDefs;
+
+// Declare global "skipUnexpectedGroups". See also footer of this file.
+skipUnexpectedGroups;
+
+include <std/structure.std>;
+
+pawPot              { type="group"; maxItems=1; optional; 
+  species           { type="group"; minItems=1; 
+     name           { type="string"; optional;}
+     element        { type="string"; optional; }
+     potential      { type="string"; }
+     potType        { type="string"; }
+         
+     gyromagneticRatio { type="real"; optional; }
+
+     reciprocalMass { type="real"; min=0; optional; }
+     dampingMass    { type="real"; min=0; optional; }
+     ionicMass      { type="real"; min=0; optional; }
+     valenceCharge  { type="real"; min=0; max=104; optional; }
+     atomicRhoOcc   { type="list"; minRank=0; maxRank=2; optional; }
+
+     lMaxRho        { type="int"; min=0; optional; }
+     angularGrid    { type="int"; min=0; max=31; optional; }
+     nRadGrid       { type="int"; min=100; optional; }
+
+     coreX          { type="matrix"; optional; }
+     coreWaves      { type="string"; optional; }
+
+     checkOverlap   { type="flag"; optional; }
+     useProjG       { type="flag"; optional; }
+  }
+  kjxc { type="flag"; optional; }
+  verbose { type="flag"; optional; }
+  useProjG { type="flag"; optional; }
+}
+
+include <std/basis.std>;
+
+aoBasis { type="group"; nItems=1; optional;
+   file { type="string"; optional; }
+   fromPotential { type="flag"; optional; }
+}
+
+include <std/initialGuess.std>;
+
+spinConstraint       { type="group"; optional;
+   label { type="string"; xor="file"; optional; }
+   file  { type="string"; xor="label"; optional; }
+   constraint { type="real"; optional; }
+}
+
+PAWHamiltonian        { type="group"; nItems=1; optional;
+   nEmptyStates      { type="int"; min=0; optional; }
+   vExt              { type="group"; optional; 
+      file { type="string"; }
+   }
+   nExcessElectrons  { type="real"; min=-1000; max=1000; optional; }
+   ekt               { type="real"; min=0; }
+   MethfesselPaxton  { type="int"; min=0; optional; }
+   xc                { type="int"; min=0; max=33; }
+   xcMesh            { type="group"; optional;
+      eCut              { type="real"; min=5; xor="eCut,mesh,meshAccuracy";}
+      mesh              { type="vector"; dim=3; xor="eCut,mesh,meshAccuracy";}
+      meshAccuracy      { type="real"; xor="eCut,mesh,meshAccuracy";}
+   }
+   omegaHSE          { type="real"; optional; }
+   alphaHybrid       { type="real"; optional; }
+   spinPolarized     { type="flag"; optional; }
+   hContrib          { type="int"; optional; }
+   //nlBlockSize       { type="int"; optional; min=1; }
+   dipoleCorrection  { type="flag"; optional; }
+   fixedDipoleZ      {type="real"; optional;}
+   zField            {type="real"; optional;}
+   rSoft             {type="real"; optional; min=0;}
+   HubbardU { type="group"; optional;
+      verbose { type="flag"; optional; }
+      site { type="group"; optional;
+         element { type="string"; optional; xor="element,species,label"; }
+         species { type="int"; optional; xor="element,species,label"; }
+         label   { type="string"; optional; xor="element,species,label"; }
+
+         projectorType { type="int"; }
+         U             { type="real"; }
+         shift         { type="real"; optional; }
+
+         update { type="flag"; optional; }
+      }
+      MO { type="group"; optional;
+         verbose { type="flag"; optional; }
+
+         element { type="string"; optional; xor="element,species,label"; }
+         species { type="int"; optional; xor="element,species,label"; }
+         label   { type="string"; optional; xor="element,species,label"; }
+
+         minDist { type="real"; min=0.; optional; }
+         maxDist { type="real"; min=0.; }
+         nInterpolate { type="int"; min=10; optional; }
+
+         orbital { type="group";
+            fromPotential { type="flag"; optional; xor="fromPotential,file"; }
+            file { type="string"; optional; xor="fromPotential,file"; }
+            iot { type="int";   min=0;}
+            // take from this species in file (default: same as element)
+            is  { type="int"; optional; min=0;}
+         }
+         nRadGrid { type="int"; min=100; optional; }
+         rCut { type="real"; min=0.; }
+         cutWidth { type="real"; min=0.; optional; }
+         // rotational quantum number along the molecular axis
+         mMO { type="int"; min=0; }
+         sign { type="int"; min=-1; max=1; }
+         setupBoxSize { type="real"; min=10.; optional; }
+
+         U             { type="real"; }
+         shift         { type="real"; optional; }
+
+         //update { type="flag"; optional; }
+
+      }
+      AO { type="group"; optional;
+         verbose { type="flag"; optional; }
+
+         element { type="string"; optional; xor="element,species,label"; }
+         species { type="int"; optional; xor="element,species,label"; }
+         label   { type="string"; optional; xor="element,species,label"; }
+
+         orbital { type="group";
+            fromPotential { type="flag"; optional; xor="fromPotential,file"; }
+            file { type="string"; optional; xor="fromPotential,file"; }
+            iot { type="int";   min=0;}
+            // take from this species in file (default: same as element)
+            is  { type="int"; optional; min=0;}
+         }
+         nRadGrid { type="int"; min=100; optional; }
+         rCut { type="real"; min=0.; }
+         cutWidth { type="real"; min=0.; optional; }
+
+         U             { type="real"; }
+         shift         { type="real"; optional; }
+
+         //update { type="flag"; optional; }
+
+      }
+   }
+}
+
+main                 { type="group"; nItems=1;
+   Hirshfeld { type="flag"; optional; }
+   evalForces { type="group"; optional;
+      file { type="string"; optional; }
+   }
+   include <std/ccg.std>;
+   include <std/linqnPAW.std>;
+   include <std/ricqn.std>;
+   include <std/qn.std>;
+   include <std/scf.std>;
+   include <std/bandstruct.std>;
+   include <std/moldyn.std>;
+   include <std/frozenPhonon.std>;
+   include <std/lcao.std>;
+   include <std/extControl.std>;
+}
+
+// --- Put value back to false. It might have been overwriten by included stds.
+skipUnexpectedGroups = false;

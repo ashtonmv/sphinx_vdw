@@ -1,0 +1,54 @@
+This file describes the basic structure of the GNUmakefile for module 
+directories such as util/
+
+Overview:
+* NAME=...
+* include ../system/make.libs
+* prelink (optional)
+* special rules
+
+-------------------------------------------------------
+
+*** NAME=libsx...
+describes the name of the archive to be created without any extension like 
+.a or .so, but with the preceding "lib".
+
+Each module must have a unique name. It must be all lowercase. In general,
+new modules must be configured (described elsewhere). The part after the
+-l in the configuration is the part after lib for NAME.
+
+Example:
+module "util":
+in configuration (SXLIBS) -lsxutil
+in util/GNUmakefile       libsxutil
+in lib/ directory         libsxutil.a (or libsxutil.so for shared libraries)
+
+------------------------------------------------------
+
+*** include ../system/make.libs
+Here, all the rules to generate libraries (as well as add-ons) are imported.
+General rules go to that file, directory-specific rules come AFTER the include.
+
+------------------------------------------------------
+
+*** prelink: ...
+Here, prelinkable object files are listed for the 
+configure --enable-fastlink 
+option. In general, this is restricted to low-level wrapper function 
+files/classes that hide numeric/io libraries from the developer. In the
+prelinking, these external libraries are already linked with the wrapper
+functions, which hopefully speeds up the linking. This is experimental.
+If you are in doubt, do not put your object file here.
+
+------------------------------------------------------
+**** special rules
+Special rules may be necessary for certain files in some directories.
+This is plain make, please refer to
+
+info make
+
+for more information
+
+
+
+

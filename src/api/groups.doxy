@@ -1,0 +1,63 @@
+/** \defgroup   group_dirac         Dirac notation
+
+    SPHInX allows to a certain extent the usage of the Dirac notation
+    in the C++ source code. Using this notation the code can be organized
+    almost basis-set independent.
+
+    More information can be found in \ref page_dirac.
+    */
+
+/** \defgroup   group_structure    Atomic Structure
+
+    Classes in this module compute the Born-Oppenheimer surfaces at
+    different atomic structures iteratively, e.g.
+    - atomic structure relaxation / structure optimization
+    - transition state search
+    - phonon calculations
+    - molecular dynamics
+
+    Furthermore several helper classes are located in this group, such as
+    - Super cell definition
+    - Description of atomic structures and forces
+    - Filters
+
+    More information can be found in \ref page_struct.
+    */
+
+
+
+/** \defgroup   group_dft          DFT
+
+    The DFT (Density Functional Theory) Kernel of SPHInX is split up
+    into three class familties:
+       - Basis set classes  (SxBasis)
+       - Wavefunction classes  (SxPsiSet)
+       - Hamiltonian (SxHamiltonian)
+    */
+
+/** \defgroup  group_num           Numerics
+
+    SPHInX supports numeric interfaces to platform dependent numeric 
+    libraries. It supports:
+       - Fast Fourier Transformation (FFT)
+       - Algebra
+       - Special functions
+    */
+
+/** \defgroup group_addons         Add-ons
+
+    SPHInX add-ons are executables based on the SPHInX libraries. In general
+    they have three interfaces:
+       - programming interface
+       - command line interface
+       - PHInaX module interface
+
+    Read more about \ref page_addons.
+    */
+
+/** \defgroup group_os  Operating system
+
+    In order to keep SPHInX platform-independent direct operating system
+    calls have to be redirected through an interface layer. Classes in this
+    group provide such independent function interfaces. For each new platform
+    these implementation of these classes can be adopted. */

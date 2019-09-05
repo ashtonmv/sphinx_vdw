@@ -1,0 +1,67 @@
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usepackage{calc}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{framed}
+\usepackage{tcolorbox}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\geometry{includeheadfoot,margin=2.20cm}
+
+\colorlet{shadecolor}{gray!10}
+
+\definecolor{darkgreen}{HTML}{2E8B57}
+\definecolor{darkblue}{HTML}{000080}
+\definecolor{magenta}{HTML}{FF00FF}
+\definecolor{gray}{HTML}{9696B7}
+\definecolor{darkred}{HTML}{A71515}
+
+\hypersetup{
+   unicode     = false,
+   bookmarks   = true,
+   bookmarksnumbered  = false,
+   bookmarksopen      = true,
+   bookmarksopenlevel = 1,
+   pdfborder   = true,
+   backref     = page,
+   pdfusetitle = true,
+   breaklinks  = true,
+   colorlinks  = true,
+   urlcolor    = blue,
+   linkcolor   = blue,
+   citecolor   = red,
+   pdftitle    = {S/PHI/nX Accelerate Libraries},
+   pdfauthor   = {DACS Laboratories},
+   pdfproducer = {SxQ Publisher},
+   pdfkeywords = {Manual}
+}
+
+\setcounter{tocdepth}{5}
+\setcounter{secnumdepth}{5}
+
+\setlength{\parindent}{0pt}
+
+\newcommand{\sxbackslash}{\char`\\}
+
+\newenvironment{sxqverb}
+{\begin{tcolorbox}[colback=yellow!5!white,colframe=black!15!white,boxrule=1pt]
+ \begin{list}{}{
+\setlength{\topsep}{0pt}
+\setlength{\leftmargin}{0pt}
+\setlength{\rightmargin}{0pt}
+\setlength{\listparindent}{0pt}
+\raggedright
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\normalfont\ttfamily\footnotesize}
+\item[]}
+{\end{list}\end{tcolorbox}}
+
+\title{S/PHI/nX Accelerate Libraries Developer's Guide}
+\author{DACS Laboratories}
+

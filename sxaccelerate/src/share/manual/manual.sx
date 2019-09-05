@@ -1,0 +1,20 @@
+format sxpublisher;
+
+/* SxDoc {
+h1. abc
+
+p1. asdsd
+
+} */
+document {
+   file = "sxdoc/manual.sxdoc";
+
+   macros {
+      sxcmdref {
+         dirs {
+            cli = "/scratch/freysoldt/devel/sxab/sxaccelerate/src/apps";
+            src = "/home/freysoldt/devel/sphinx/sxaccelerate/src/apps";
+         }
+      }
+   }
+}

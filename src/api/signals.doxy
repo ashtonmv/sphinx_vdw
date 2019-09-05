@@ -1,0 +1,63 @@
+/** \page   page_signals    Signal Handling under SPHInX
+
+\section  sig_intro   Introduction
+
+   SPHInX has a crossplatform signal handler implemented which can be used
+   to trap the signals SIGINT(2) and SIGTERM(15). Usually SIGINT is emitted
+   when the user hits <CTRL>-C whereas SIGTERM will be generated from other
+   processes (e.g. parent process, batch system, computer shutdown). 
+   For more information about these signals please read the UNIX man page
+   signal(7).
+   The SPHInX signal handler can be used to jump into specified routines 
+   before the program stops. For example, the program could write emergency
+   data before it stops.
+
+\section  sig_add     Adding a signal handler
+
+   Adding a signal handler to a C++ class is quite simple. The class
+   which should trap a signal should be derived from the SPHInX signal
+   handler SxEmergency and the purely abstract function dumpData has to be
+   defined, e.g.
+
+   \verbatim
+   // --- myclass.h
+   #include <SxEmergency.h>
+   ...
+   class MyClass : public SxEmergency
+   {
+      public:
+         ...
+         virtual void dumpData ();
+   }
+   \endverbatim
+
+   In the corresponding C++ source file routine dumpData can be defined by the
+   developer (e.g. with writing special data):
+
+   \verbatim
+   // --- myclass.cpp
+   # include <myclass.h>
+   ...
+   void MyClass::dumpData ()
+   {
+      FILE *fp = fopen ("emergency.dat", "w");
+      ...
+      fprintf (fp, ...);
+      ...
+      fclose (fp);
+   }
+   \endverbatim
+
+\section  sig_problems    Problems
+
+   If the signal is emitted from another process (e.g. the computer or the 
+   queuing system is about to go down) usually first SIGTERM is sent. After
+   a certain time interval (ask your system administrator) a SIGKILL is used
+   to be emitted in order to terminate the process. SIGKILL cannot be trapped.
+   Since the interval between SIGTERM and SIGKILL is usually rather small
+   (1-2 minutes) make sure that the dumpData routine can be finished quickly!
+   Also keep in mind that other classes in the same program can use the
+   SPHInX signal handler. Hence, only very important data should be safed.
+
+\author Sixten Boeck
+  */

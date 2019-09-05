@@ -1,0 +1,9 @@
+      name           = "Nitrogen";
+      element        = "N";
+      skElementName  = "n"; // --- used to identify the SK files for every pair of species in the structure: 
+      valenceCharge  = 5;   //     (SK files names = "skElementName"(species_i) + "..."(species_j) + ".sx")
+      lMax           = p;
+      atomicRhoOcc   = [2,3];
+      reciprocalMass = 3.5;
+      dampingMass    = 0.7;
+      ionicMass      = 3.5;

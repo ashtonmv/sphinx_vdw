@@ -1,0 +1,60 @@
+Version 2.6 (2019-05-22)
+- Hubbard-U on atomic quamols (via HubbardMO)
+- atomic density transfer with Hirshfeld decomposition
+- better Pulay reininitialization: keep the best case
+- forces for single-point calculations via evalForces{}
+- fix PAW spin initialization via total moment
+- improved openmp parallelization for xc in PAW sphere
+- improved performance of AO projections
+- made vector allocation thread-safe
+
+Version 2.5 (2018-12-18)
+- k-point parallelization of norm-conserving PPs
+- more openmp parallelization
+- Hubbard-U for molecular orbitals (homonuclear diatomics)
+- Hubbard-U on PAW projectors
+- reduced memory demands
+
+Version 2.4 (2017-06-06)
+- elliptic preconditioner for metallic slabs
+- charge initialization in rho setup via input file
+- consistent definition of total energy/potential/forces for charged slabs
+- ric optimizer: revised implementation, external interface (sxopt)
+- structure optimizer trajectories
+- charge corrections for 2D/slab systems
+- sxdefectalign for quantum espresso
+- latest features in k.p code from Oliver Marquardt
+
+Version 2.3 (2016-11-24)
+- ricQN minimizer
+- defect strain tools
+- generalized dipole correction
+- FFT2d+1d for SxPWHamiltonian
+
+Version 2.2 (2016-09-06)
+- use C++14 standard
+- symmetry code: class to deal with equivalent atoms
+- more openmp parallelization
+- sxdefectalign for socorro
+- sxdefectalign for anisotropic dielectric tensor
+- extControl {} interface to steer SPHInX via pipes
+- improved spinconstraints (faster, less memory)
+- SxPWHamiltonian uses SxAOBasis for fast nonlocal projections
+- block algorithms in exact-exchange
+
+Version 2.1 (2016-04-05)
+- spin constraints
+- hierarchical MPI parallelization
+- Harris-Foulkes functional
+- openmp parallelization
+- improved PAW potential readers (VASP, atompaw 4.0)
+- fast non-local projectors (sxgemmm/sxpgem3m)
+- HSE
+- image charge method for 2D systems (add-on)
+- quamols add-on
+- ELNES add-on
+- phonon model for ionic systems (add-on)
+
+Version 2.0 (2012-05-23)
+- PAW
+- k dot p

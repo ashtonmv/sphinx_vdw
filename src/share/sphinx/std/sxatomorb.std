@@ -1,0 +1,3 @@
+set validation;
+include <std/structure.std>; 
+include <std/basis.std>;

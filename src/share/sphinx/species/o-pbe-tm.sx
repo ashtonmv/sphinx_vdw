@@ -1,0 +1,21 @@
+potential      = <potentials/o-pbe-t14spd.cpi>;
+name           = "Oxygen";
+element        = "O";
+valenceCharge  = 6;
+lMax           = d;
+lLoc           = d;
+lcaoOrbitals   = [s,p];
+atomicRhoOcc   = [2,4,0];
+rGauss         = 1;
+reciprocalMass = 16.;
+dampingMass    = 0.7;
+ionicMass      = 16.;
+
+
+/* --- fhi98PP input file:
+8.00 1 2 6 0.00 : z nc nv
+    1  0   2.00      : n  l   f 
+    2  0   2.00 
+    2  1   4.00 
+2 t
+*/

@@ -1,0 +1,824 @@
+h2. @SxList<T>@
+
+p1. The doubly linked list container @SxList<T>@ has been provided to
+    allow for storing elements dynamically. In particular, appending,
+    removing of individual elements is efficient, while random access
+    should be avoided. Instead, use iterators to read or manipulate
+    list elements.
+
+p1. In the following the common applications of @SxList<T>@ are demonstrated
+    by means of simple data types, such as @int@ or @SxString@. Therefore,
+    include the header files
+
+{{{cpp(sxlist)
+#include <SxList.h>
+#include <SxString.h>
+#include <SxAlg.h>
+}}}
+
+p1. and instantiate lists:
+
+{{{cpp(sxlist.fixture)
+SxList<int> myIntList;
+SxList<SxString> myStrList;
+SxList<SxString> tmpStrList;
+}}}
+
+h3. Initialize using @std::initializer\_list@
+
+p1. The @SxList@ can be initialized using @std::initializer\_list@ as shown below:
+
+{{{cpp(sxlist.initList)
+SxList<int> lst({11,22,33,44,55});
+std::cout << lst << std::endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxlist.initList)
+0: 11
+1: 22
+2: 33
+3: 44
+4: 55
+}}}
+
+h3. Append elements/lists, @operator<<@ / @.append()@
+
+p1. The lists can easily be populated by using the streaming operator @<<@
+    or the @append@ function:
+
+{{{cpp(sxlist.fixture)
+myIntList << 10 << 20 << 30;
+tmpStrList << "one" << "two";
+myStrList.append (tmpStrList);
+myStrList.append ("three");
+}}}
+
+p1. For debugging purposes the list objects can simply be redirected to
+    @cout@:
+
+{{{cpp(sxlist.fixture.append)
+cout << myIntList << endl;
+cout << myStrList << endl;
+}}}
+
+p1. which yields
+
+{{{expect(stdout,sxlist.fixture.append)
+0: 10
+1: 20
+2: 30
+}}}
+
+p1. and
+
+{{{expect(stdout,sxlist.fixture.append)
+0: one
+1: two
+2: three
+}}}
+
+h3. Remove elements, @removeFirst()@, @removeLast()@, @remove()@
+
+p1. The @removeFirst@ and @removeLast@ functions remove the 1st and
+    the last element of the list, respectively. With the @remove@ function
+    the elements can be removed individually. The latter, however,
+    should be avoided due to the low efficiency of random access in lists.
+
+{{{cpp(sxlist.rm_fixture)
+SxList<int> list;
+list << 10 << 20 << 30 << 40 << 50 << 60;
+cout << list << endl;
+}}}
+
+{{{expect(stdout,sxlist.rm_fixture)
+0: 10
+1: 20
+2: 30
+3: 40
+4: 50
+5: 60
+}}}
+
+p1. To remove the 3rd, the first and the last element, write:
+
+{{{cpp(sxlist.rm_fixture.rm)
+list.remove (2);
+list.removeFirst ();
+list.removeLast ();
+cout << list << endl;
+}}}
+
+p1. giving
+
+{{{expect(stdout,sxlist.rm_fixture.rm)
+0: 20
+1: 40
+2: 50
+}}}
+
+p1. The 2nd element '10' has been removed from the @list@.
+
+h3. Remove element using iterator, @removeItem()@
+
+p1. The @removeItem@ function can be used to safely remove an element from
+    @SxList@ object by providing the @Iterator@ pointing to the element.
+    The element is removed and a valid @Iterator@ pointing to next element
+    of @SxList@ is returned. The next element is decided based on the direction
+    of the provided iterator. If iterator's direction is forward, then after
+    a call to @removeItem@ the iterator would be pointing to the next element
+    in the @SxList@. Otherwise, If the iterator's direction is backward, then
+    the next element is the previous element in the @SxList@.
+    By using the @list@ object from above,
+
+{{{cpp(sxlist.rm_fixture.itm)
+SxList<int>::Iterator rmIt = list.begin ();
+while (rmIt != list.end ()) {
+   if(*rmIt == 30) {
+      list.removeItem (&rmIt);
+   }
+   else {
+      cout << "elem=" << *rmIt << endl;
+      rmIt++;
+   }
+}
+}}}
+
+p1. The above code results in,
+
+{{{expect(stdout,sxlist.rm_fixture.itm)
+elem=10
+elem=20
+elem=40
+elem=50
+elem=60
+}}}
+
+h3. Sorting elements, @sort()@ / @sortDesc()@ / @qsort()@  / @qsortDesc()@
+
+p1. The elements of @SxList@ can be sorted in ascending order by
+    using @sort()@ or @qsort()@ function. Similarly, @sortDesc()@
+    or @qsortDesc()@ function can be used to sort elements in descending order.
+    The @sort@ function uses bubble sort algorithm whereas @qsort@ function uses
+    quick sort algorithm to sort the elements. Consider a @slist@ object
+    given below,
+
+{{{cpp(sxlist.sort_fixture)
+SxList<int> slist;
+slist << 35 << 32 << 100 << 5 << 15;
+}}}
+
+p1. The @sort()@ function can be used to sort all elements in ascending order
+    by using bubble sort as shown below,
+
+{{{cpp(sxlist.sort_fixture.sort)
+slist.sort ();
+cout << slist << endl;
+}}}
+
+p1. which results in
+
+{{{expect(stdout,sxlist.sort_fixture.sort)
+0: 5
+1: 15
+2: 32
+3: 35
+4: 100
+}}}
+
+p1. This function also allows the option to provide custom compare function.
+    The compare function must receive two parameters of the corresponding
+    iterator type and return an integer value. It returns -1, if element
+    pointed to by the first iterator is less than the element pointed to by
+    the second iterator. It returns 0, if both elements are equal and returns 1
+    if first element is greater than second.
+
+{{{cpp(sxlist.sort_fixture.sortLambda)
+slist.sort ([](const auto &itA, const auto &itB)->int 
+            {   if (*itA < *itB)        return -1;
+                else if (*itA == *itB)  return  0;
+                else                    return  1;
+            });
+cout << slist << endl;
+}}}
+
+{{{expect(stdout,sxlist.sort_fixture.sortLambda)
+0: 5
+1: 15
+2: 32
+3: 35
+4: 100
+}}}
+
+p1. In order to sort in descending order,
+
+{{{cpp(sxlist.sort_fixture.sortDesc)
+slist.sortDesc ();
+cout << slist << endl;
+}}}
+
+p1. which gives
+
+{{{expect(stdout,sxlist.sort_fixture.sortDesc)
+0: 100
+1: 35
+2: 32
+3: 15
+4: 5
+}}}
+
+p1. Or for custom comparator,
+
+{{{cpp(sxlist.sort_fixture.sortDescLambda)
+slist.sortDesc ([](const auto &itA, const auto &itB)->int 
+                {   if (*itA < *itB)        return -1;
+                    else if (*itA == *itB)  return  0;
+                    else                    return  1;
+                });
+cout << slist << endl;
+}}}
+
+{{{expect(stdout,sxlist.sort_fixture.sortDescLambda)
+0: 100
+1: 35
+2: 32
+3: 15
+4: 5
+}}}
+
+p1. In order to sort the list using quick sort @qsort()@ or @qsortDesc()@ can
+    be used. To sort in ascending order @qsort()@ can be used as follows,
+
+{{{cpp(sxlist.sort_fixture.qsort)
+slist.qsort ();
+cout << slist <<  endl;
+}}}
+
+p1. which yields
+
+{{{expect(stdout,sxlist.sort_fixture.qsort)
+0: 5
+1: 15
+2: 32
+3: 35
+4: 100
+}}}
+
+p1. This function also allows the option to provide custom compare function.
+    The compare function must receive two parameters of the corresponding
+    iterator type and return an integer value. It returns -1, if element
+    pointed to by the first iterator is less than the element pointed to
+    by the second iterator. It returns 0, if both elements are equal and
+    returns 1 if first element is greater than second.
+
+{{{cpp(sxlist.sort_fixture.qsortLambda)
+slist.qsort ([](const auto &itA, const auto &itB)->int 
+             {   if (*itA < *itB)        return -1;
+                 else if (*itA == *itB)  return  0;
+                 else                    return  1;
+             });
+cout << slist << endl;
+}}}
+
+{{{expect(stdout,sxlist.sort_fixture.qsortLambda)
+0: 5
+1: 15
+2: 32
+3: 35
+4: 100
+}}}
+
+p1. In order to sort in descending order, quick sort @qsortDesc()@ function
+    can be used as follows,
+
+{{{cpp(sxlist.sort_fixture.qsortDesc)
+slist.qsortDesc ();
+cout << slist << endl;
+}}}
+
+p1. which gives following result
+
+{{{expect(stdout,sxlist.sort_fixture.qsortDesc)
+0: 100
+1: 35
+2: 32
+3: 15
+4: 5
+}}}
+
+p1. Or to use custom compare function,
+
+{{{cpp(sxlist.sort_fixture.qsortDescLambda)
+slist.qsortDesc ([](const auto &itA, const auto &itB)->int 
+                 {   if (*itA < *itB)        return -1;
+                     else if (*itA == *itB)  return  0;
+                     else                    return  1;
+                 });
+cout << slist << endl;
+}}}
+
+{{{expect(stdout,sxlist.sort_fixture.qsortDescLambda)
+0: 100
+1: 35
+2: 32
+3: 15
+4: 5
+}}}
+
+h3. Sorting of elements by iterators, @sx::sort()@ / @sx::qsort()@
+
+p1. The @SxList@ object can also be sorted by using @sort()@ or @qsort()@
+    functions that require iterators as parameters. The @sort()@/@qsort()@
+    function require the iterator pointing to first element to be sorted and
+    the iterator pointing to the last element to be sorted.
+    Consider the @slist@ object from above,
+
+{{{cpp(sxlist.sort_fixture.sortIt)
+sx::sort (slist.begin (), slist.fromLast ());
+cout << slist << endl;
+}}}
+
+p1. which yields the list elements sorted in ascending order,
+
+{{{expect(stdout,sxlist.sort_fixture.sortIt)
+0: 5
+1: 15
+2: 32
+3: 35
+4: 100
+}}}
+
+p1. This function also allows the option to provide custom compare function.
+    The compare function must receive two parameters of the corresponding
+    iterator type and returns an integer value. It returns -1, if element
+    pointed to by the first iterator is less than the element pointed to by
+    the second iterator. It returns 0, if both elements are equal and returns 1
+    if first element is greater than second.
+
+{{{cpp(sxlist.sort_fixture.sortItLambda)
+sx::sort (slist.begin (), slist.fromLast (), 
+          [](const auto &itA, const auto &itB)->int
+            {   if (*itA < *itB)        return -1;
+                else if (*itA == *itB)  return  0;
+                else                    return  1;
+            });
+cout << slist << endl;
+}}}
+
+p1. The above code results in the following sorted list:
+
+{{{expect(stdout,sxlist.sort_fixture.sortItLambda)
+0: 5
+1: 15
+2: 32
+3: 35
+4: 100
+}}}
+
+p1. In order to sort in descending the order of parameters can be reversed.
+
+{{{cpp(sxlist.sort_fixture.sortDescIt)
+sx::sort (slist.fromLast (), slist.begin ());
+cout << slist << endl;
+}}}
+
+p1. which results in the following output:
+
+{{{expect(stdout,sxlist.sort_fixture.sortDescIt)
+0: 100
+1: 35
+2: 32
+3: 15
+4: 5
+}}}
+
+p1. Or for custom comparator,
+
+{{{cpp(sxlist.sort_fixture.sortDescItLambda)
+sx::sort (slist.fromLast (), slist.begin (), 
+          [](const auto &itA, const auto &itB)->int 
+            {   if (*itA < *itB)        return -1;
+                else if (*itA == *itB)  return  0;
+                else                    return  1;
+            });
+cout << slist << endl;
+}}}
+
+p1. The above code also results in the same sorted list:
+
+{{{expect(stdout,sxlist.sort_fixture.sortDescItLambda)
+0: 100
+1: 35
+2: 32
+3: 15
+4: 5
+}}}
+
+
+p1. The @qsort()@ function can be used to sort elements in the list
+    using quick sort. By using the @slist@ object from above:
+
+{{{cpp(sxlist.sort_fixture.qsortIt)
+sx::qsort (slist.begin (), slist.fromLast ());
+cout << slist << endl;
+}}}
+
+p1. which yields the same sorted list of elements,
+
+{{{expect(stdout,sxlist.sort_fixture.qsortIt)
+0: 5
+1: 15
+2: 32
+3: 35
+4: 100
+}}}
+
+p1. This function also allows the option to provide custom compare function.
+    The compare function must receive two parameters of the corresponding
+    iterator type and returns an integer value. It returns -1, if element
+    pointed to by the first iterator is less than the element pointed to by
+    the second iterator. It returns 0, if both elements are equal and returns 1
+    if first element is greater than second.
+
+{{{cpp(sxlist.sort_fixture.qsortItLambda)
+sx::qsort (slist.begin (), slist.fromLast (), 
+           [](const auto &itA, const auto &itB)->int 
+             {   if (*itA < *itB)        return -1;
+                 else if (*itA == *itB)  return  0;
+                 else                    return  1;
+             });
+cout << slist << endl;
+}}}
+
+p1. The above code yields the following output:
+
+{{{expect(stdout,sxlist.sort_fixture.qsortItLambda)
+0: 5
+1: 15
+2: 32
+3: 35
+4: 100
+}}}
+
+
+p1. In order to sort in descending order, the order of parameters can be reversed.
+
+{{{cpp(sxlist.sort_fixture.qsortDescIt)
+sx::qsort (slist.fromLast (), slist.begin ());
+cout << slist << endl;
+}}}
+
+p1. which gives the elements in descending order:
+
+{{{expect(stdout,sxlist.sort_fixture.qsortDescIt)
+0: 100
+1: 35
+2: 32
+3: 15
+4: 5
+}}}
+
+p1. Or to use custom compare function,
+
+{{{cpp(sxlist.sort_fixture.qsortDescItLambda)
+sx::qsort (slist.fromLast (), slist.begin (), 
+           [](const auto &itA, const auto &itB)->int 
+              {   if (*itA < *itB)        return -1;
+                  else if (*itA == *itB)  return  0;
+                  else                    return  1;
+              });
+cout << slist << endl;
+}}}
+
+p1. Which results in the same sorted list:
+
+{{{expect(stdout,sxlist.sort_fixture.qsortDescItLambda)
+0: 100
+1: 35
+2: 32
+3: 15
+4: 5
+}}}
+
+
+h3. Iterators and lambda functions
+
+p1. The @SxList<T>@ container class supports iterators. Considering
+    the example list objects from above:
+
+{{{cpp(sxlist.fixture.iterators)
+for (auto it = myIntList.begin(); it != myIntList.end(); ++it)  {
+   cout << "elem=" << *it << endl;
+}
+}}}
+
+p1. printing the following output:
+
+{{{expect(stdout,sxlist.fixture.iterators)
+elem=10
+elem=20
+elem=30
+}}}
+ 
+
+p1. The above example can be written more condensed using lambda functions:
+
+{{{cpp(sxlist.fixture.lambdait)
+myIntList.foreach([](auto it) {cout<<"elem="<<*it<<endl; });
+}}}
+
+p1. which gives the same output:
+
+{{{expect(stdout,sxlist.fixture.lambdait)
+elem=10
+elem=20
+elem=30
+}}}
+
+h4. Accessing Iterators, @begin()@ / @end()@ and @fromLast()@ / @toFirst()@
+
+p1. The @begin()@ function returns iterator pointing to the first element of
+    @SxList@ object. It is used in conjunction with @end()@ function, which
+    returns an iterator pointing to the element one past the last valid element
+    in the list. 
+
+
+.begin() := returns iterator pointing to first valid element in the list.
+.end()   := returns iterator pointing to one past the last valid element.
+
+.fromLast() := returns iterator pointing to the last valid element in the list.
+.toFirst()  := returns iterator pointing to one before the first valid element.
+
+
+p1. By using the @slist@ object from above,
+
+{{{cpp(sxlist.sort_fixture.beginIt)
+for (auto beginIt = slist.begin ();beginIt != slist.end (); ++beginIt) {
+   cout << *beginIt << endl;
+}
+}}} 
+
+p1. which yields:
+
+{{{expect(stdout,sxlist.sort_fixture.beginIt)
+35
+32
+100
+5
+15
+}}}
+
+p1. The @fromLast()@ function returns the iterator pointing to the last
+    valid element and @toFirst()@ returns the iterator pointing to before
+    the first valid element.
+
+{{{cpp(sxlist.sort_fixture.fromLastIt)
+for(auto beginIt = slist.fromLast ();beginIt != slist.toFirst (); --beginIt) {
+   cout << *beginIt << endl;
+}
+}}}
+
+p1. which results in,
+
+{{{expect(stdout,sxlist.sort_fixture.fromLastIt)
+15
+5
+100
+32
+35
+}}}
+
+h4. Setting iterator direction, @isForward()@ / @forward()@ / @backward()@ / @reverse()@
+
+p1. An iterator can have either forward or backward direction. The iterator
+    returned by @begin()@ function is by default an forward iterator and the
+    iterator returned by @fromLast@ is a backward iterator. The direction can
+    be checked by calling @isForward@ function. The @isForward@ returns true if
+    the iterator has forward direction and false otherwise. The following code
+    shows this behavior:
+
+{{{cpp(sxlist.sort_fixture.isForward)
+auto beginIt = slist.begin ();
+if (beginIt.isForward () == true)
+   cout << "The beginIt is a forward iterator" << endl;
+auto lastIt = slist.fromLast ();
+if (lastIt.isForward () == false)
+   cout << "The lastIt is a backward iterator" << endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxlist.sort_fixture.isForward)
+The beginIt is a forward iterator
+The lastIt is a backward iterator
+}}}
+
+p1. The @forward@ function returns a copy of the iterator with it's direction
+    set to forward and @backward@ function returns a copy of the calling
+    iterator with it's direction set to backward. The following code snippet
+    shows example of their usage:
+
+{{{cpp(sxlist.sort_fixture.forwardBackwardIt)
+auto beginIt = slist.begin ();
+if (beginIt.isForward () == true)
+   cout << "beginIt's direction is forward" << endl;
+beginIt = beginIt.backward ();
+if (beginIt.isForward () == false)
+   cout << "beginIt's direction is backward" << endl;
+beginIt = beginIt.forward ();
+if (beginIt.isForward () == true)
+   cout << "beginIt's direction is forward" << endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxlist.sort_fixture.forwardBackwardIt)
+beginIt's direction is forward
+beginIt's direction is backward
+beginIt's direction is forward
+}}}
+
+p1. Similarly, @reverse@ function returns a copy of the calling iterator
+    with it's direction reversed. As shown in the following code:
+
+{{{cpp(sxlist.sort_fixture.reverseIt)
+auto lastIt = slist.fromLast ();
+if (lastIt.isForward () == false)
+   cout << "The lastIt's direction is backward" << endl;
+lastIt = lastIt.forward ();
+if (lastIt.isForward () == true)
+   cout << "The lastIt's direction is forward" << endl;
+lastIt = lastIt.backward ();
+if (lastIt.isForward () == false)
+   cout << "The lastIt's direction is backward" << endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxlist.sort_fixture.reverseIt)
+The lastIt's direction is backward
+The lastIt's direction is forward
+The lastIt's direction is backward
+}}}
+
+h4. Access Iterator to specific element, @begin()@
+
+p1. The @begin@ function also allows to get an iterator pointing to a
+    specific element. It requires the index of the element and iterator
+    direction as parameters. The default value of the @direction@ is forward.
+    The following code shows an example usage of this function:
+
+{{{cpp(sxlist.sort_fixture.beginParam)
+auto it = slist.begin (2, sx::Backward);
+if (it.isValid ()) {
+if (*it == 100)
+   cout << "The returned iterator points to 100" << endl;
+if (it.isForward () == false)
+   cout << "The returned iterator's direction is backward" << endl;
+}
+else {
+   cout << "The specified element not found" << endl;
+}
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxlist.sort_fixture.beginParam)
+The returned iterator points to 100
+The returned iterator's direction is backward
+}}}
+
+h2. Unique List @SxUniqueList@
+
+p1. The @SxUniqueList@ provides a @SxList@ based container to store unique
+    elements of the given template type @T@. Apart from the requirement that
+    only unique elements are inserted, it provides all the functionality
+    of @SxList@ class. In order to use @SxUniqueList@ following
+    header file must be included:
+
+{{{cpp(sxuniquelist)
+#include<SxUniqueList.h>
+}}}
+
+p1. The following code shows a simple example on how to use @SxUniqueList@.
+
+{{{cpp(sxuniquelist.createList)
+SxUniqueList<int> uList;
+uList << 1 << 5 << 4 << 4 << 7;
+cout << uList << endl;
+}}}
+
+p1. Above example code creates a unique list of integers. As this is a
+    unique list, any duplicate elements do not get inserted into the list.
+    The above code results in the following output:
+
+{{{expect(stdout,sxuniquelist.createList)
+0: 1
+1: 5
+2: 4
+3: 7
+}}}
+
+h3. Add elements @insert@/@append@/@prepend@
+
+p1. By default the elements inserted using << operator are stored in the
+    insertion order. In order to insert elements at a certain position
+    @insert@, @append@ or @prepend@ can be used. The @insert@ function allows
+    to insert an element at a specific position in the list. It takes the
+    specific position and the element to be inserted as parameters.
+    The @insert@ function requires that the @position@ parameter should be
+    less or equal to the current size of the list.
+    The following code shows usage of @insert@ function:
+
+{{{cpp(sxuniquelist.insertE)
+SxUniqueList<int> iList;
+iList.insert (0, 3);
+iList.insert (0, 5);
+iList.insert (1, 10);
+cout << iList << endl;
+}}}
+
+{{{expect(stdout,sxuniquelist.insertE)
+0: 5
+1: 10
+2: 3
+}}}
+
+p1. The @append@ function allows to append a new element at the end of
+    the list object whereas @prepend@ function adds the new element to the
+    start of the list. An example is shown in the following code:
+
+{{{cpp(sxuniquelist.appendPrepend)
+SxUniqueList<int> aList;
+aList.append (100);
+aList.prepend (10);
+aList.append (200);
+aList.prepend (5);
+cout << aList << endl;
+}}}
+
+{{{expect(stdout,sxuniquelist.appendPrepend)
+0: 5
+1: 10
+2: 100
+3: 200
+}}}
+
+h2. Sorted List @SxSortedList@
+
+p1. The @SxSortedList@ provides a @SxList@ based container that allows to
+    store sorted list of elements. It provides all the functionality of
+    @SxList@ with one difference that the elements are stored in sorted order.
+    In order to provided sorted insertion, the operator << and @append@
+    function are overloaded. Hence only these two methods must be used to
+    insert elements into the sorted list, which ensures sorted order of
+    elements. In order to use this class following header file must be
+    included into the program:
+
+{{{cpp(sxsortedlist)
+#include <SxSortedList.h>
+}}}
+
+p1. The following code shows example usage of @SxSortedList@ class:
+
+{{{cpp(sxsortedlist.sortedList)
+SxSortedList<int> slist;
+slist << 30 << 10 << 50 << 3;
+cout << slist << endl;
+}}}
+
+p1. Above example shows insertion of element into the @SxSortedList@.
+    As it can be seen in the output given below that @slist@ object internally
+    keeps the order of elements sorted even though they were inserted in
+    random order.
+
+{{{expect(stdout,sxsortedlist.sortedList)
+0: 3
+1: 10
+2: 30
+3: 50
+}}}
+
+h3. Append elements @append@
+
+p1. The @append@ function allows to add elements to the list in sorted order.
+    The following code snippet shows an example of it's usage:
+
+{{{cpp(sxsortedlist.append)
+SxSortedList<int> alist;
+alist.append (55);
+alist.append (-3);
+alist.append (10);
+alist.append (5);
+cout << alist << endl;
+}}}
+
+p1. which results in following sorted list:
+
+{{{expect(stdout,sxsortedlist.append)
+0: -3
+1: 5
+2: 10
+3: 55
+}}}

@@ -1,0 +1,12 @@
+3.194    # aLat angstrom
+1.581    # c/a
+6.44     # cohesive energy eV
+2.15     # vacancy formation energy eV
+0        # stress component sigma11
+0        #                  sigma33
+1.1866   # elastic constant C11 eV angstrom^(-3)
+0.4650   #                  C12
+0.4089   #                  C13
+1.2759   #                  C33
+0.3745   #                  C44
+0.3608   #                  C66

@@ -1,0 +1,60 @@
+// ---------------------------------------------------------------------------
+//
+//      The ab-initio based multiscale library
+//
+//                  S / P H I / n X
+//
+//      Copyright:  Max-Planck-Institute for Iron Research
+//                  40237 Duesseldorf, Germany
+//
+//      Contact:    https://sxlib.mpie.de
+//      Authors:    see sphinx/AUTHORS
+//      License:    see sphinx/LICENSE
+//
+// ---------------------------------------------------------------------------
+// Rather strict input file format definitions:
+//    * variables may be defined only in top level node
+//    * k-Points for bandstructures (path through the Brillouin zone) are
+//      expected in cartesion coordinates
+//    * k-Points used in the Monkhorst-Pack folding are expected in 
+//      relative coordinates
+//    * energy-cutoff limited 
+// --------------------------------------------------------------------------
+set validation;
+
+
+deprecateFormat;
+topLevelDefs;
+
+// Declare global "skipUnexpectedGroups". See also footer of this file.
+skipUnexpectedGroups;
+
+DefectAlign               { type="group";
+   
+   cellGroup              { type="group";
+      fromVElStat            { type="flag"; xor="fromVElStat,fromFile,cell";}
+      file               { type="string"; xor="fromVElStat,fromFile,cell"; } 
+      cell                   { type="matrix"; dims=[3,3]; xor="fromVElStat,fromFile,cell";}
+   }  
+      
+   parameters              { type="group";  
+      eCut                    { type="real"; min=0.0;}
+   }
+
+   modelCharge            { type="group"; optional;
+      gaussian               { type="group"; minItems=1;
+         pos                    { type="vector"; dim=3;}
+         electrons              { type="real";}
+      }
+      dielecConstant          { type="real"; min=0.0;optional;}
+   } 
+   vElStat                { type="group";optional;
+      vDefect             { type="group";
+         file                { type="string";}
+      }
+      vReference          { type="group";
+         file                { type="string";}
+      }
+      fileType            { type="string";optional;}
+   } 
+}

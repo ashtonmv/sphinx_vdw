@@ -1,0 +1,598 @@
+h1. The SxAccelerate Debug mode
+
+p1. During development with SxAccelerate it is recommended to build in DEBUG mode
+    which speeds up the development processes significantly. The DEBUG mode
+    provides the developer with
+
+    * runtime assertion validation,
+    * runtime call stack tracing,
+    * additional debug output with filter support,
+    * automatically printing the call-stack on any exit,
+    * breakpoints with integrated call stack analysis, and
+    * evaluate core files as command line option.
+
+p1. This chapter sheds light on the various aspects of the DEBUG mode and
+    demonstrates how to exploit its features during the development process.
+
+h2. Enabling the Debug mode
+
+p1. Switching between Release and Debug mode has to be done prior to building
+    SxAccelerate since the necessary Debug code needs to be compiled in. When
+    configuring SxAccelerate simply add @--enable-debug@ as additional
+    option when invoking @configure@.
+
+{{{cmd
+   /path/to/sxaccelerate/configure --enable-debug ...
+}}}
+
+p1. On *Linux* it is advisable to install @gdb@ and @ddd@ somewhere in the 
+    binary search path before invoking @configure@. The make environment
+    of SxAccelerate will add additional functionality to the executable
+    which allows to automatically evaluate the call stack upon exit and 
+    to invoke the executable with a core file to enter a post-mortem analysis.
+
+p1. By enabling the debug option the libraries and executables will
+
+    * add debug symbols (C++ compiler flag @-g@),
+    * create runtime link to debugger,
+    * reduce the compiler optimization level to O2 (@-O2@), and
+    * compile in all debug macros (such as @SX\_TRACE@, @SX\_CHECK@, @SX\_DBG\_MSG@, @SX\_BREAK@, @SX\_EXIT@).
+
+p1. Every executable which employs @SxCLI@ can be invoked with @--opts@ to
+    determine whether it has been built with the Debug mode enabled. If so
+    the compiler options contains @-g@.
+
+h2. Assertion checks
+
+p1. Throughout the entire SxAccelerate framework nearly every function begins with
+    a set of assertions in order to identify any inconsistency or unexpected
+    behavior. Instead of trying to keep the program flow running or issuing
+    runtime warnings, SxAccelerate immediately triggers a segmentation fault
+    and writes a core file which contains the memory snapshot of the
+    process at the time of the detected inconsistency.
+
+p1. The SxAccelerate framework provides two macros which can trigger 
+    controlled segmentation faults:
+
+    @SX\_CHECK@ := Trigger controlled program crash upon invalid condition
+    @SX\_EXIT@  := Trigger controlled program crash when reaching a specific code line
+
+p1. In order to have these macros available include @SxError.h@. Both macros
+    are ignored in SxAccelerate's Release mode.
+
+p1. The usage of both macros will be discussed in detail the following
+    paragraphs.
+
+h3. @SX\_CHECK@
+
+p1. The assertion statement @SX\_CHECK@ is a variadic macro with the following
+    syntax:
+
+{{{cpp
+SX_CHECK (cond)
+SX_CHECK (cond, var1)
+SX_CHECK (cond, var1, var2)
+SX_CHECK (cond, var1, var2, var3)
+SX_CHECK (cond, var1, var2, var3, var4)
+}}}
+
+p1. If the condition @cond@ is *not* met this macro will print an error
+    message with the following information to @STDERR@:
+
+    * Source code file name, line number, and C/C++ function name where
+      the assertion failed.
+    * Stringified condition @cond@
+    * If provided, the values of the variables @var1@, @var2@, @var3@, and
+      @var4@ at the moment of the failed assertion.
+    * The complete function call stack. On Linux please make sure that 
+      the @gdb@ was installed when configuring SxAccelerate.
+
+p1. The power of @SX\_CHECK@ can be illustrated by the following example.
+    Assume a demonstration function which should compute a square root
+    of a real value. The header @SxError.h@ should be included to declare
+    the debug macros:
+
+{{{cpp
+#include <SxError.h>
+
+double mySqrt (double val)
+{
+   SX_CHECK (val >= 0, val);
+   return sqrt(val);
+}
+}}}
+
+p1. The check macro in the above example code ensures with the condition
+    @val >= 0@ that @mySqrt()@ can only be invoked with positive values. 
+    If the condition is not met, the current value of the input argument
+    @var@ is being printed.
+
+p1. An error could be trigged as follows:
+
+{{{cpp
+cout << "Sqrt(-5) = " << mySqrt(-5) << endl;
+}}}
+
+p1. When executing the code will terminate with an error message similar
+    to:
+
+{{{
+ASSERTATION FAILED in sxaccelerate/src/util/examples/sxdemo.cpp:29
+                   double mySqrt(double)
+val >= 0, val=-5
+
+Call stack:
+1: sxaccelerate/src/util/SxError.cpp:206: SxDebug::dump
+2: sxaccelerate/src/util/SxError.cpp:350: sxExit
+3: sxaccelerate/src/util/examples/sxdemo.cpp:29: mySqrt
+4: gcc/c++/ostream:561: mySqrt
+5: sxaccelerate/src/util/examples/sxdemo.cpp:82: main(argc=1,argv=0x7ffcb2cd1998)
+Aborted (core dumped)
+}}}
+    
+p1. The assertion error message contains the source file name along with the
+    function name @mySqrt@ and the invalid input argument @val=-5@.  The call
+    stack reveals the file, line, and function of the callee who caused the
+    inconsistency (see Call stack level 3 and 4).
+
+p1. Many functions in SxAccelerate begin with various individual @SX\_CHECK@
+    macro definitions. It is recommended to add a set of suitable macros
+    to any function to be defined in order to make it error-resisting.
+
+h3. @SX\_EXIT@
+
+p1. Besides the conditional program stop caused by @SX\_CHECK@ SxAccelerate
+    provides an unconditional controlled program stop with @SX\_EXIT@. This
+    macro takes no input argument. When the program counter reaches an
+    @SX\_EXIT@ statement the process will stop with an error message
+    containing file and function name, line number, and function call stack.
+
+p1. Use this macro to mark source code parts which are not expected to be
+    reached. That could be useful, e.g.,
+
+    * when marking functions which have been implemented/sketched but not
+      tested yet.
+    * Debugging iteratively to mark parts not to be expected to run into.
+    * Ensuring that a certain if-if-else situation should never occur.
+
+p1. Examples could be an exit statement to mark a part which is not yet 
+    implemented:
+
+{{{cpp
+SX_EXIT;  // to be implemented
+}}}
+
+p1. Block an implemented code part which has not been tested yet
+
+{{{cpp
+SX_EXIT;  // not tested yet
+...
+...
+}}}
+
+p1. or make sure that a certain situation in the program control is not
+    making sense:
+
+{{{cpp
+if (someCond1)      ...
+else if (someCond2) ...
+else if (someCond3) ...
+else
+   SX_EXIT; // should never reach here
+}}}
+
+h2. _Post-mortem_ analysis
+
+p1. Besides the explanatory message of @SX\_CHECK@ and @SX\_EXIT@ the 
+    unexpected situation can be analysed in more detail of the generated
+    core file is inspected. The core file contains a full memory snapshot
+    of the failed process at the moment when the controlled crash occurs.
+
+p1. On *Linux*, the core file generation needs to be enabled before launching
+    the program:
+
+{{{
+ulimit -c unlimited
+}}}
+
+p1. Upon controlled crash the core files can be found typically in the
+    current working directory:
+
+    Unix    := @core.{PID}@ with @{PID}@ being the process number
+    Windows := @core.dmp@
+
+p1. In order to perform a _post-mortem_ analysis run the crashed program
+    again as follows:
+
+{{{
+myprogram --debug /path/to/core/file
+}}}
+
+p1. On Linux it will open a @ddd@ session if @ddd@ was found in the binary
+    search path during configuring SxAccelerate. On windows it will open a
+    @WinDbg@ or @WinDbg64@ session. The debugger session will attach to the
+    core file and provide the call stack and all values of all variables
+    defined at the moment of the controlled crash. Please consult the manual
+    of the debugger for more information.
+
+h2. Runtime tracing
+
+p1. In the previous paragraphs it was discussed how to utilize @SX\_CHECK@
+    and @SX\_EXIT@ to identify the most critical program inconsistencies
+    quickly during the development process. However, logical inconsistencies
+    cannot be identified only by assertions. Here, program tracing is sometimes 
+    handy.
+
+p1. Program tracing can obviously be accomplished by invoking the program
+    within a debugger. However, depending on the debugger the execution speed
+    tends to be very slow compared to a normal program run. If the
+    inconsistency can only be triggered with larger data sets and the execution
+    speed matters, running the application in a debugger often is not a 
+    good choice.
+
+p1. SxAccelerate provides a built-in runtime tracing which combines 
+
+    * high runtime performance compared to in-debugger execution,
+    * detailed tracing information about entering and leaving a function,
+    * timing information about time-deltas between entering and leaving
+      a function,
+    * additional context specific user-defined debug messages,
+    * various filters to control the detail level of the tracing information.
+
+p1. The runtime tracing output is redirected to STDERR in order not to 
+    interfere with STDOUT.
+    
+p1. The runtime tracing of SxAccelerate is organized as follows:
+
+p1. *1. Macros to generate tracing and debug information:*
+
+    @SX\_FILE@     := Macro to generate information about the 
+                      file name.
+    @SX\_FUNC@     := Macro to generate the function along with
+                      it's signature.
+    @SX\_TAG@      := Macro to generate debug information about the file name,
+                      line number and function name.
+    @SX\_TRACE@    := Macro to generate tracing and timing information about
+                      entering and leaving an individual function.
+    @SX\_DBG\_MSG@ := Macro to print additional user-defined debug
+                      information.
+
+p1. *2. Environment variables: Control tracing filter:*
+
+p1. The runtime tracing output can be controlled by defining environment
+    variables. These are:
+
+    @SX\_DEBUG@           := Set to 1 (or any value) to enable runtime
+                             tracing of all files.
+    @SX\_DEBUG\_COMP@     := Comma separated list of components for which
+                             runtime tracing should be enabled.
+    @SX\_DEBUG\_FILE@     := Comma separated list of source files which
+                             runtime tracing should be enabled for.
+    @SX\_DEBUG\_FUNC@     := Comma separated list of C/C++ functions 
+                             which should print runtime tracing information,
+                             a specified set C/C++ functions only.
+
+p1. *3. Environment variables: Control filter detail level:*
+
+p1. Once the runtime tracing is enabled with either of @SX\_DEBUG@,
+    @SX\_DEBUG\_FILE@, or @SX\_DEBUG\_FUNCTION@ the output level can be
+    reduced by setting @SX\_DEBUG\_SIMPLE@:
+
+    @SX\_DEBUG\_SIMPLE@ not set := Trace function enter, function leave event,
+                                   timing information, and user-defined
+                                   @SX\_DBG\_MSG@ output.
+    @SX\_DEBUG\_SIMPLE@ set     := Print only @SX\_DBG\_MSG@ output
+
+h3. @SX\_FILE@
+
+p1. @SX\_FILE@ macro returns the file name without the absolute path. It is 
+    often used in conjunction with @\_\_LINE\_\_@ C preprocessor macro which
+    returns the line number within the source file. The following code snippet
+    shows the usage of this macro:
+
+{{{cpp
+#include <SxError.h>
+void B::func() {
+   cout << "Current file name and line: " << SX_FILE << ":" << __LINE__ << endl;
+}
+}}}
+
+{{{
+Current file name and line: sxdemo.cpp:16
+}}}
+
+h3. @SX\_FUNC@
+
+p1. @SX\_FUNC@ is a macro that returns the string containing function name
+    along with it's signature. The following example shows usage of this macro:
+
+{{{cpp
+#include <SxError.h>
+void func() {
+   cout << "function name and signature: " << SX_FUNC << endl;
+}
+}}}
+
+p1. The example code above will result in the following output:
+
+{{{
+function name and signature: void func()
+}}}
+
+h3. @SX\_TAG@
+
+p1. @SX\_TAG@ provides a concise way to store debug information about a
+    line of code in the form of file name, line number and the corresponding
+    function name. It returns @SX\_FILE@, @\_\_LINE\_\_@ and @SX\_FUNC@ combined
+    as a C-string. This macro is available in DEBUG and RELEASE mode.
+
+{{{cpp
+#include <SxError.h>
+void printDebug(char *tag_) {
+   cout << "Function called from: " << tag_ << endl;
+}
+printDebug (SX_TAG);
+}}}
+
+p1. The above code will result in the following descriptive output about the
+    place the @SX\_TAG@ was called at:
+
+{{{
+Function called from: sxdemo.cpp:5:int main(int, char **)
+}}}
+
+h3. @SX\_TRACE@
+
+p1. The support of tracing a function can be controlled by adding the
+    macro @SX\_TRACE@ at the beginning of the function body. When compiling
+    in RELEASE mode the macro is being ignored and will not lower down
+    runtime performance.
+
+p1. The C function or C++ member function would follow this pattern:
+
+{{{cpp
+#include <SxError.h>
+void A::foo ()
+{
+   SX_TRACE ();
+   SX_CHECK (...);
+   ...
+}
+}}}
+
+p1. The above code results in the following output:
+
+{{{
+___demo.cpp:14 foo: BEGIN
+___demo.cpp:14 foo: END 0.001 ms
+}}}
+
+p1. As demonstrated in this example output the following information are
+    being printed:
+
+    # Static prefix "@\_\_\_@" to simplify discrimination with other output
+      to STDERR.
+    # Source file name and line number.
+    # Function name with events:
+    ** @BEGIN@ when entering the function
+    ** @END@ plus wall clock time spent in the function when leaving
+
+p1. @SX\_TRACE@ can also accept a string as debug message to be printed between
+    its BEGIN and END tags, respectively. For example:
+
+{{{cpp
+#include <SxError.h>
+void myFunc() {
+   SX_TRACE ("hello");
+}
+}}}
+
+p1. The above code prints out the usual @SX\_TRACE@ information along with
+    @hello@ string as shown below:
+
+{{{
+___sxdemo.cpp:20 myFunc: BEGIN [hello]
+___sxdemo.cpp:20 myFunc: END [hello] 0.007 ms
+}}}
+
+
+p1. The runtime tracing can be controlled by defining / removing
+    @SX\_DEBUG@:
+
+    UNIX Bash          := @export SX\_DEBUG=1@
+                       := @unset SX\_DEBUG@
+    Windows PowerShell := @$env:SX\_DEBUG=1@
+                       := @remove-item env:SX\_DEBUG@
+            
+
+h3. @SX\_DBG\_MSG@
+
+p1. Often it is beneficial for the developer to add additional debug-related
+    data. This can be accomplished by adding the macro @SX\_DBG\_MSG@. In
+    the DEBUG mode it will print additional data, while when compiling in 
+    the RELEASE mode it will be ignored and not reduce the runtime performance.
+
+p1. The macro's arguments are put into the @cerr@ stream, i.e., different
+    arguments can be concatenated using the @<<@ operator:
+
+{{{cpp
+void foo ()
+{
+   SX_TRACE ();
+   ...
+   SX_DBG_MSG ("a=" << aVal << ", b=" << bVal );
+   ...
+}}}
+
+p1. When enabling tracing the output becomes more detailed:
+
+{{{
+...
+___myprogram.cpp:35 mySqrt: BEGIN
+___myprogram.cpp:36: double mySqrt(double): hi
+___myprogram.cpp:37: double mySqrt(double): juhu
+___myprogram.cpp:29 foo: BEGIN
+___myprogram.cpp:30: void foo(): a=5, b=7
+___myprogram.cpp:29 foo: END 0.004 ms
+___myprogram.cpp:35 mySqrt: END 0.042 ms
+...
+}}}
+
+h3. Disabling function tracing, @SX\_DEBUG\_SIMPLE@
+
+p1. The last example illustrated how the output of @SX\_TRACE@ and
+    @SX\_DBG\_MSG@ is printed which is the default mode of SxAccelerate's
+    runtime profiling. Since the output of @SX\_TRACE@ sometimes might result
+    in lengthy output (every function call yields at least 2 output lines),
+    it is possible, to filter out only the output of the user-defined
+    @SX\_DBG\_MSG@ macros by defining _additionally_ the environment
+    variable @SX\_DEBUG\_SIMPLE@:
+
+    UNIX Bash          := @export SX\_DEBUG=1@
+                       := @export SX\_DEBUG\_SIMPLE=1@
+                       := @unset SX\_DEBUG@
+                       := @unset SX\_DEBUG\_SIMPLE@
+    Windows PowerShell := @$env:SX\_DEBUG=1@
+                       := @$env:SX\_DEBUG\_SIMPLE=1@
+                       := @remove-item $env:SX\_DEBUG@
+                       := @remove-item $env:SX\_DEBUG\_SIMPLE@
+
+p1. The previous example output in this mode would become:
+
+{{{
+___a=5, b=7
+}}}
+
+p1. As can be seen the simple mode prints only the output of @SX\_DBG\_MSG@
+    _without_ source file name and line number or the function name.
+
+
+h3. Filtering runtime tracing output
+
+p1. In the previous discussions the environment variable @SX\_DEBUG@ has been
+    used to enable / disable runtime tracing in general. A complex application
+    may generate huge tracing information. In order to shorten the output
+    various filters have been introduced which can be used _instead_ of
+    @SX\_DEBUG@ which are
+
+    @SX\_DEBUG\_COMP@   := Filter out debug output originating from the set of
+                           provided components.
+    @SX\_DEBUG\_FILE@   := Filter out output only originating from the set of
+                           provided source files.
+    @SX\_DEBUG\_FUNC@   := Filter out output only originating from the set of
+                           provided C/C++ function names.
+    @SX\_DEBUG\_PARSER@ := Enables the parser tracing output in debug mode.
+
+p1. These filters can be combined which results in an output generated by the
+    provided set of functions defined in the set of specified source files. These
+    source files must also be part of one of the specified list of components.
+
+p1. Multiple source files,function or component names can be separated by ",".
+    Please also note that the filters are *case-sensitive*.
+
+p1. *Examples:*
+
+{{{
+export SX_DEBUG_COMP=sxutil,sxipc
+export SX_DEBUG_FILE=SxString.cpp,SxRegex.cpp
+export SX_DEBUG_FUNC=mySqrt
+}}}
+
+p1. On Windows use 
+
+{{{
+$env:SX_DEBUG_COMP=sxutil,sxipc
+$env:SX_DEBUG_FILE=SxString.cpp,SxRegex.cpp
+$env:SX_DEBUG_FUNC=mySqrt
+}}}
+
+p1. Remove the variables with
+
+{{{
+unset SX_DEBUG_*
+}}}
+
+p1. or
+
+{{{
+$env:SX_DEBUG_*
+}}}
+
+p1. respectively.
+
+h3. Runtime tracing VIM plugin
+
+p1. The file @src/share/vim/sxlog.vim@ provides a vim syntax file which
+    automatically folds matching @BEGIN@...@END@ blocks. Simply copy it to
+    @$HOME/.vim/syntax@ and append the following line to your vim syntax file
+    @$HOME/.vim/syntax/syntax.vim@:
+
+{{{
+au BufRead *.sxlog so $HOME/.vim/syntax/sxlog.vim
+}}}
+
+p1. Log the output as follows:
+
+{{{bash
+SX_DEBUG=1 sxmyapp 2>&1 | tee sxmyapp.sxlog
+}}}
+
+p1. Please use the filename extension @\*.sxlog@ as this is being used as
+    trigger to enable the VIM plugin. When opening the geerated log file using
+    @vim@ or @gvim@  every matching block is replaced with a single folding
+    header line, for example:
+
+{{{
+[1] 0.012ms: SxGraph.hpp:32 SxGraphItState                       12 lines
+}}}
+
+p1. The following information are being displayed:
+
+    @[1]@            := number of nested debug blocks
+    @0.012ms@        := wall clock time spend in the current block and its
+                        nested blocks
+    @SxGraph.hpp:32@ := filename and line number indicated the begin of the
+                        code block
+    @SxGraphItState@ := function name of the code block
+    @12 lines@       := number of lines which have been folded
+
+p1. In VIM's escape mode use the following key shortcuts for navigating the
+    folded blocks:
+
+    @zr@ := open all blocks in the current level and descent to next nested
+            level
+    @zm@ := ascent to next outer level and fold all blocks of this level
+    @zM@ := Fold all levels
+    @zi@ := Unfold all levels
+    @zv@ := Open fold at cursor location
+
+h2. Breakpoints
+
+p1. Previously, the tracing macros @SX\_TRACE@ and @SX\_DBG\_MSG@ have been
+    discussed, which allow for an output of function calls and user-defined
+    debug print messages. These macros can be used outside of a debugger which
+    yields high execution performance even during debugging.
+
+p1. In the following paragraphs the support of runtime breakpoints outside 
+    of debugger session will be explained. Runtime breakpoints can be placed
+    in any code line by just adding the macro @SX\_BREAK@. Once the program
+    pointer reaches this statement it suspends the program flow,
+    prints the current source file name and line number as well as the
+    C/C++ function name. It prompts the user for any of these options:
+
+    Hit @<ENTER>@ := Resume the program normally.
+    @<c>@ (core)  := Stop the program and write a memory dump which can be
+                     analyzed with @--debug <core\_file>@ afterwards.
+    @<t>@ (trace) := Print the current function call stack and suspend the
+                     program again.
+
+p1. A conditional runtime break point could be implemented as follows:
+
+{{{cpp
+for (int i=0; i < 100; ++i)  {
+   ...
+   if (i == 50)  SX_BREAK;
+   ...
+}
+}}}
+

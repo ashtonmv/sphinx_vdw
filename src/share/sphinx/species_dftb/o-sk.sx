@@ -1,0 +1,10 @@
+name           = "Oxygen";
+element        = "O";
+skElementName  = "o"; // --- used to identify the SK files for every pair of species in the structure:  
+valenceCharge  = 6;   //     (SK files names = "skElementName"(species_i) + "..."(species_j) + ".sx")
+lMax           = d;
+atomicRhoOcc   = [2,4,0];
+reciprocalMass = 16.;
+dampingMass    = 0.7;
+ionicMass      = 16.;
+

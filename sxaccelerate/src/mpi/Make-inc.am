@@ -1,0 +1,34 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxLoopMPI.h \
+                  SxMpiComm.h \
+                  SxMpiTaskGroup.h \
+                  SxParallelHierarchy.h \
+                  SxTaskGroup.h
+
+lib_LTLIBRARIES       = libsxmpi.la
+libsxmpi_la_SOURCES  = $(AUX_SRC)
+libsxmpi_la_SOURCES += SxLoopMPI.cpp \
+   SxMpiComm.cpp \
+   SxMpiTaskGroup.cpp \
+   SxParallelHierarchy.cpp \
+   SxTaskGroup.cpp
+
+libsxmpi_la_LIBADD   = $(SXIMPORTLIBS)
+libsxmpi_la_LIBADD  += 
+libsxmpi_la_LIBADD  += $(SXIMPORTOBJS)
+libsxmpi_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxmpi_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(top_builddir)/io -I$(top_srcdir)/io
+AM_CPPFLAGS += -I$(top_builddir)/fs -I$(top_srcdir)/fs
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

@@ -1,0 +1,103 @@
+/** \page  page_ssh  Password-free authentification using the OpenSSH.
+
+    A detailed oeverview how password-free authentification can be
+    accomplished can be found at
+
+       http://svn.sphinxlib.de/index.php?id=209
+
+
+    \subsection ssh_bridge Using a bridge host
+
+    Sometimes the destination host is not accessible directly (e.g. it is
+    in a subnet or IP masquerading is used). In this case it is not possible
+    to login directly to the remote host. Instead, first one has to login to
+    a reachable computer inside of the remote firewall. From there the login
+    to the destination computer can be done.
+    Of course, when a passphrase-free access is needed an SSH agent has to
+    run on the bridge host as well.
+    Therefore consider the following setup:
+
+    \par bridgehost:$HOME/bin/agent
+
+\verbatim
+#!/bin/sh
+if [ -x /usr/bin/ssh-agent ]; then
+   killall ssh-agent 2>/dev/null
+   /usr/bin/ssh-agent | grep -v echo > $HOME/.agent.csh
+   
+   cat $HOME/.agent.csh                                      \
+   | sed s/'setenv SSH_AUTH_SOCK '/'export SSH_AUTH_SOCK='/g \
+   | sed s/'setenv SSH_AGENT_PID '/'export SSH_AGENT_PID='/g \
+   > $HOME/.agent.sh
+fi
+sleep 1
+if [ -x /usr/bin/ssh-add ]; then
+   source $HOME/.agent.sh
+   /usr/bin/ssh-add $HOME/.ssh/id_rsa < /dev/null
+fi
+
+
+trap "rm $HOME/.agent.sh $HOME/.agent.csh; kill $SSH_AGENT_PID" SIGINT
+trap "rm $HOME/.agent.sh $HOME/.agent.csh; kill $SSH_AGENT_PID" SIGTERM
+
+cat -
+\endverbatim
+    This shell scipt has to be located on the bridge host and it has to
+    be executable:
+
+    \par on bridge host
+
+\verbatim
+   chmod u+rx bin/agent
+\endverbatim
+
+    The agent parameters have to be accessable from the shell. Therefor, the
+    shell's start-up also has to be changed. Assuming that you run the (t)csh
+    the beginning of the $HOME/.(t)cshrc should be changed like
+
+    \par on bridge host
+\verbatim
+if ( -f $HOME/.agent.csh ) then
+   source $HOME/.agent.csh
+endif
+
+if ( $?prompt ) then
+   # --- here starts the user's tcsh configuration for interactive shells
+   #     such as setup of paths, aliases and so on
+   # ...
+   # ...
+   # ...
+endif
+\endverbatim
+
+
+   In order to make sure that this script works properly try to run it
+   on the remote host. It should prompt a message like
+
+   \par on bridge host
+
+\verbatim
+   bin/agent
+   Identity added: /home/johndoe/.ssh/id_rsa (/home/johndoe/.ssh/id_rsa)
+\endverbatim
+
+   Now a simple start-up script is needed on the localhost which invokes
+   the bridge side agent. Call that file for example sshbridge:
+
+   \par localhost:sshbridge
+
+\verbatim
+#!/bin/sh
+xterm -title "SSH-bridge@mybridgehost" -geometry 65x3-0+0 -e ssh -t johndoe@bridgehost.aaa.xx bin/agent
+\endverbatim
+    Please replace 'mybridgehost' and 'johndoe@bridgehost.aaa.xx' with 
+    proper values.
+    
+
+    \section ssh_security Security considerations
+
+    This approach is safe. But make sure that the screen is always locked
+    whenever leaving the computer!
+
+    \author Sixten Boeck, boeck@mpie.de
+*/

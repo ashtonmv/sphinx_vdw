@@ -1,0 +1,47 @@
+set validation;
+skipUnexpectedGroups;
+topLevelDefs;
+
+include <std/pseudoPot.std>;
+include <std/eamPot.std>;
+include <std/skData.std>;
+
+
+structure           { type="group"; nItems=1;
+  cell              { type="matrix"; dims=[3,3]; optional;}
+  movable           { type="flag"; optional; not="movableX,movableY,movableZ";}
+  movableX          { type="flag"; optional; }
+  movableY          { type="flag"; optional; }
+  movableZ          { type="flag"; optional; }
+  species           { type="group"; minItems=1;
+     //name           { type="string"; optional; }
+     element        { type="string"; optional; }
+
+     movable        { type="flag"; optional; not="movableX,movableY,movableZ";}
+     movableX       { type="flag"; optional; }
+     movableY       { type="flag"; optional; }
+     movableZ       { type="flag"; optional; }
+
+     atom           { type="group"; minItems=1;
+        coords      { type="vector"; dim=3; }
+        relative    { type="flag"; optional; }
+        spin        { type="vector"; dim=3; optional; }
+        force       { type="vector"; dim=3; optional; }
+
+        movable     { type="flag"; optional; not="movableX,movableY,movableZ";}
+        movableX    { type="flag"; optional; }
+        movableY    { type="flag"; optional; }
+        movableZ    { type="flag"; optional; }
+        movableLine { type="vector"; dim=3; optional; }
+
+        label       { type="string"; optional; }
+     }
+  }
+  symmetry          { type="group"; maxItems=1; optional;
+     operator       { type="group"; minItems=1; optional;
+        S           { type="matrix"; dims=[3,3]; }
+        shift       { type="vector"; dim=3; optional; }
+     }
+  }
+  epsSym            { type="real"; min=0; optional; }
+}

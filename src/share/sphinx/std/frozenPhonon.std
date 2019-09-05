@@ -1,0 +1,42 @@
+frozenPhonon              {type="group"; optional;
+   performance            { type="group"; optional;
+      freezeMode           { 
+         type="string"; type="enum";val="z,xyz,notr"; optional; 
+      }
+      twoStep             { type="flag"; optional; }
+      deviation           { type="real"; optional; }
+      refineDeviation     { type="real"; optional; }
+      refineFreqsDeviation     { type="real"; optional; }
+      refineFreqsUpTo     { type="real"; optional; }
+		}
+
+   basis               { type="group"; optional;
+      symmetry {type="flag"; xor = "symmetry,file,cartesian";} 
+      file {type="string"; xor = "symmetry,file,cartesian";} 
+      cartesian {type="flag"; xor = "symmetry,file,cartesian";}
+      secondaryStructure { type="group"; optional;
+         periodicity {type="string";}
+         nTurns {type="int";}
+         motif {type="enum";val="helix,FES,apSheet,pSheet";}
+      }
+   }	
+
+   dofRange               { type="group"; optional;
+      startDof            { type="int"; }
+      endDof              { type="int"; }
+   }
+
+   bornOppenheimer { type="group";optional;
+      include <std/elmin.std>;
+   }
+
+   include <std/elmin.std>;
+
+   output { type="group"; optional;
+      include <std/dispersion.std>;
+      include <std/tdOutput.std>;
+      include <std/printMolden.std>;
+      include <std/printFC.std>;
+   }
+      
+}

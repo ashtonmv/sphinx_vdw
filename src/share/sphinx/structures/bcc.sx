@@ -1,0 +1,29 @@
+// --------------------------------------------------------------------------
+// SFHIngX  -  body centered cubic lattice
+//             bcc, A2
+//
+// Sixten Boeck, boeck@fhi-berlin.mpg.de
+// 08/12/2002
+//
+// Reference: Landold-Bernstein
+//
+// --------------------------------------------------------------------------
+// Argument:
+//    aLat                lattice parameter a [Bohr]
+// --------------------------------------------------------------------------
+
+requires aLat;
+
+// --- definition of the primitive unit cell
+cell = aLat/2 * [ [-1,  1,  1],        // - a1 -
+                  [ 1, -1,  1],        // - a2 -
+                  [ 1,  1, -1] ];      // - a3 -
+
+
+
+// --- high symmetry k-points
+global G, H, N, P;
+G = 2*pi/aLat * [  0,   0,   0];
+H = 2*pi/aLat * [  0,   1,   0];
+N = 2*pi/aLat * [1/2, 1/2,   0];
+P = 2*pi/aLat * [1/2, 1/2, 1/2];

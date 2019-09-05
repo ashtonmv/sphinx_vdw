@@ -1,0 +1,231 @@
+/* ---------------------------------------------------------------------------
+//
+//           The general purpose cross platform C/C++ framework
+//
+//                       S x A c c e l e r a t e
+//
+//           Home:       https://www.sxlib.de
+//           License:    Apache 2
+//           Authors:    see src/AUTHORS
+//
+// ------------------------------------------------------------------------ */
+
+%option reentrant
+%option prefix="SxJSONParser_"
+%option bison-bridge
+%option bison-locations
+%option noyywrap
+%option yylineno
+%option stack
+
+%{
+#define SXPARSER_TYPE SxJSONParser
+#define lexerPtr (static_cast<SxJSONParser *> (yyextra))
+#include <SxParserBase.h>
+#include <SxJSONParser.h>
+#include <SxJSONParser.tab.hpp>
+%}
+
+%x IncludeState
+%x StringState
+%x CommentState
+
+
+SPACE         [ \t]*
+
+DIGIT         [0-9]
+INTEGER       -?{DIGIT}+
+FLOAT         -?{DIGIT}*[\.]{DIGIT}*
+SCIENTIFIC    ({INTEGER}|{FLOAT})[e|E][\-|+]?{INTEGER}
+REAL          {FLOAT}|{SCIENTIFIC}
+NULL          "null"|"NULL"
+
+A7_CHAR       [\x00-\x7f]
+U_BYTE        [\x80-\xbf]
+U2_BYTE       [\xc2-\xdf]
+U3_BYTE       [\xe0-\xef]
+U4_BYTE       [\xf0-\xf4]
+U8_CHAR       ({U4_BYTE}{U_BYTE}{3}|{U3_BYTE}{U_BYTE}{2}|{U2_BYTE}{U_BYTE})
+A7_ESC_CHAR   [\x00-\x7f]{-}[\n\\\"]
+U8_STRING     ({U8_CHAR}|{A7_ESC_CHAR})+
+
+INCLUDE       ^{SPACE}[#]*include[ ]+
+
+%%
+
+[\t]+ { }
+[\n]+ { }
+
+(?# --- include file handling )
+{INCLUDE}[<"]   {
+   SX_DBG_LEX ("Include");
+   SXPARSER_PUSH_STATE (IncludeState);
+}
+<IncludeState>[^>";\n]+ {
+   SX_DBG_LEX ("include#open");
+   SXPARSER_APPEND_STATE (yytext);
+   try                    { SXPARSER_VALIDATE_INCLUDE (yytext); }
+   catch (SxException e)  { SXPARSER_FATAL (e.toString()); }
+}
+<IncludeState>[>"]{SPACE}[;]*{SPACE}\n {
+   SxString pattern = SxString::join (SXPARSER_COLLECT_STATE(), "");
+   SX_DBG_LEX ("include#done:" << pattern);
+   try                    { SXPARSER_PUSH_INCLUDE (pattern); }
+   catch (SxException e)  { SXPARSER_FATAL (e.toString()); }
+}
+<IncludeState>. {
+   SXPARSER_ERROR (SxString("Unexpected token ") + yytext );
+}
+
+
+(?# --- Comments )
+"/*" {
+   SX_DBG_LEX ("<*> C Comment: BEGIN");
+   SXPARSER_SKIP_WHITESPACE ();
+   SXPARSER_PUSH_STATE (CommentState);
+}
+
+(?# --- Single line comment )
+"//"[^\n]*             { }
+
+(?# --- bool )
+"true" {
+   SX_DBG_LEX ("true");
+   SXPARSER_SKIP_WHITESPACE ();
+   yylval->boolVal = true;
+   SXPARSER_SEND (TK_BOOL);
+}
+
+(?# --- bool )
+"false" {
+   SX_DBG_LEX ("false");
+   SXPARSER_SKIP_WHITESPACE ();
+   yylval->boolVal = false;
+   SXPARSER_SEND (TK_BOOL);
+}
+
+(?# --- null )
+{NULL} {
+   SX_DBG_LEX ("NULL");
+   SXPARSER_SKIP_WHITESPACE ();
+   SXPARSER_SEND (TK_NULL);
+}
+
+<CommentState>"/*" {
+   SX_DBG_LEX ("<Comment> C Comment: BEGIN");
+   SXPARSER_SKIP_WHITESPACE ();
+   SXPARSER_REPUSH_STATE ();
+}
+
+<CommentState>[^*/]+        { SX_DBG_LEX ("<Comment>#1"); }
+<CommentState>"*"+[^*/]*    { SX_DBG_LEX ("<Comment>#2"); }
+<CommentState>"*"+"/" {
+   SX_DBG_LEX ("<Comment> C Comment: END");
+   SXPARSER_POP_STATE ();
+}
+<CommentState><<EOF>> {
+   SxString msg = SXTAG_LEX() + ": Unbalanced block: Comment /*...*/ is not closed.";
+   SXPARSER_ERROR (msg);
+   yyterminate ();
+}
+
+(?# --- Numbers)
+{INTEGER} {
+   yylval->intVal = atoi (yytext);
+   SX_DBG_LEX ("Integer: " << yylval->intVal)
+   SXPARSER_SEND (TK_INTEGER);
+}
+
+{FLOAT} {
+   yylval->floatVal = atof(yytext);
+   SX_DBG_LEX ("Float: " << yylval->floatVal);
+   SXPARSER_SEND (TK_FLOAT);
+}
+
+[{] {
+   SX_DBG_LEX ("brace:");
+   SXPARSER_SKIP_WHITESPACE ();
+   SXPARSER_SEND ('{');
+}
+
+[}] {
+   SX_DBG_LEX ("brace:");
+   SXPARSER_SKIP_WHITESPACE ();
+   SXPARSER_SEND ('}');
+}
+
+[\[] {
+   SX_DBG_LEX ("brace:");
+   SXPARSER_SKIP_WHITESPACE ();
+   SXPARSER_SEND ('[');
+}
+
+[\]] {
+   SX_DBG_LEX ("brace:");
+   SXPARSER_SKIP_WHITESPACE ();
+   SXPARSER_SEND (']');
+}
+
+[:] {
+   SX_DBG_LEX (":");
+   SXPARSER_SKIP_WHITESPACE ();
+   SXPARSER_SEND (':');
+}
+
+[,] {
+   SX_DBG_LEX (",");
+   SXPARSER_SKIP_WHITESPACE ();
+   SXPARSER_SEND (',');
+}
+
+{SPACE} { }
+
+(?# --- Strings )
+"\"" {
+   SX_DBG_LEX ("StringBegin");
+   SXPARSER_SKIP_WHITESPACE ();
+   SXPARSER_PUSH_STATE (StringState);
+}
+
+<StringState>{U8_STRING} {
+   SX_DBG_LEX ("U8_String");
+   SxString s = SxString::unicodeFromUtf8 (yytext);
+   SXPARSER_APPEND_STATE (s);
+}
+
+<StringState>"\\". {
+   SX_DBG_LEX ("<String>.#2");
+   SXPARSER_APPEND_STATE (yytext);
+}
+
+<StringState>\"  {
+   SX_DBG_LEX ("<String>.#3");
+   // -- append empty string because closing quote is found
+   SXPARSER_APPEND_STATE ("");
+   SxString token = SxString::join (SXPARSER_COLLECT_STATE(), "");
+   SXPARSER_POP_STATE ();
+   yylval->strPtr = new SxString (token);
+   SXPARSER_SEND (TK_STRING);
+}
+<StringState>\n  {
+   SX_DBG_LEX ("<String>.#4");
+   SXPARSER_POP_STATE ();
+   SxString msg = "Unterminated string";
+   SXPARSER_ERROR (msg);
+}
+
+<StringState>. {
+   SXPARSER_POP_STATE ();
+   SXPARSER_ERROR (SxString("Invalid UTF-8 character: ") + yytext);
+}
+
+(?# --- default fallback: any other character is an error)
+<*>(.|\n)  {
+   if (yyextra->getLexState () != -1) {
+      SXPARSER_POP_STATE ();
+   }
+   SXPARSER_ERROR (SxString("Unexpected character ") + yytext);
+}
+
+%%
+SXPARSER_FOOTER

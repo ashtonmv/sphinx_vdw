@@ -1,0 +1,14 @@
+forces { type="group"; maxItems=2; optional; 
+  analytical { type="bool"; optional; xor="analytical,numerical";
+                                      xor="analytical,disp";      }
+  numerical  { type="bool"; optional; xor="analytical,numerical"; }
+  disp       { type="real"; optional; min=0.; max=1.; }
+}
+
+HesseMatrix { type="group"; maxItems=1; optional; 
+  disp { type="real"; optional; min=0.; max=1.; }
+}
+
+TTensor { type="group"; maxItems=1; optional; 
+  disp { type="real"; optional; min=0.; max=1.; }
+}

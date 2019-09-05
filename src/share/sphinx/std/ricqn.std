@@ -1,0 +1,27 @@
+ricQN            { type="group"; optional;
+   maxSteps      { type="int"; min=1; optional; }
+   dX            { type="real"; min=0.; optional; }
+   dF            { type="real"; min=0.; optional; }
+   dEnergy       { type="real"; min=0.; optional; }
+   nProjectors   { type="int"; min=1; optional; }
+   maxStepLength { type="real"; min=0.; optional; }
+   driftFilter   { type="flag"; optional; }
+
+   softModeDamping { type="real"; min=0.; optional; }
+
+   ric { type="group"; optional;
+      maxDist { type="real"; optional; min=1; }
+      typifyThreshold { type="real"; optional; min=0.001; }
+      rmsThreshold    { type="real"; optional; min=1; }
+      planeCutLimit   { type="real"; optional; min=0.5; }
+      withAngles      { type="flag"; optional; }
+      bvkAtoms        { type="list"; optional; }
+   }
+
+   bornOppenheimer { type="group";optional;
+      include <std/ccg.std>;
+      include <std/scf.std>;
+      include <std/lcao.std>;
+   }
+
+}

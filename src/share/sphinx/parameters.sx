@@ -1,0 +1,73 @@
+// ---------------------------------------------------------------------------
+// S/PHI/nX  -  parameter file
+//
+// Sixten Boeck, boeck@fhi-berlin.mpg.de
+// 08/10/2002
+// ---------------------------------------------------------------------------
+
+
+// --- constants and units
+ANGSTROEM_TO_BOHR = 1.8897261;
+BOHR_TO_ANGSTROEM = 0.52917721;
+EV_TO_HARTREE     = 0.036749326;
+HARTREE_TO_EV     = 27.211383;
+
+
+// --- orbital indicies
+s = 0; p = 1; d = 2; f = 3;
+
+
+// --- Excange-correlation functionals
+LDA        = 0; 
+PBE        = 1; 
+PBE_LDA    = 2; 
+READ_VXC   = 3;
+EXX        = 4;
+EXX_LDA    = 5;
+EXX_PBE    = 6;
+EXX_PBE_WB = 7;
+Slater     = 8;
+KLI        = 9;
+LDA_PW     = 10;
+
+// --- control the Hamiltonian
+CALC_NONE       =  0;
+CALC_KIN        =  1;
+CALC_V_HARTREE  =  2;
+CALC_V_X        =  4;
+CALC_V_C        =  8;
+CALC_V_LOC      = 16;
+CALC_V_NL       = 32;
+CALC_V_EXT      = 64;
+CALC_V_SCR      = 128;
+CALC_RHO        = 256;
+CALC_V_XC       = CALC_V_X + CALC_V_C;
+CALC_V_EFF      = CALC_V_HARTREE + CALC_V_XC + CALC_V_LOC + CALC_RHO;
+CALC_DEFAULT    = CALC_KIN + CALC_V_EFF + CALC_V_NL + CALC_V_SCR;
+CALC_ALL        = 65535;  // 0xffff
+
+
+// --- charge density mixing methods
+LINEAR         = 0;
+PRECOND_LINEAR = 1; // deprecate
+PULAY          = 2;
+PRECOND_PULAY  = 3; // deprecate
+
+// --- density preconditioners
+NONE     = 0;
+KERKER   = 1;
+LINDHARD = 2;
+CSRB     = 3;
+ELLIPTIC = 5;
+
+// --- EXX writeControl
+EXX_WRITE_ALL         = 255;
+EXX_WRITE_NONE        = 0;
+EXX_WRITE_CHI_MATRIX  = 1;
+EXX_WRITE_CHI_ROWDIAG = 2;
+EXX_WRITE_E_G         = 4;
+EXX_WRITE_VXR         = 8;
+EXX_WRITE_VXG         = 16;
+
+// --- define data from the periodic system of elements
+PSE = <species/elements.sx>;

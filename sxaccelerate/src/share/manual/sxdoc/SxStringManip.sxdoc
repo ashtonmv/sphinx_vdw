@@ -1,0 +1,15 @@
+a. SxString
+h1. String Handling
+
+p1. @SxAccelerate@ provides a variety of general purpose string handling/manipulation functionalities. The main classes are as follows:
+
+@SxString@ := A general purpose string handling class that provides dynamically increasing 
+              string storage.
+@SxRegex@  := A class that provides an efficient way to find strings with the help of 
+              regular expression.
+@SxSed@    := A class that provides an efficient way to replace substrings based on the 
+              regular expression.
+
+include <SxString.sxdoc>
+
+include <SxRegex.sxdoc>

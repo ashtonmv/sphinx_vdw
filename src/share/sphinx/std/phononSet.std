@@ -1,0 +1,40 @@
+set validation;
+topLevelDefs;
+
+// settings for sxphonon: include in sxdynmat.sx otherwise not generally usable!
+// see also: src/SFHIngX/std/sfhingx.std
+
+// optional qMesh settings
+qMesh                { type="group"; optional;
+   qPoint            { type="group"; minItems=1; 
+      coords         { type="vector"; dim=3; }
+      label          { type="string"; optional; }
+      weight         { type="real"; min=0; max=1; }
+      relative       { type="flag"; optional; }
+   }
+   folding        { type="vector"; dim=3; }
+}
+
+// optional qPath settings
+qPath                { type="group"; optional; 
+      relative       { type="flag"; optional; } //may be given for all k-points
+      from           { type="group"; nItems=1;
+         coords      { type="vector"; dim=3; }
+         label       { type="string"; optional; }
+         relative    { type="flag"; optional; } 
+      }             
+      to             { type="group"; minItems=1;
+         coords      { type="vector"; dim=3; }
+         nPoints     { type="int"; min = 1;}
+         label       { type="string"; optional; }
+         relative    { type="flag"; optional; } 
+      }             
+}
+                
+// optional indices of a special qPoint & mode for which e.v. are given. -1 gives minimum.
+eigenVecs { type="group"; optional; 
+   sQ { type="int"; min = -1; }
+   sMode { type="int"; min = -1; }
+}
+
+//TODO add settings to correct soft frequencies

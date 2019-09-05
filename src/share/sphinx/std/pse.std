@@ -1,0 +1,30 @@
+// Type definition for the species/elements.sx file
+
+set validation;
+
+topLevelDefs;
+
+ANGSTROEM              { type="real"; optional; }
+chemElements           { type="group"; nItems=1;
+   elem                { type="group"; minItem=1;
+      symbol           { type="enum"; 
+                         val = "?,"
+                       + "H,He,"
+                       + "Li,Be,B,C,N,O,F,Ne,"
+                       + "Na,Mg,Al,Si,P,S,Cl,Ar,"
+                       + "K,Ca,Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Ge,As,Se,Br,Kr,"
+                       + "Rb,Sr,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,In,Sn,Sb,Te,I,Xe,"
+                       + "Cs,Ba,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Tl,Pb,Bi,Po,At,Rn,"
+                       + "Fr,Ra,Ac,"
+                       + "Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,"
+                       + "Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lw";
+                       }
+      name             { type="string"; }
+      number           { type="int"; }
+      weight           { type="real"; min=0; max=300; }
+      covalentRadius   { type="real"; min=0;  }
+      atomicRadius     { type="real"; min=0; }
+      gyromagneticRatio { type="real"; optional; }
+      CPKcolor         { type="vector"; dim=3; }
+   }
+}

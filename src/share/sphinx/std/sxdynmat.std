@@ -1,0 +1,75 @@
+set validation;
+topLevelDefs;
+
+// see also: src/SFHIngX/std/sfhingx.std
+// qMesh settings
+qMesh                { type="group"; optional;
+   qPoint            { type="group"; minItems=1; 
+      coords         { type="vector"; dim=3; }
+      label          { type="string"; optional; }
+      weight         { type="real"; min=0; max=1; }
+      relative       { type="flag"; optional; }
+   }
+   folding        { type="vector"; dim=3; }
+}
+
+// qPath settings
+qPath                { type="group"; optional; not="folding";
+      // relative may be given for all k-points
+      relative    { type="flag"; optional; } 
+      from           { type="group"; nItems=1;
+         coords      { type="vector"; dim=3; }
+         label       { type="string"; optional; }
+         relative    { type="flag"; optional; } 
+      }             
+      to             { type="group"; minItems=1;
+         coords      { type="vector"; dim=3; }
+         nPoints     { type="int"; min = 1;}
+         label       { type="string"; optional; }
+         relative    { type="flag"; optional; } 
+      }             
+}
+                
+// indices of qPoints/modes for which e.v. are given. -1 minimises.
+eigenVecs { type="group"; optional; 
+   iQMesh { type="int"; min = -1; max = 999; }
+   iModeMesh { type="int"; min = -1; max = 333; }
+   iQPath { type="int"; min = -1; max = 999; }
+   iModePath { type="int"; min = -1; max = 333; }
+}
+
+maxT            { type="integer"; optional;}// maximum temperature
+dT              { type="integer"; optional;}// temperature step
+
+// volumes to which phonons are extrapolated: "0" is first volume provided, "1" the second etc. If we have just two volumes then "2" is 2*"1" - 1*"0" etc..
+extraVol        { type="vector"; optional;}
+
+// settings for correction of a soft phonon mode: qVector and potential moments
+softQ           { type="vector"; dim=3; optional; }
+potMom          { type="vector"; mindim=2; optional; }
+
+// ALL coords and forces from the phonon calculations for one volume
+// it is assumed that the first structure and forces are the undisplaced ones
+// and that they are grouped per species.
+structure           { type="group"; minItems=1;
+   cell             { type="matrix"; optional; dims=[3,3];}
+   reciprocalMass   { type="vector"; optional; minDim=0;}
+   relative         { type="flag"; optional; }
+   species          { type="group"; minItem=1;
+      relative      { type="flag"; optional; }
+      atom          { type="group"; minItem=1;
+         coords     { type="vector"; dim=3; }
+         relative   { type="flag"; optional; }
+      }
+   }
+}
+
+forces              { type="group"; minItems=1;
+   structure        { type="group"; nItem=1; 
+      species          { type="group"; minItem=1; 
+         atom          { type="group"; minItem=1; 
+            coords     { type="vector"; dim=3; }
+         }
+      }
+   }
+}

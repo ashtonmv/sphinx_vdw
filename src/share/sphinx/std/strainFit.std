@@ -1,0 +1,8 @@
+strainFit           { type="group";
+  refCell           { type="matrix"; dims=[3,3]; }
+  dof               { type="list"; maxRank=2; minRank=1; }
+  dof0              { type="vector"; }
+  scale             { type="vector"; }
+  param             { type="vector"; }
+}
+

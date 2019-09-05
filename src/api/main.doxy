@@ -1,0 +1,29 @@
+/** \mainpage The S/PHI/nX - API
+
+   This is the S/PHI/nX API documentation.
+
+   \section main_guides Guides
+
+      - \ref page-names "S/PHI/nX Style Guide"
+      - \ref page_debug   "DEBUG mode"
+      - \ref page-prefactors  "Prefactors"
+
+   \section main_addons Add-Ons
+
+      - \ref addons_intro "Writing S/PHI/nX add-ons"
+      - \ref page_cli     "The Command Line Interface"
+      - \ref page_phinax  "Writing PHInaX modules"
+
+   \section main_comm Communication
+
+      - \ref tutor_parser "S/PHI/nX File Parser"
+      - \ref tutor_sxb    "S/PHI/nX Binary Files"
+      - \ref page_signals "Signal Handler"
+      - \ref page_sockets "Network Protocols"
+
+   \section main_advanced Advanced Topics
+
+      - \ref page_dirac   "S/PHI/nX Dirac Notation"
+      - \ref page_langmix "Calling FORTRAN routines"
+
+*/

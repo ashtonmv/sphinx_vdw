@@ -1,0 +1,28 @@
+set validation;
+topLevelDefs;
+
+// ALL coords and forces from the phonon calculations for one volume
+// it is assumed that the first structure and forces are the undisplaced ones
+// see also: src/SFHIngX/std/sfhingx.std
+
+pseudoPot            { type="group"; nItem=1;
+   species           { type="group"; minItem=1;
+      reciprocalMass { type="real"; min=0.; max=1.;}
+   } 
+}
+
+structure           { type="group"; minItems=1;
+   cell             { type="matrix"; optional; dims=[3,3];}
+   relative         { type="flag"; optional; }
+   movable          { type="flag"; optional; } // irrelevant
+   species          { type="group"; minItem=1;
+      element        { type="string"; optional; }
+      relative      { type="flag"; optional; }
+      atom          { type="group"; minItem=1;
+         coords     { type="vector"; dim=3; }
+         force      { type="vector"; dim=3; optional; }
+         spin       { type="vector"; dim=3; optional; }
+         relative   { type="flag"; optional; }
+      }
+   }
+}

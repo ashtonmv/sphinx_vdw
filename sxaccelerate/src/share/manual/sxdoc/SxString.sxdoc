@@ -1,0 +1,538 @@
+p1. The @SxString@ class provides general purpose string manipulation
+    functionality. It supports dynamically growing strings along with all
+    the fundamental string operations that can be useful for the developer. In
+    the following sections some of the important operations are described with
+    the help of code snippets.
+
+p1. In order to start using the @SxString@ class, the first thing required is
+    the inclusion of @SxString@ header file in the code.
+
+{{{cpp(sxstring)
+#include <SxString.h>
+#include <SxList.h>
+}}}
+
+p1. After the inclusion of header file, all of @SxString@ functionality is
+    available. For example a simple string object can be created in one of
+    the following ways.
+
+{{{cpp(sxstring.strCreate)
+SxString str1 = "Hello ";
+SxString str2("World", 5);
+SxString str3(str1, str2);
+cout << str3 << endl;
+}}}
+
+p1. The above code first creates a @SxString@ object by providing a given
+    C-string and secondly creates a string object by providing a C-string
+    along with the number of characters to be copied to the new object from
+    the given C-string. In the third case the object @str3@ is created by
+    concatenation of two @SxString@ objects. The corresponding output would read:
+
+{{{expect(stdout,sxstring.strCreate)
+Hello World
+}}}
+
+h2. Data type conversion
+
+p1. The @SxString@ also provides constructors to convert common numerical data
+    types to a string and vice versa. The following sections provide
+    a few examples:
+
+h3. Converting number to string
+
+p1. The following example code shows how to convert a numeric type
+    into an @SxString@ object:
+
+{{{cpp(sxstring.strNumCreate)
+SxString numStr1 = 55;
+SxString numStr2 = 2.5;
+cout << numStr1 <<  endl;
+cout << numStr2 <<  endl;
+}}}
+
+p1. The above example yields following output:
+
+{{{expect(stdout,sxstring.strNumCreate)
+55
+2.5
+}}}
+
+h3. Converting string to number @toNumber@
+
+p1. The @toNumber@ member function allows to convert a string to a given
+    numeric type. It takes a pointer to @bool@ to set in case of an error.
+    It also takes an optional parameter that specifies the base of the number.
+    The template parameter specifies the type of object to return once
+    string is converted to a number. In case the string is not a valid
+    number or not a valid number of the given base or it cannot
+    be converted to the specified type, this function sets the @bool@
+    parameter to @true@.
+
+{{{cpp(sxstring.memberToNumber)
+SxString str = "133556";
+bool error = false;
+int num = str.toNumber<int> (&error);
+if (error == false) {
+   cout << num << endl;
+}
+SxString hexStr = "0xff";
+num = hexStr.toNumber<int> (&error);
+if (error == false) {
+   cout << num << endl;
+}
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxstring.memberToNumber)
+133556
+255
+}}}
+
+p1. @SxString@ also provides convenient functions to directly convert to common
+    numeric types as shown in the following code snippet. These functions
+    take pointer to @bool@ as optional parameter which is set to true if
+    an error occurs while converting to specific type. If @error@ pointer is
+    not provided, these functions throw an exception if the conversion fails.
+
+{{{cpp(sxstring.toNumType)
+SxString intStr = "666558";
+bool error = false;
+int intVal = intStr.toInt (&error);
+if (error == false) {
+   cout << intVal << endl;
+}
+SxString longStr = "229188398";
+int64_t longVal = longStr.toInt64 ();
+cout << longVal << endl;
+}}}
+
+p1. The above code yields,
+
+{{{expect(stdout,sxstring.toNumType)
+666558
+229188398
+}}}
+
+
+h2. Changing Case @toUpper@/@toLower@
+
+p1. The @toUpper@ function returns a string object with same characters as the
+    calling object but with all alphabets changed to upper case. Similarly,
+    @toLower@ function returns a string with all alphabets changed to lower case.
+
+{{{cpp(sxstring.toUpperLower)
+SxString str = "Hello I am a String.";
+cout << str.toUpper () << endl;
+cout << str.toLower () << endl;
+}}}
+
+p1. Which results in,
+
+{{{expect(stdout,sxstring.toUpperLower)
+HELLO I AM A STRING.
+hello i am a string.
+}}}
+
+
+h2. Managing white spaces
+
+p1. The white spaces present in a @SxString@ object can be removed/managed by
+    using the following member functions:
+
+h3. Trim white spaces @trim@
+
+p1. The @trim@ function returns a @SxString@ object with white spaces removed
+    from the beginning and end of the string.
+
+{{{cpp(sxstring.trim)
+SxString str = "   Hello I am a String.     ";
+cout << "|" << str.trim () << "|" << endl;
+}}}
+
+p1. The above code yields the following trimmed string:
+
+{{{expect(stdout,sxstring.trim)
+|Hello I am a String.|
+}}}
+
+h3. Simplifying white spaces @simplifyWhiteSpace@
+
+p1. @simplifyWhiteSpace@ function works in similar way as the @trim@, but with
+    additional functionality that it replaces sequence of white spaces found
+    within the string with a single white space.
+
+{{{cpp(sxstring.simplifyWhiteSpace)
+SxString str = "   This        is    a      different string.     ";
+cout << "|" << str.simplifyWhiteSpace () << "|" << endl;
+}}}
+
+p1. The above code results in the following string where intermediate and
+    trailing spaces have been removed:
+
+{{{expect(stdout,sxstring.simplifyWhiteSpace)
+|This is a different string.|
+}}}
+
+h2. Wrap string @wrap@
+
+p1. The @wrap@ function provides a way to prepend a given prefix to the string
+    represented by @SxString@ object. It allows to add given number of spaces
+    after the prefix and also wraps the lines in the text to a given length.
+
+{{{cpp(sxstring.wrap)
+SxString str = "This is a random string.This is a different string.This is another string.This is a different string.This is a another string.This is a different string.";
+std::cout << str.wrap ("Prefix:", 2, 40);
+}}}
+
+p1. The above code shows the following output:
+
+{{{expect(stdout,sxstring.wrap)
+Prefix:  This is a random string.This is
+         a different string.This is 
+         another string.This is a 
+         different string.This is a 
+         another string.This is a 
+         different string.
+}}}
+
+p1. This function also provides the option to add prefix to every new line,
+    when the optional last parameter is set to 'false'. Consider the
+    following example:
+
+{{{cpp(sxstring.wrapAllLines)
+SxString str = "This is a random string.This is a different string.This is another string.This is a different string.This is a another string.This is a different string.";
+std::cout << str.wrap ("Prefix:", 2, 40, false);
+}}}
+
+p1. which yields,
+
+{{{expect(stdout,sxstring.wrapAllLines)
+Prefix:  This is a random string.This is
+Prefix:  a different string.This is 
+Prefix:  another string.This is a 
+Prefix:  different string.This is a 
+Prefix:  another string.This is a 
+Prefix:  different string.
+}}}
+
+h2. Joining multiple strings @join@
+
+p1. The @join@ function returns a new string made up by joining a given list
+    of @SxString@ objects. Apart from the @SxList@ parameter, it also takes an
+    optional parameter to specify a character that will be concatenated between
+    each joining pair of strings.
+
+{{{cpp(sxstring.join)
+SxList<SxString> strList;
+strList << "This" << "is" << "a" << "string";
+cout << SxString::join (strList,",") << endl;
+cout << SxString::join (strList," ") << endl;
+}}}
+
+p1. The above code yields the following output:
+
+{{{expect(stdout,sxstring.join)
+This,is,a,string
+This is a string
+}}}
+
+h2. String concatenation
+
+p1. An @SxString@ can be concatenated to another C-string or @SxString@ object
+    by using the addition operator.
+
+{{{cpp(sxstring.concatenate)
+SxString s = "Hello";
+SxString s2 = s + " World";
+cout << s2 << endl;
+SxString s3 = ", Good Morning!";
+SxString s4 = s + s3;
+cout << s4 << endl;
+}}}
+
+p1. The above example code results in the following output:
+
+{{{expect(stdout,sxstring.concatenate)
+Hello World
+Hello, Good Morning!
+}}}
+
+h2. Character encodings
+
+p1. The @SxString@ class provides the option to store a string as ASCII 
+    or Unicode character set. As ASCII character set is stored using 8 bits, it
+    can only represent limited number of characters. In contrast, UTF-8/UTF-16
+    allows to store characters using variable number of bytes, hence allows much
+    larger set of characters to be represented.In UTF-8 each character can have
+    minimum of 1 byte and maximum of 4 bytes. One benefit of this is that all
+    ASCII characters can be stored in the same representation in UTF-8. UTF-16,
+    on the other hand, uses minimum of 2 bytes to store a character, while 
+    maximum size is 4 bytes.
+
+h3. Initializing @SxString@ from ASCII, UTF-8, or UTF-16
+
+p1. When initializing strings other than ASCII the encoding must be taken into
+    account. This can be accomplished by using one of these static convenient
+    functions:
+
+   @fromAscii(const char \*)@      := create a @SxString@ object from a null
+                                      terminated ASCII byte array by copying
+                                      the provided data.
+   @fromUtf8(const char \*)@       := create a @SxString@ object from a null
+                                      terminated UTF-8 byte array by copying
+                                      the provided data.
+   @fromUtf16(const uint16\_t \*)@ := create a @SxString@ object from a
+                                      "0x00 0x00" terminated UTF-16
+                                      byte array by copying the data.
+
+p1. The following code snippet demonstrate the example usage of these
+    functions:
+
+{{{cpp(sxstring.fromAscii)
+SxString asciiStr = SxString::fromAscii ("Hello, Good Morning");
+std::cout << asciiStr << std::endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxstring.fromAscii)
+Hello, Good Morning
+}}}
+
+p1. Similarly, @fromUtf8@ function can be used as:
+
+{{{cpp(sxstring.fromUtf8)
+SxString utf8String = SxString::fromUtf8 (u8"Hello, Good Morning");
+}}}
+
+p1. which yields:
+
+{{{expect(stdout,sxstring.fromUtf8)
+Hello, Good Morning
+}}}
+
+h3. Converting @SxString@ to ASCII, UTF-8, or UTF-16 arrays
+
+p1. The content of @SxString@ objects can be returned as pointers to ASCII,
+    UTF-8, or UTF-16 byte arrays. Hereby, ASCII and UTF-8 are returned as
+    pointers to @const char \*@ while UTF-16 is exported as
+    @SxArray<uint16\_t>@:
+
+    @ascii ()@      := return the null terminated @const char \*@ 
+                       representation of the underlying ASCII string object.
+                       The pointer is valid as long as the @SxString@ object
+                       lives. The function exists with @SX\_CHECK@ if the
+                       object contains Unicode data.
+    @utf8 ()@       := This function returns the null terminated
+                       @const char \*@ representation of the UTF-8 encoded
+                       @SxString@ object. The pointer is valid as long as the
+                       @SxString@ object lives.
+    @utf16 ()@      := This function returns the @SxArray<uint16\_t>@
+                       representation of the given @SxString@ object including
+                       the "0x00 0x00" termination.
+
+p1. The following code snippets demonstrate example usages:
+
+{{{cpp(sxstring.getElems)
+SxString asciiStr("Hello");
+std::cout << asciiStr.ascii () << std::endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxstring.getElems)
+Hello
+}}}
+
+p1. Similarly, the @utf8@ function can be used to get the @char \*@
+    representation of a @SxString@ object as follows:
+
+{{{cpp(sxstring.utf8)
+SxString utf8Str(u8"Hello");
+std::cout << utf8Str.utf8 () << std::endl;
+}}}
+
+p1. which results in:
+
+{{{expect(stdout,sxstring.utf8)
+Hello
+}}}
+ 
+
+
+h3. ASCII to UTF-8 Unicode conversion @toUnicode@
+
+p1. The @toUnicode@ function returns the UTF-8 Unicode encoded copy of the
+    given ASCII encoded @SxString@ object. The following example shows usage of
+    this function:
+
+{{{cpp(sxstring.toUnicode)
+SxString asciiStr = "This is a string.";
+if (!asciiStr.isUnicode ()) {
+   std::cout << "This is an ASCII string." << std::endl;
+}
+SxString unicodeStr = asciiStr.toUnicode ();
+if (unicodeStr.isUnicode ()) {
+   std::cout << "This is a Unicode string." << std::endl;
+}
+}}}
+
+p1. The above example code results in the following output:
+
+{{{expect(stdout,sxstring.toUnicode)
+This is an ASCII string.
+This is a Unicode string.
+}}}
+
+h3. @getNBytes@ function
+
+p1. This function returns the total size of a @SxString@ object in number of
+    bytes. This function is different than the @getSize@ because @getSize@
+    function returns the number of characters present in the string excluding
+    the trailing '\\0' character. Whereas the @getNBytes@ returns the actual
+    size in bytes excluding the trailing '\\0' character. Therefore, the output
+    of @getNBytes@ will be different than @getSize@ if Unicode characters are
+    used where each character may require up to four bytes for storage.
+
+h2. Searching for substrings
+
+h3. Retrieve substring @subString@
+
+p1. The @subString@ function returns the sub string starting from the given
+    index and up till the provided ending index. The ending index is an
+    optional parameter, if it is not provided then the substring till the end
+    of the string is returned.
+
+{{{cpp(sxstring.subString)
+SxString str = "Hello World!";
+cout << str.subString (0,4) << endl;
+cout << str.subString (6) << endl;
+}}}
+
+p1. The above example gives the following output:
+
+{{{expect(stdout,sxstring.subString)
+Hello
+World!
+}}}
+
+h3. Left or right substring @left@/@right@
+
+p1. The @left@ function returns the substring to the left of the given
+    substring whereas @right@ returns the substring to the right of the given
+    substring found in the @SxString@ object.
+
+{{{cpp(sxstring.leftRightSubstring)
+SxString str = "Hello World!";
+cout << str.left ("World!") << endl;
+cout << str.right ("Hello") << endl;
+}}}
+
+p1. Which yields,
+
+{{{expect(stdout,sxstring.leftRightSubstring)
+Hello 
+ World!
+}}}
+
+h3. Head or tail substring @head@/@tail@
+
+p1. The @head@ function returns a substring made up of first @len@ characters
+    whereas @tail@ returns substring of last @len@ characters, where @len@ is
+    the required length specified as a parameter.
+
+{{{cpp(sxstring.headTail)
+SxString str = "Hello World!";
+cout << str.head (5) << endl;
+cout << str.tail (6) << endl;
+}}}
+
+p1. The above code results in:
+
+{{{expect(stdout,sxstring.headTail)
+Hello
+World!
+}}}
+
+h3. Tokenizing strings @tokenize@
+
+p1. The @tokenize@ function allows to divide a string into multiple parts
+    based on a given delimiter. This function takes the specific delimiter
+    and a second optional boolean parameter to specify whether empty
+    substrings are allowed.
+
+{{{cpp(sxstring.tokenize)
+SxString str = "This is a test string";
+SxList<SxString> parts = str.tokenize (" ");
+cout << parts << endl;
+}}}
+
+p1. The above code results in the following components of the example string:
+
+{{{expect(stdout,sxstring.tokenize)
+0: This
+1: is
+2: a
+3: test
+4: string
+}}}
+
+h2. String search/manipulation
+
+h3. Finding substring @find@/@findLast@/@findAll@
+
+p1. The @find@ function returns the position of the first character of the
+    given substring found in the calling @SxString@ object. It also takes an
+    optional parameter of the starting index which specifies the index from
+    which to start the search for the given substring.
+
+{{{cpp(sxstring.strFind)
+SxString str = "Hello World";
+ssize_t sIdx = str.find ("llo");
+cout << "Position of 'llo' is: " << sIdx << endl;
+sIdx = str.find ("l", 5);
+cout << "Position of 'l' starting from index 5: " << sIdx << endl;
+}}}
+
+p1. The above code snippet yields the following results:
+
+{{{expect(stdout,sxstring.strFind)
+Position of 'llo' is: 2
+Position of 'l' starting from index 5: 9
+}}}
+
+p1. On the contrary, @findLast@ function returns the position of the last
+    occurrence of the substring.
+
+{{{cpp(sxstring.strFindLast)
+SxString str = "Hello World";
+ssize_t lastIdx = str.findLast ("l");
+cout << lastIdx << endl;
+}}}
+
+p1. Which prints the following output:
+
+{{{expect(stdout,sxstring.strFindLast)
+9
+}}}
+
+p1. The @findAll@ function returns a list of all occurrences of the given
+    substring in the calling object. It returns an object of @SxList@ which
+    contains the starting positions of all occurrences of the specified substring.
+
+{{{cpp(sxstring.strFindAll)
+SxString str = "Hello World";
+SxList<ssize_t> lst = str.findAll ("l");
+cout << lst << endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxstring.strFindAll)
+0: 2
+1: 3
+2: 9
+}}}
+

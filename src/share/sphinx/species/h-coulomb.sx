@@ -1,0 +1,12 @@
+potential      = <potentials/h-coulomb.cpi>;
+name           = "Hydrogen";
+element        = "H";
+valenceCharge  = 1;
+lMax           = s;
+lLoc           = s;
+lcaoOrbitals   = [s];
+atomicRhoOcc   = [1];
+rGauss         = 1;
+reciprocalMass = .5;
+dampingMass    = .7;
+ionicMass      = 1.;

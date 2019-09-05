@@ -1,0 +1,52 @@
+# ---------------------------------------------------------------------------
+#
+#      The ab-initio based multiscale library
+#
+#                  S / P H I / n X
+#
+#      Copyright:  Max-Planck-Institute for Iron Research
+#                  40237 Duesseldorf, Germany
+#
+#      Contact:    https://sxlib.mpie.de
+#      Authors:    see sphinx/AUTHORS
+#      License:    see sphinx/LICENSE
+#
+# ---------------------------------------------------------------------------
+
+AC_PREREQ(2.59)
+AC_INIT([@PACKAGE_NAME@],[@PACKAGE_VERSION@], [@PACKAGE_BUGREPORT@])
+
+AC_CONFIG_FILES([scripts/sxget.pl])
+AC_CONFIG_FILES([scripts/sxget.rc])
+
+AC_SUBST(SXGET_RC,   [`pwd`/scripts/sxget.rc])
+
+AC_PATH_TOOL(PERL,   [perl])
+AC_PATH_TOOL(GREP,   [grep])
+AC_PATH_TOOL(FIND,   [find])
+AC_PATH_TOOL(RM,     [rm])
+
+AC_PATH_PROGS(ZCAT,   [gzcat zcat])
+AC_PATH_PROGS(AWK,    [gawk awk])
+AC_PATH_PROGS(SED,    [gsed sed])
+
+AC_OUTPUT
+
+
+top=`pwd`
+
+files=`cd $top/bin && ls`
+cd $top/scripts
+
+for f in $files; do
+   $top/scripts/sxwrap.sh $top $top/bin $f $top/lib
+done
+
+# perl script(s): remove .pl and make executable
+for f in `ls *.pl | sed s/\.pl//g` ; do
+   mv $f.pl $f
+   chmod a+rx $f
+done
+
+cd $top
+rm confdefs.h config.log config.status > /dev/null

@@ -1,0 +1,38 @@
+// ---------------------------------------------------------------------------
+//
+//      The ab-initio based multiscale library
+//
+//                  S / P H I / n X
+//
+//      Copyright:  Max-Planck-Institute for Iron Research
+//                  40237 Duesseldorf, Germany
+//
+//      Contact:    https://sxlib.mpie.de
+//      Authors:    see sphinx/AUTHORS
+//      License:    see sphinx/LICENSE
+//
+// ---------------------------------------------------------------------------
+// Rather strict input file format definitions:
+//    * variables may be defined only in top level node
+//    * k-Points for bandstructures (path through the Brillouin zone) are
+//      expected in cartesion coordinates
+//    * k-Points used in the Monkhorst-Pack folding are expected in 
+//      relative coordinates
+//    * energy-cutoff limited 
+// --------------------------------------------------------------------------
+set validation;
+
+
+deprecateFormat;
+topLevelDefs;
+
+// Declare global "skipUnexpectedGroups". See also footer of this file.
+skipUnexpectedGroups;
+
+blockInteraction  { type="group";
+   
+      is1         { type="int";   min=0;}
+      is2         { type="int";   min=0;}
+      l1          { type="int";   min=0;}
+      l2          { type="int";   min=0;}
+}

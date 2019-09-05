@@ -1,0 +1,5 @@
+vdwCorrection      { type="group"; optional;
+      potentialType { type="enum";  
+                  val = "WTYang_I,WTYang_II,Elstner_I,Elstner_II"; }
+}
+

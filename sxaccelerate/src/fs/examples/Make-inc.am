@@ -1,0 +1,78 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = sxchmod sxcp_a sxfind sxln_sf sxls sxmkdir sxmv sxrm sxtouch 
+
+sxchmod_SOURCES   = $(AUX_SRC)
+sxchmod_SOURCES  += sxchmod.cpp
+sxchmod_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxchmod_LDADD     =  $(SXIMPORTLIBS)
+sxchmod_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxchmod_LDADD    +=  $(SXIMPORTOBJS)
+
+sxcp_a_SOURCES   = $(AUX_SRC)
+sxcp_a_SOURCES  += sxcp_a.cpp
+sxcp_a_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxcp_a_LDADD     =  $(SXIMPORTLIBS)
+sxcp_a_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxcp_a_LDADD    +=  $(SXIMPORTOBJS)
+
+sxfind_SOURCES   = $(AUX_SRC)
+sxfind_SOURCES  += sxfind.cpp
+sxfind_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxfind_LDADD     =  $(SXIMPORTLIBS)
+sxfind_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxfind_LDADD    +=  $(SXIMPORTOBJS)
+
+sxln_sf_SOURCES   = $(AUX_SRC)
+sxln_sf_SOURCES  += sxln_sf.cpp
+sxln_sf_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxln_sf_LDADD     =  $(SXIMPORTLIBS)
+sxln_sf_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxln_sf_LDADD    +=  $(SXIMPORTOBJS)
+
+sxls_SOURCES   = $(AUX_SRC)
+sxls_SOURCES  += sxls.cpp
+sxls_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxls_LDADD     =  $(SXIMPORTLIBS)
+sxls_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxls_LDADD    +=  $(SXIMPORTOBJS)
+
+sxmkdir_SOURCES   = $(AUX_SRC)
+sxmkdir_SOURCES  += sxmkdir.cpp
+sxmkdir_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmkdir_LDADD     =  $(SXIMPORTLIBS)
+sxmkdir_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxmkdir_LDADD    +=  $(SXIMPORTOBJS)
+
+sxmv_SOURCES   = $(AUX_SRC)
+sxmv_SOURCES  += sxmv.cpp
+sxmv_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmv_LDADD     =  $(SXIMPORTLIBS)
+sxmv_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxmv_LDADD    +=  $(SXIMPORTOBJS)
+
+sxrm_SOURCES   = $(AUX_SRC)
+sxrm_SOURCES  += sxrm.cpp
+sxrm_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxrm_LDADD     =  $(SXIMPORTLIBS)
+sxrm_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxrm_LDADD    +=  $(SXIMPORTOBJS)
+
+sxtouch_SOURCES   = $(AUX_SRC)
+sxtouch_SOURCES  += sxtouch.cpp
+sxtouch_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxtouch_LDADD     =  $(SXIMPORTLIBS)
+sxtouch_LDADD    +=  @SX_SHORTCUT_LIBS@
+sxtouch_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/fs -I$(top_srcdir)/fs
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

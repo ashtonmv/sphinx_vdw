@@ -1,0 +1,514 @@
+h2. @SxFileIO@
+
+p1. The @SxFileIO@ class provides general purpose file I/O functionality in @SxAccelerate@. It supports API level functions to create, read and write to a file. In order to access this functionality, the @SxFileIO@ header file must be included as shown below:
+
+{{{cpp(sxfileio)
+#include <SxFileIO.h>
+#include <SxFSAction.h>
+#include <SxException.h>
+#include <SxArray.h>
+}}}
+
+p1. The main functions of this class are explained below:
+
+h3. Performance considerations on buffering @setBuffering@
+
+p1. The @SxFileIO@ provides a member function @setBuffering()@ to optionally
+    disable the kernel buffering of read and write requests. By default, in
+    order to reduce system calls kernel would always read in multiple of
+    fixed block size, even if user requested less number of bytes. Similarly,
+    in case of write requests kernel would only write data to disk, when the
+    data is of the size multiple of block size.
+
+p1. In specific cases, this default behavior can be disabled by
+    setting the buffering to @false@ by calling @setBuffering@ before opening
+    the file. But it should be noted that this would result in each read/write
+    request to cause a system call, which would result in performance penalty.
+
+h3. Open file @open()@
+
+p1. In order to perform I/O operations on a file, the corresponding file must be opened first using the @open@ function of @SxFileIO@. This function takes three parameters where first is the file path, second is the mode flags and third (optional) parameter is the permissions to be set in case the file is being created. The mode flags parameter specifies whether the file needs to be opened in read, write or append mode. The following modes are currently supported:
+
+ @r@ := open an existing file to read.
+ @r+@ := open an existing file to read and write.
+ @w@ := open a file to write. Delete existing contents and create if doesn't exist.
+ @w+@ := open a file to write and read. Delete existing contents and create if doesn't exist.
+ @a@ := open a file to append. It writes to the end of existing contents and creates the file if doesn't exist.
+ @a+@ := open a file for append and read. It writes to the end of existing contents and reads from the beginning by default. It creates the file if it doesn't exist.
+ @b@ := It stands for binary and it can be used in combination with any of the previously mentioned modes. It opens the file in binary mode which means that file I/O is performed in bytes as opposed to stream of text.
+
+p1. The @open@ function throws an exception if it is unable to open the file with given mode flags. The following example shows how to use this function:
+
+{{{cpp(sxfileio.open)
+try {
+   SxString filename ("./myfile.txt");
+   SxFileIO f;
+   f.open (filename, "w+");
+   std::cout << "File was opened successfully" << std::endl;
+   f.close ();
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code yields following result when successful:
+
+{{{expect(stdout,sxfileio.open)
+File was opened successfully
+}}}
+
+h3. Write to file @write@ / @<<@
+
+p1. Once a file is opened for writing it can be written to, by the @write@ function or the overloaded @<<@ operator. Both methods require the corresponding data to be passed as @SxArray@ object.
+
+h4. Write using function @write@
+
+p1. The write function allows to write to a file that is opened in write/append mode. It takes @SxArray@ object of template type @T@ and number of elements to be written, as parameters. This function throws an exception if write operation fails to write the given number of elements. It returns the number of elements written as a result. The following code snippet shows an example usage of this function:
+
+{{{cpp(sxfileio.writeFunc)
+try {
+   SxString filename ("./writeFuncTest.txt");
+   uint64_t nElemsToWrite = 5;
+   SxFileIO f;
+   f.open (filename, "w");
+   SxArray<char> buffer = SxString ("Hello");
+   uint64_t nElemsWritten = f.write (buffer, nElemsToWrite);
+   if (nElemsWritten == nElemsToWrite)
+      std::cout << "Write operation was successful" << std::endl;
+   f.close ();
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxfileio.writeFunc)
+Write operation was successful
+}}}
+
+p1. Another overload of function @write@ requires a @void@ pointer and size in bytes. It provides a generic interface that allows to write any data type as sequence of bytes to file.
+
+h4. Write using operator @<<@
+
+p1. The overloaded operator @<<@ makes it easy to perform write operations. It requires @SxFileIO@ object on the left and the @SxArray@ object on the right of the operator. It also throws an exception in case of failure. In this case the number of elements to write are decided based on the size of @SxArray@ object and the actual number of written elements can be fetched by using the function @getLastWritten@. The following code shows usage of this operator:
+
+{{{cpp(sxfileio.writeOp)
+try {
+   SxString filename ("./writeOpTest.txt");
+   uint64_t nElemsToWrite = 12;
+   SxFileIO f;
+   f.open (filename, "w");
+   SxArray<char> buffer = SxString ("Good Morning");
+   f << buffer;
+   uint64_t nElemsWritten = f.getLastWritten ();
+   if (nElemsWritten == nElemsToWrite)
+      std::cout << "Write operation was successful" << std::endl;
+   f.close ();
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code yields the following output when successful:
+
+{{{expect(stdout,sxfileio.writeOp)
+Write operation was successful
+}}}
+
+h4. Static @write@/@appendToFile@
+
+p1. The static functions to write or append to a file are provided by @SxFileIO@ for ease of use. These functions are described below:
+
+h5. @write@
+
+p1. The @write@ static function allows to write the given @SxString@ object to a file. The file is created if it does not exist and it's data is deleted if file exists. It takes three parameters which are the data string, filename and file permissions for creation of file. The following code presents an example usage of the function:
+
+{{{cpp(sxfileio.staticWrite)
+try {
+   SxString filename ("./staticWrite.txt");
+   SxString str ("Hello, good morning!");
+   SxFileIO::write (str, filename, 0600);
+   std::cout << "Write operation successful" << std::endl;
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code throws an exception in case the write operation fails. In case of success the following output is printed:
+
+{{{expect(stdout,sxfileio.staticWrite)
+Write operation successful
+}}}
+
+h5. @appendToFile@
+
+p1. The @appendToFile@ static function allows to append data at the end of an existing file. The file is created if it does not exist. It takes the data to be written as @SxString@ object and the file name as parameters. An example of this function is shown below:
+
+{{{cpp(sxfileio.staticAppendToFile)
+try {
+   SxString filename ("./staticAppend.txt");
+   SxString str ("Hello, good morning!");
+   SxFileIO::appendToFile (str, filename);
+   std::cout << "Append operation successful" << std::endl;
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code results in an exception if the operation fails. In case of success it yields the following output:
+
+{{{expect(stdout,sxfileio.staticAppendToFile)
+Append operation successful
+}}}
+
+h3. Read from file @read@ / @>>@
+
+p1. Once a file is opened in read mode, it can be read by the @read@ function or the overloaded @>>@ operator. Both methods require an @SxArray@ object as parameter to store the read data.
+
+h4. Read using function @read@
+
+p1. The read function allows to read from a file that is opened in read mode. It takes @SxArray@ object of template type @T@ and number of elements to be read, as parameters. The read function throws an exception if the read operation fails to read the required number of elements. If the elements required are more than the file size then only number of elements left in the file are returned. It returns the number of elements read as a result. The following code snippet shows an example usage of this function:
+
+{{{cpp(sxfileio.readFunc)
+try {
+   SxString filename ("./readFuncTest.txt");
+   SxFileIO f;
+   f.open (filename, "w");
+   SxArray<char> buffer = SxString ("Good Morning");
+   uint64_t nElemsToWrite = buffer.getSize ();
+   f << buffer;
+   uint64_t nElemsWritten = f.getLastWritten ();
+   if (nElemsWritten == nElemsToWrite)
+      std::cout << "Write operation was successful" << std::endl;
+   f.close ();
+   f.open (filename, "r");
+   SxArray<char> readBuf (nElemsWritten);
+   uint64_t nElemsRead = f.read (&readBuf, readBuf.getSize ());
+   if (nElemsWritten == nElemsRead)
+      std::cout << "Read operation was successful" << std::endl;
+   f.close ();
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code yields following output:
+
+{{{expect(stdout,sxfileio.readFunc)
+Write operation was successful
+Read operation was successful
+}}}
+
+p1. Another overload of the function @read@ requires a buffer of type @void@ pointer and size in bytes as parameters. This function provides a generic interface to be able to read specified number of bytes.
+
+h4. Write using operator @>>@
+
+p1. The overloaded operator @>>@ makes it easy to perform read operations. It requires @SxFileIO@ object on the left and the @SxArray@ object on the right of the operator. It also throws an exception in case of failure. In this case the number of elements to read are decided based on the size of @SxArray@ object and the actual number of elements read can be fetched by using the function @getLastRead@. The following code shows usage of this operator:
+
+{{{cpp(sxfileio.readOp)
+try {
+   SxString filename ("./readOpTest.txt");
+   SxFileIO f;
+   f.open (filename, "w");
+   SxArray<char> buffer = SxString ("Good Morning");
+   uint64_t nElemsToWrite = buffer.getSize ();
+   f << buffer;
+   uint64_t nElemsWritten = f.getLastWritten ();
+   if (nElemsWritten == nElemsToWrite)
+      std::cout << "Write operation was successful" << std::endl;
+   f.close ();
+   f.open (filename, "r");
+   SxArray<char> readBuf (nElemsWritten);
+   f >> readBuf;
+   uint64_t nElemsRead = f.getLastRead ();
+   if (nElemsWritten == nElemsRead)
+      std::cout << "Read operation was successful" << std::endl;
+   f.close ();
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxfileio.readOp)
+Write operation was successful
+Read operation was successful
+}}}
+
+h3. Read Lines from file @readLines@ / @readTail@
+
+p1. The @readLines@ and @readTail@ functions provide a way to read given number of lines from the file. Both functions take number of lines to be read as parameter where value 0 means to read whole file. These functions return the read lines as @SxString@ object. In order to use these functions the file must be opened in text mode (non-binary).
+
+h4. Read Lines from beginning @readLines@
+
+p1. The @readLines@ function reads the given number of lines starting from the beginning of the file. It throws an exception if the read operation fails. The following code shows an example of this function:
+
+{{{cpp
+try {
+   SxString filename ("./readLinesTest.txt");
+   uint64_t nElemsToWrite = 19;
+   SxFileIO f;
+   f.open (filename, "w");
+   SxArray<char> buffer = SxString ("Hello\nGood\nMorning\n");
+   f << buffer;
+   uint64_t nElemsWritten = f.getLastWritten ();
+   if (nElemsWritten == nElemsToWrite)
+      std::cout << "Write operation was successful" << std::endl;
+   f.close ();
+   f.open (filename, "r");
+   std::cout << SxString(f.readLines (1));
+   f.close ();
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code reads 1st line starting from beginning of the file and prints the following output:
+
+{{{
+Write operation was successful
+Hello
+}}}
+
+h4. Read lines from end @readTail@
+
+p1. The @readTail@ function reads the given number of lines starting from the end of the file. It throws an exception if the read operation fails. The following code shows an example of this function:
+
+{{{cpp
+try {
+   SxString filename ("./readTailTest.txt");
+   uint64_t nElemsToWrite = 19;
+   SxFileIO f;
+   f.open (filename, "w");
+   SxArray<char> buffer = SxString ("Hello\nGood\nMorning\n");
+   f << buffer;
+   uint64_t nElemsWritten = f.getLastWritten ();
+   if (nElemsWritten == nElemsToWrite)
+      std::cout << "Write operation was successful" << std::endl;
+   f.close ();
+   f.open (filename, "r");
+   std::cout << SxString(f.readTail (1));
+   f.close ();
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code reads the last line of the file and prints the following output:
+
+{{{
+Write operation was successful
+Morning
+}}}
+
+h4. Static @readLines@/@readTail@/@readBinary@
+
+p1. Similar to the member functions @readLines@/@readTail@, the corresponding static functions are provided, to read from a file, as part of @SxFileIO@. Their usage is briefly explained below:
+
+h5. @readLines@
+
+p1. The @readLines@ static function allows to read given number of lines from an existing file. It takes filename and number of lines as argument. The following code snippet shows example usage of the function:
+
+{{{cpp
+try {
+   SxString filename ("./staticRead.txt");
+   SxString str ("Hello\ngood\nmorning\n");
+   SxFileIO::write (str, filename, 0600);
+   std::cout << "Write operation successful" << std::endl;
+   std::cout << "Read Lines Output:\n" << SxString(SxFileIO::readLines (filename, 1));
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code yields the following output:
+
+{{{
+Write operation successful
+Read Lines Output:
+Hello
+}}}
+
+h5. @readTail@
+
+p1. The @readTail@ static function provides the functionality to read given number of lines from the end of the file. It takes file name and number of lines as parameters. An example of this function is given below:
+
+{{{cpp
+try {
+   SxString filename ("./staticReadTail.txt");
+   SxString str ("Hello\ngood\nmorning\n");
+   SxFileIO::write (str, filename, 0600);
+   std::cout << "Write operation successful" << std::endl;
+   std::cout << "ReadTail Output:\n" << SxString(SxFileIO::readTail (filename, 1));
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code results in the following output:
+
+{{{
+Write operation successful
+ReadTail Output:
+morning
+}}}
+
+h5. @readBinary@
+
+p1. The @readBinary@ static function allows reading a file in binary mode. It takes two parameters, file name and number of bytes to read from file. The function throws an exception if the file doesn't exist or read operation fails. The following code shows it's usage:
+
+{{{cpp(sxfileio.staticReadBinary)
+try {
+   SxString filename ("./readBinary.txt");
+   SxString str ("Hello, good morning");
+   SxFileIO::write (str, filename, 0600);
+   std::cout << "Write operation successful" << std::endl;
+   std::cout << "Read Binary Output:" << std::endl
+             << SxString((SxFileIO::readBinary(filename, 5)));
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. which yields:
+
+{{{expect(stdout,sxfileio.staticReadBinary)
+Write operation successful
+Read Binary Output:
+Hello
+}}}
+
+h3. Set file pointer @seek@
+
+p1. The @seek@ function allows to place the file pointer to a specific offset to perform I/O operations. The offset value starts with 0 at the beginning of the file. This function takes two parameters where first parameter is the offset value and second parameter specifies the origin from where the given offset will be calculated. The origin parameter is an enum of type @SxFileIO::Seek@, which can have following values:
+
+@BEG@ := represents origin from beginning of the file.
+@CUR@ := represents origin from the current file offset.
+@END@ := represents origin from the end of the file.
+
+p1. The default value of origin in @seek@ function is @CUR@. The following code snippet shows an example usage of this function:
+
+{{{cpp(sxfileio.seek)
+try {
+   SxString filename ("./seekTest.txt");
+   SxFileIO f;
+   f.open (filename, "w");
+   SxArray<char> buffer = SxString ("Good Morning");
+   f << buffer;
+   f.close ();
+   f.open (filename, "r");
+   f.seek (5, SxFileIO::Seek::BEG);
+   uint64_t nElemsToRead = 7;
+   SxArray<char> readBuf (nElemsToRead);
+   f >> readBuf;
+   std::cout << "Read Output: " << SxString(readBuf) << std::endl;
+   f.close ();
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code reads the file from 5th character till the end and results in the following output:
+
+{{{expect(stdout,sxfileio.seek)
+Read Output: Morning
+}}}
+
+h3. Fetch file pointer @tell@
+
+p1. This function returns the current value of file pointer starting from beginning. The following code snippet shows an example usage of the function:
+
+{{{cpp(sxfileio.tell)
+try {
+   SxString filename ("./tellTest.txt");
+   SxFileIO f;
+   f.open (filename, "w");
+   SxArray<char> buffer = SxString ("Good Morning");
+   f << buffer;
+   f.close ();
+   f.open (filename, "r");
+   uint64_t offset = f.tell ();
+   std::cout << "Initial offset: " << offset << std::endl;
+   f.seek (5, SxFileIO::Seek::BEG);
+   offset = f.tell ();
+   std::cout << "New offset: " << offset << std::endl;
+   f.close ();
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code prints out initial value of file pointer and after setting a new value of 5. It yields the following output:
+
+{{{expect(stdout,sxfileio.tell)
+Initial offset: 0
+New offset: 5
+}}}
+
+h3. @getSize@
+
+p1. The @getSize@ function returns the current file size in bytes.
+
+h3. @getOffset@
+
+p1. The @getOffset@ returns the current read offset of the file. The read and write offsets can be different when a file is opened in append mode. In this case data is always written to the end of the file whereas read operations can be performed anywhere in the file. This function is different from @tell@ because it doesn't query the offset from file system rather returns the member variable being used to track the offset.
+
+h3. @flush@
+
+p1. The @flush@ member function flushes the application buffers to kernel buffers. However, this action does not guarantee that data is pushed to the permanent storage.
+
+h3. Stream support @istream@/@ostream@
+
+p1. The @SxFileIO@ supports typecast to @istream@ and @ostream@, hence it is able to support the formatted input and output respectively. The following example illustrates the usage of this feature:
+
+{{{cpp(sxfileio.streamTest)
+try {
+   SxString filename ("./streamTest.txt");
+   SxFileIO file;
+   file.open (filename, "w+");
+   (ostream&)file << "This is a formatted output: " << 12 << std::endl;
+   file.seek (0, SxFileIO::Seek::BEG);
+   char ary[35];
+   ((istream&)file).getline (ary, 35);
+   std::cout << SxString (ary) << std::endl;
+   SxFSAction::rm (filename);
+} catch (SxException e) {
+   e.printStack ();
+}
+}}}
+
+p1. The above code yields the following output:
+
+{{{expect(stdout,sxfileio.streamTest)
+This is a formatted output: 12
+}}}
+
+h3. Exceptions handling
+
+p1. The @SxFileIO@ manages unusual circumstances by throwing exceptions for example when a read or write operations fails. The following set of errors describe the common exceptions that could be thrown by an @SxFileIO@ object:
+
+NoSuchFileError := This exception is thrown when @open@ function is called in read mode and specified file does not exist.
+FileModeError := @FileModeError@ exception is thrown when an invalid mode is specified while opening a file.
+FileCreateError := This exception is thrown when file creation fails due to invalid path or lack of permissions.
+FileOpenError := @FileOpenError@ represents an exception which occurs when @open@ function fails to open the file with the specified mode.
+FileCloseError := This exception occurs when @close@ function fails to close a file which could happen if the file has been moved/deleted or not opened yet.
+FileReadError := @FileReadError@ represents a failure of @read@ function when it is unable to read the specified number of elements/bytes from the file.
+FileReadBufferError := This exception is thrown when the provided buffer does not have enough space to hold the specified number of elements.
+FileWriteError := @FileWriteError@ exception represents a failure to write the specified number of bytes/elements to the file.
+FileWriteBufferError := This exception is thrown when the size of the given buffer is smaller than the specified number of elements/bytes.
+FileSeekError := @FileSeekError@ exception is thrown when specified offset is invalid.
+FileTellError := This exception is thrown when @tell@ function fails to find out the current file offset.

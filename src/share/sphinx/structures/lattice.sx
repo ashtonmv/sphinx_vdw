@@ -1,0 +1,7 @@
+needs lattice;
+
+include lattice;
+
+bravaisFile = "<structures/" + bravais + ".sx>";
+
+include bravaisFile;

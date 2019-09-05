@@ -1,0 +1,6 @@
+FORST              { type="group"; optional;
+   someInt         { type="int"; }
+   someDouble      { type="real"; }
+   someString      { type="string"; }
+}
+

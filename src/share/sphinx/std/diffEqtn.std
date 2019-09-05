@@ -1,0 +1,4 @@
+diffEqtn     { type="group"; optional;
+   maxStepsCCG    { type="int"; min=1; }
+   dEnergy        { type="real"; min=0; }
+   }

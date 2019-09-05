@@ -1,0 +1,212 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SPHInX.h \
+                  SxAOMatTB.h \
+                  SxDefectConc.h \
+                  SxDielec.h \
+                  SxDynMat.h \
+                  SxEPRHyper.h \
+                  SxExt.h \
+                  SxGetSKFiles.h \
+                  SxMurn.h \
+                  SxPartialRho.h \
+                  SxPhonon.h \
+                  SxQuamol.h \
+                  SxQuamolRedSubSpace.h \
+                  SxSlab.h \
+                  SxTestbed.h \
+                  SxThermo.h \
+                  SxVibrations.h \
+                  SxWannier.h \
+                  SxWannierHam.h \
+                  SxWavesCmp.h \
+                  SxWavesJoin.h
+
+if COND_BUILD_ADDONS
+   bin_PROGRAMS     = sphinx sxaomattb sxdefectconc sxdielec sxdynmat sxeprhyper sxgetskfiles sxmurn sxpartialrho sxphonon sxquamol sxquamolredsubspace sxslab sxthermo sxvibrations sxwannier sxwannierham sxwavescmp sxwavesjoin 
+endif
+lib_LTLIBRARIES       = libsxext.la
+libsxext_la_SOURCES  = $(AUX_SRC)
+libsxext_la_SOURCES += SPHInX.cpp \
+   SxAOMatTB.cpp \
+   SxDefectConc.cpp \
+   SxDielec.cpp \
+   SxDynMat.cpp \
+   SxEPRHyper.cpp \
+   SxGetSKFiles.cpp \
+   SxMurn.cpp \
+   SxPartialRho.cpp \
+   SxPhonon.cpp \
+   SxQuamol.cpp \
+   SxQuamolRedSubSpace.cpp \
+   SxSlab.cpp \
+   SxThermo.cpp \
+   SxVibrations.cpp \
+   SxWannier.cpp \
+   SxWannierHam.cpp \
+   SxWavesCmp.cpp \
+   SxWavesJoin.cpp
+
+libsxext_la_LIBADD   = $(SXIMPORTLIBS)
+libsxext_la_LIBADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+libsxext_la_LIBADD  += $(SXIMPORTOBJS)
+libsxext_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxext_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/struct -I$(top_srcdir)/struct
+AM_CPPFLAGS += -I$(top_builddir)/dft -I$(top_srcdir)/dft
+AM_CPPFLAGS += -I$(top_builddir)/geom -I$(top_srcdir)/geom
+AM_CPPFLAGS += -I$(top_builddir)/classic -I$(top_srcdir)/classic
+AM_CPPFLAGS += -I$(top_builddir)/exx -I$(top_srcdir)/exx
+AM_CPPFLAGS += -I$(top_builddir)/dirac -I$(top_srcdir)/dirac
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/io
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/io
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/ipc
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/fs
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/math
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/util
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/util
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/nonstd
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/mpi
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/mpi
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+
+sphinx_SOURCES   = $(AUX_SRC) SPHInX.cpp
+sphinx_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sphinx_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sphinx_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sphinx_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sphinx_LDADD  += $(SXIMPORTOBJS)
+
+sxaomattb_SOURCES   = $(AUX_SRC) SxAOMatTB.cpp
+sxaomattb_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxaomattb_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxaomattb_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxaomattb_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxaomattb_LDADD  += $(SXIMPORTOBJS)
+
+sxdefectconc_SOURCES   = $(AUX_SRC) SxDefectConc.cpp
+sxdefectconc_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxdefectconc_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxdefectconc_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxdefectconc_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxdefectconc_LDADD  += $(SXIMPORTOBJS)
+
+sxdielec_SOURCES   = $(AUX_SRC) SxDielec.cpp
+sxdielec_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxdielec_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxdielec_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxdielec_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxdielec_LDADD  += $(SXIMPORTOBJS)
+
+sxdynmat_SOURCES   = $(AUX_SRC) SxDynMat.cpp
+sxdynmat_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxdynmat_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxdynmat_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxdynmat_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxdynmat_LDADD  += $(SXIMPORTOBJS)
+
+sxeprhyper_SOURCES   = $(AUX_SRC) SxEPRHyper.cpp
+sxeprhyper_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxeprhyper_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxeprhyper_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxeprhyper_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxeprhyper_LDADD  += $(SXIMPORTOBJS)
+
+sxgetskfiles_SOURCES   = $(AUX_SRC) SxGetSKFiles.cpp
+sxgetskfiles_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxgetskfiles_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxgetskfiles_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxgetskfiles_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxgetskfiles_LDADD  += $(SXIMPORTOBJS)
+
+sxmurn_SOURCES   = $(AUX_SRC) SxMurn.cpp
+sxmurn_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxmurn_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmurn_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxmurn_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxmurn_LDADD  += $(SXIMPORTOBJS)
+
+sxpartialrho_SOURCES   = $(AUX_SRC) SxPartialRho.cpp
+sxpartialrho_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxpartialrho_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxpartialrho_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxpartialrho_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxpartialrho_LDADD  += $(SXIMPORTOBJS)
+
+sxphonon_SOURCES   = $(AUX_SRC) SxPhonon.cpp
+sxphonon_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxphonon_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxphonon_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxphonon_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxphonon_LDADD  += $(SXIMPORTOBJS)
+
+sxquamol_SOURCES   = $(AUX_SRC) SxQuamol.cpp
+sxquamol_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxquamol_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxquamol_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxquamol_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxquamol_LDADD  += $(SXIMPORTOBJS)
+
+sxquamolredsubspace_SOURCES   = $(AUX_SRC) SxQuamolRedSubSpace.cpp
+sxquamolredsubspace_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxquamolredsubspace_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxquamolredsubspace_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxquamolredsubspace_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxquamolredsubspace_LDADD  += $(SXIMPORTOBJS)
+
+sxslab_SOURCES   = $(AUX_SRC) SxSlab.cpp
+sxslab_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxslab_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxslab_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxslab_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxslab_LDADD  += $(SXIMPORTOBJS)
+
+sxthermo_SOURCES   = $(AUX_SRC) SxThermo.cpp
+sxthermo_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxthermo_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxthermo_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxthermo_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxthermo_LDADD  += $(SXIMPORTOBJS)
+
+sxvibrations_SOURCES   = $(AUX_SRC) SxVibrations.cpp
+sxvibrations_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxvibrations_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxvibrations_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxvibrations_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxvibrations_LDADD  += $(SXIMPORTOBJS)
+
+sxwannier_SOURCES   = $(AUX_SRC) SxWannier.cpp
+sxwannier_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxwannier_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxwannier_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxwannier_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxwannier_LDADD  += $(SXIMPORTOBJS)
+
+sxwannierham_SOURCES   = $(AUX_SRC) SxWannierHam.cpp
+sxwannierham_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxwannierham_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxwannierham_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxwannierham_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxwannierham_LDADD  += $(SXIMPORTOBJS)
+
+sxwavescmp_SOURCES   = $(AUX_SRC) SxWavesCmp.cpp
+sxwavescmp_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxwavescmp_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxwavescmp_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxwavescmp_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxwavescmp_LDADD  += $(SXIMPORTOBJS)
+
+sxwavesjoin_SOURCES   = $(AUX_SRC) SxWavesJoin.cpp
+sxwavesjoin_CPPFLAGS  = $(AM_CPPFLAGS) -DSX_STANDALONE
+sxwavesjoin_CPPFLAGS += -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxwavesjoin_LDADD   = libsxext.la $(SXIMPORTLIBS)
+sxwavesjoin_LDADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@ @SX_NETCDF_LIBS@
+sxwavesjoin_LDADD  += $(SXIMPORTOBJS)
+

@@ -1,0 +1,111 @@
+initialGuess { type="group"; nItems=1; optional;
+
+   waves             { type="group"; nItems=1; optional;
+      random         { type="flag";            xor="file,random,lcao"; }
+      file           { type="string";          xor="file,random,lcao"; }
+      lcao           { type="group"; nItems=1; xor="file,random,lcao";
+         file        { type="string";  optional; }
+         maxSteps    { type="int"; min=0; max=50; optional;}
+         mixingMethod     { type="int"; min=0; max=2; optional; }
+         nPulaySteps      { type="int"; min=1; max=50; optional; }
+         spinMixing       { type="real"; min=0; max=1; optional; }
+         rhoMixing        { type="real"; min=0; max=1; optional; }
+         linearVacMixing  { type="flag"; optional; }
+         basisDecomposition {type="flag"; optional;  }
+         dEnergy        { type="real"; min=0; optional;}
+         preconditioner   { type="group"; optional;
+            type           { type="int"; min=0; max=3; }
+            scaling        { type="real"; optional; }
+            dielecConstant { type="real"; optional; not="kerkerDamping"; }
+            kerkerDamping  { type="real"; optional; not="dielecConstant"; }
+            nonDiagonal    { type="group"; optional;
+               eCut           { type="real"; optional; }
+               update         { type="int"; optional; min=1; } 
+               noDiag         { type="flag"; optional; 
+                                not="avgEpsDiag,avgDensityDiag"; }
+               avgDensityDiag { type="flag"; optional; not="avgEpsDiag,noDiag"; }
+               avgEpsDiag     { type="flag"; optional; not="avgDensityDiag,noDiag"; }
+            }
+         }
+         pulayForces { type="flag"; optional; }
+
+      }             
+      keepWavesOnDisk { type="flag"; optional; }
+      changeCharge { type="flag"; optional; needs="file"; }
+      pawBasis        { type="flag"; optional; xor="keepWavesOnDisk,pawBasis"; }
+   }
+
+   exchange          { type="group"; nItems=1; optional;
+      file           { type="string";}
+   }
+
+   rho               { type="group"; nItems=1; 
+      file           { type="string"; 
+                       xor="file,atomicOrbitals,fromWaves,random"; }
+      atomicOrbitals { type="flag";  
+                       xor="file,atomicOrbitals,fromWaves,random"; }
+      fromWaves      { type="flag";  
+                       xor="file,atomicOrbitals,fromWaves,random"; }
+      random         { type="flag";  
+                       xor="file,atomicOrbitals,fromWaves,random"; }
+      atom { type="group"; optional; and="atomicOrbitals";
+         label { type="string"; }
+         spin  { type="real"; optional; xor="focc";} // deprecated
+         focc  { type="list"; minRank=0; maxRank=2; optional; xor="spin";}
+      }
+      atomicSpin { type="group"; optional; and="atomicOrbitals"; xor="spinMoment";
+         file  { type="string"; optional; xor="file,label";}
+         label { type="string"; optional; xor="file,label";}
+         spin  { type="real"; optional; xor="file,spin";}
+       }
+      spinMoment     { type="real"; min=-100; max=100; optional; 
+                       and="atomicOrbitals"; }
+      charged { type="group"; optional;
+         charge { type="real"; }
+         beta   { type="real"; optional; }
+         z      { type="real"; xor="z,coords"; }
+         coords { type="vector"; dim=3; xor="z,coords"; }
+      }
+   }
+
+   occupations { type="group"; nItems=1; optional;
+      values { type="vector"; xor="kPoints,spin,bands"; }
+      kPoints { type="group"; xor="kPoints,values"; optional;
+         range  { type="vector"; nItems=1; xor="values,range"; }
+         values { type="vector"; nItems=1; xor="values,range"; }
+         spin { type="group"; optional;
+            range  { type="vector"; nItems=1; xor="values,range"; }
+            values { type="vector"; nItems=1; xor="values,range"; }
+            bands { type="group";
+               range  { type="vector"; nItems=1; xor="values,range"; }
+               values { type="vector"; nItems=1; xor="values,range"; }
+               focc { type="real"; nItems=1; min=0.; max=2.; }
+            }
+         }
+         bands { type="group"; optional;
+            // all spins
+            range  { type="vector"; nItems=1; xor="values,range"; }
+            values { type="vector"; nItems=1; xor="values,range"; }
+            focc { type="real"; nItems=1; min=0.; max=2.; }
+         }
+      }
+      spin { type="group"; xor="values,spin"; optional;
+         range  { type="vector"; nItems=1; xor="values,range"; }
+         values { type="vector"; nItems=1; xor="values,range"; }
+         bands { type="group";
+            range  { type="vector"; nItems=1; xor="values,range"; }
+            values { type="vector"; nItems=1; xor="values,range"; }
+            focc { type="real"; nItems=1; min=0.; max=2.; }
+         }
+      }
+      bands { type="group"; xor="values,bands"; optional;
+         // all spins
+         range  { type="vector"; nItems=1; xor="values,range"; }
+         values { type="vector"; nItems=1; xor="values,range"; }
+         focc { type="real"; nItems=1; min=0.; max=2.; }
+      }
+   }
+   noWavesStorage { type="flag"; optional; }
+   noRhoStorage { type="flag"; optional; }
+}
+

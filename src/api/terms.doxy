@@ -1,0 +1,38 @@
+/** \page page_rules   License-terms to use the SPHInX - API
+
+\section rules1 (i)  CVS access to the Dirac-SPHInX project:
+
+  - The developer can download the source code from the SPHInX CVS server. 
+
+  - BY DOWNLOADING, THE DEVELOPER CONFIRMS TO AGREE IN THIS TERMS.
+
+  - The licensee will not supply a copy of the code to anyone for any reason
+    whatsoever. 
+
+  - For non-commercial usage the package is free of charge. 
+
+  - All modifications and new implementations will be distributed under these
+    terms.
+
+\section rules2 (ii) Citations
+
+  - Publications of any kind which contain results produced with usage
+    of the official SPHInX executable (downloadable from http://www.sxlib.de)
+    have to cite
+       - Object-oriented approach to Density Functional Theory,
+         S. Boeck, J. Neugebauer, A. Dick, L. Ismer, 
+         CPC, to be published
+
+  - Publications of any kind which contain results produced with usage of 
+    the SPHInX source code have to cite
+       - High performance computing with Template Linkage Techniques,
+         S. Boeck, J. Neugebauer, 
+         CPC, to be published
+       - Dirac-like Implementation of Density Functional Theory,
+         S. Boeck, J. Neugebauer
+         CPC, to be published, and
+       - Object-oriented approach to Density Functional Theory
+         S. Boeck, J. Neugebauer, A. Dick, L. Ismer, 
+         CPC, to be published
+         
+  */

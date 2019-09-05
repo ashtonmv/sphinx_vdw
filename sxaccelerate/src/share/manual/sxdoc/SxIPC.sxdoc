@@ -1,0 +1,754 @@
+a. SxProcess
+h1. Process Management, @SxProcess@
+
+p1. The @SxProcess@ class defines an intuitive cross-platform API for
+    creating and managing separate programs (processes). In particular,
+    it allows for executing external programs as a child process. Basic
+    communication functions such as interacting with the STDIN, STDOUT,
+    and STDERR channels of the child process are provided.
+
+p1. In order to demonstrate the basic functionality please consider the
+    testbed program @sxtestproc@ residing in @src/libexec/apps@ which
+    mimics the behavior of normal processes:
+
+    @sxtestproc --stdout _msg_@  := Prints the string _msg_ to STDOUT.
+                                    The message is taken from STDIN if the
+                                    option is "-".
+    @sxtestproc --stderr _msg_@  := Prints the string _msg_ to STDERR or
+                                    redirect from STDIN if "-" is provided.
+    @sxtestproc --runtime _sec_@ := Run (sleep) for the provided number of
+                                    seconds before generating any output and
+                                    stopping.
+    @sxtestproc --exit _code_@   := The test program emits the specified
+                                    exit code (integer between 0 and 127).
+
+p1. The test program could be used to simulate different examples across
+    various platforms:
+
+{{{
+     echo "This is a test." \
+   | sxtestproc --stdout - --stderr - --exit 2
+}}}
+
+p1. Which would read the message _This is a test_ from STDIN and redirects it
+    to both STDOUT and STDERR before exiting with the code 2.
+
+h2. Starting a new process
+
+p1. In order to use @SxProcess@ simply include the following header file:
+
+{{{cpp(sxprocess)
+#include <SxProcess.h>
+}}}
+
+p1. and define an object:
+
+{{{cpp(sxprocess.basic)
+SxString cmd = "sxtestproc";
+SxList<SxString> args;
+}}}
+
+{{{cpp(sxprocess.basic.run)
+args << "--stdout" << "This is a test." // sim. STDOUT
+     << "--exit" << "123";              // sim. exit code
+SxProcess proc (cmd, args);
+}}}
+
+p1. The lines above perform the necessary preparations to launch a new
+    program. It can be started by invoking @start@:
+
+{{{cpp(sxprocess.basic.run)
+int exitCode = proc.start ();
+cout << "Exit code = " << exitCode << endl;
+}}}
+
+p1. which yields the expected output in STDOUT:
+
+{{{expect(stdout,sxprocess.basic.run)
+sxtestproc started.
+This is a test.
+Exit code = 123
+}}}
+
+h2. Restricting maximal runtime / timeout
+
+p1. A process may be terminated if its runtime exceeds a specific time. 
+    Therefore, @SxProcess@ allows to set optionally a timeout value.
+    If exceeded the child process will be terminated by receiving
+
+    # a SIGTERM from @SxProcess@ to gracefully stop
+    # and after a second interval of the specified timeout eventually 
+      a SIGKILL.
+
+p1. The test process @sxtesproc@ can be invoked with @--runtime@ in order
+    to simulate a long lasting program. Consider the following example:
+
+{{{cpp(sxprocess.basic.timeout)
+args << "--stdout" << "This is a test."
+     << "--exit" << "123"
+     << "--runtime" << "10"; // sim. 10s runtime
+SxProcess proc (cmd, args);
+proc.setTimeout (0.5);  // terminate after 0.5 sec.
+proc.start ();
+cout << "Back in main process." << endl;
+}}}
+
+p1. In this example the test process @sxtestproc@ is being launched which
+    will print the welcome message "@sxtestproc started@ first before 
+    sleeping for 10 seconds (@--runtime 10@). The child process, however,
+    is limited to 0.5s by calling @setTimeout(0.5)@. Therefore, the final
+    output "@This is a test.@" cannot be printed as the process is
+    terminated during the sleep statement. The exit code is also set to 1;
+
+
+{{{expect(stdout,sxprocess.basic.timeout)
+sxtestproc started.
+Back in main process.
+}}}
+
+h2. Evaluating STDOUT / STDERR / STDIN
+
+p1. In the examples presented in the previous sections STDOUT and STDERR
+    was shared between both parent and child process. If the parent
+    process should monitor the output to either of these channels they have
+    to be redirected accordingly. 
+
+p1. The following combinations are supported:
+
+    * redirect STDOUT
+    ** overload @readFromStdout@
+    ** register STDOUT redirection:
+       @setCommunication (SxProcess::StdOut)@
+    * redirect STDERR
+    ** overload @readFromStderr@
+    ** register STDERR redirection:
+       @setCommunication (SxProcess::StdErr)@
+    * redirect STDIN
+    ** overload @writeToStdin@
+    ** register STDIN redirection:
+       @setCommunication (SxProcess::StdIn)@
+    * redirect STDOUT and STDERR
+    ** overload @readFromStdout@ and @readFromStderr@
+    ** register STDOUT and STDERR redirection:
+       @setCommunication (SxProcess::StdOutErr)@
+    * redirect STDOUT combined with STDERR
+    ** overload @readFromStdout@
+    ** register STDOUT and STDERR redirection:
+       @setCommunication (SxProcess::StdOutErr)@
+    ** combine STDERR to STDOUT:
+       @synchronize (SxProcess::StdOutErr)@
+    * redirect STDIN, STDOUT and STDERR
+    ** overload @writeToStdin@, @readFroomStdout@ and @readFromStderr@
+    ** register STDIN, STDOUT and STDERR redirection:
+       @setCommunication (SxProcess::StdInOutErr)@
+
+p1. The following example demonstrates how to intercept STDOUT:
+
+{{{cpp(sxprocess.fixture)
+class MyProc : public SxProcess
+{
+   public:
+      MyProc (const SxString &cmd_,
+                 const SxList<SxString> &args_)
+         : SxProcess (cmd_, args_) { }
+      virtual void readFromStdout (const SxString &line) {
+         cout << "STDOUT: >" << line << "<" << endl;
+      }
+      virtual void readFromStderr (const SxString &line) {
+         cout << "STDERR: >" << line << "<" << endl;
+      }
+      virtual SxString writeToStdin () {
+         return SxString("STDIN: Hello.");
+      }
+};
+}}}
+
+{{{cpp(sxprocess.fixture.redirectStdout)
+SxString cmd = "sxtestproc";
+SxList<SxString> args;
+args << "--stdout" << "This is STDOUT.";  // sim. STDOUT
+MyProc proc (cmd, args);
+proc.setCommunication (SxProcess::StdOut);
+proc.start ();
+cout << "Back in main process." << endl;
+}}}
+
+p1. The output of the test process is being intercepted by the overloaded
+    functions @readFromStdout@ and @readFromStderr@. In this example, they
+    simply prepend the token @STDOUT:@ and @STDERR:@, respectively. Hence,
+    the expected output reads:
+
+{{{expect(stdout,sxprocess.fixture.redirectStdout)
+STDOUT: >sxtestproc started.<
+STDOUT: >This is STDOUT.<
+Back in main process.
+}}}
+
+p1. In order to intercept STDERR of child process:
+
+{{{cpp(sxprocess.fixture.redirectStderr)
+SxString cmd = "sxtestproc";
+SxList<SxString> args;
+args << "--stderr" << "This is STDERR.";
+MyProc proc (cmd, args);
+proc.setCommunication (SxProcess::StdErr);
+proc.start ();
+cout << "Back in main process." << endl;
+}}}
+
+p1. Which yields,
+
+{{{expect(stdout,sxprocess.fixture.redirectStderr)
+sxtestproc started.
+STDERR: >This is STDERR.<
+Back in main process.
+}}}
+
+p1. In the same way, the @StdIn@ of child process can be redirected by
+    overriding @writeToStdin@ method and setting the communication variable
+    value to @SxProcess::StdIn@ as follows:
+
+{{{cpp(sxprocess.fixture.redirectStdin)
+SxString cmd = "sxtestproc";
+SxList<SxString> args;
+args << "--stdout" << "-";
+MyProc proc (cmd, args);
+proc.setCommunication (SxProcess::StdIn);
+proc.start ();
+cout << "Back in main process." << endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxprocess.fixture.redirectStdin)
+sxtestproc started.
+STDIN: Hello.
+Back in main process.
+}}}
+
+p1. Similarly, different combinations of @StdIn@, @StdOut@ and @StdErr@ can
+    be redirected by setting communication flags and overriding the
+    corresponding required functions. For example, to redirect @StdIn@
+    and @StdErr@, the @SxProcess::StdInErr@ can be set for communication
+    channels. In the following, an example for redirecting all three streams
+    is presented:
+
+{{{cpp(sxprocess.fixture.redirectAll)
+SxString cmd = "sxtestproc";
+SxList<SxString> args;
+args << "--stdout" << "-" << "--stderr" << "This is STDERR.";
+MyProc proc (cmd, args);
+proc.setCommunication (SxProcess::StdInOutErr);
+proc.start ();
+cout << "Back in main process." << endl;
+}}}
+
+p1. Here input to @Stdin@ is printed to @Stdout@, which is redirected
+    back to parent process as shown below:
+
+{{{expect(stdout,sxprocess.fixture.redirectAll)
+STDOUT: >sxtestproc started.<
+STDOUT: >STDIN: Hello.<
+STDERR: >This is STDERR.<
+Back in main process.
+}}}
+
+h2. Read Linewise @setLineWise@
+
+p1. The redirected @StdOut@/@StdErr@ and @StdIn@ can be read in two
+    different ways, either line wise or simply a stream of bytes. The line wise
+    option reads the data to the redirected stream as a sequence of lines,
+    whereas if @setLineWise@ is set to false, then @SxProcess@ reads all bytes
+    available at the time of read and print them to parent process's
+    @StdOut@/@StdErr@ respectively. The @LineWise@ option keeps reading the
+    data until a new line character is read and then prints out the
+    data to @Stdout@/@StdErr@. The following example shows the usage
+    of @setLineWise@ function.
+
+{{{cpp(sxprocess.fixture.readLineWise)
+SxString cmd = "sxtestproc";
+SxList<SxString> args;
+args << "--stdout" << "This is a line.";
+MyProc proc (cmd, args);
+proc.setCommunication (SxProcess::StdOut);
+proc.setLineWise (true);
+proc.start ();
+cout << "Back in main process." << endl;
+}}}
+
+p1. The above code yields the following results:
+
+{{{expect(stdout,sxprocess.fixture.readLineWise)
+STDOUT: >sxtestproc started.<
+STDOUT: >This is a line.<
+Back in main process.
+}}}
+
+h2. Synchronize StdOut and StdErr @synchronize()@
+
+p1. when both @StdOut@ and @StdErr@ are being redirected, the @synchronize@
+    option can be used to combine the data received on @StdErr@ to @StdOut@.
+    In this case, @StdOut@ of parent process is used to print the data received
+    from child process's @StdErr@.
+
+{{{cpp(sxprocess.fixture.syncOutErr)
+SxString cmd = "sxtestproc";
+SxList<SxString> args;
+args << "--stdout" << "This is STDOUT." << "--stderr" << "This is STDERR.";
+MyProc proc (cmd, args);
+proc.setCommunication (SxProcess::StdOutErr);
+proc.synchronize (SxProcess::StdOutErr);
+proc.start ();
+cout << "Back in main process." << endl;
+}}}
+
+p1. As shown in below result, the @STDOUT@ and @STDERR@ both are redirected
+    to the parent's @STDOUT@:
+
+{{{expect(stdout,sxprocess.fixture.syncOutErr)
+STDOUT: >sxtestproc started.<
+STDOUT: >This is STDOUT.<
+STDOUT: >This is STDERR.<
+Back in main process.
+}}}
+
+
+h1. Multithreading
+
+a. SxSystemThread
+h2. @SxSystemThread@
+
+p1. @SxSystemThread@ class provides cross-platform threads interface.
+    It can be used in two different ways as shown below:
+
+h3. By extending @SxSystemThread@
+
+    @SxSystemThread@ class can be used by extending it and overriding
+    the @main@ function of the class to provide the operations that the
+    thread is required to perform. A simple example is given below:
+
+{{{cpp(sxsysthread)
+#include <SxException.h>
+#include <SxFileIO.h>
+#include <SxSystemThread.h>
+#include <SxThread.h>
+}}}
+
+{{{cpp(sxsysthread.simpleSysThread)
+class SimpleSysThread : public SxSystemThread
+{
+   private:
+      int num;
+   public:
+      virtual void main () {
+         SxThread::sleep (1);
+         cout << "Square of the number is: " << num*num << endl;
+      }
+      void setNum (int v) {
+         num = v;
+      }
+};
+SimpleSysThread t;
+t.setNum (2);
+t.start ();
+cout << "Inside main thread" << endl;
+t.wait ();
+}}}
+
+p1. Above example creates a simple thread class that computes the square of
+    a given number. In this case the given number is 2. The example results in
+    the following output.
+
+{{{expect(stdout,sxsysthread.simpleSysThread)
+Inside main thread
+Square of the number is: 4
+}}}
+
+h3. By providing Lambda Function
+
+p1. The @SxSystemThread@ can also be used by providing lambda function
+    containing the code that must be executed by the thread. This lambda
+    function does not take any parameters and returns @void@. The following
+    example shows it's usage:
+
+{{{cpp(sxsysthread.sysThreadLambda)
+SxSystemThread s([]() {
+   cout << "Hello Lambda!!";
+});
+s.start ();
+s.wait ();
+}}}
+
+p1. which prints the following line when executed:
+
+{{{expect(stdout,sxsysthread.sysThreadLambda)
+Hello Lambda!!
+}}}
+
+h3. Wait for thread @wait()@
+
+p1. The @SxSystemThread@ also provides the functionality to wait for a thread
+    to finish it's computation using @wait@ method. When @wait@ function is
+    called on an object of class derived from @SxSystemThread@ it halts the
+    calling thread until the callee thread returns.
+
+{{{cpp(sxsysthread.threadWait)
+class SysWaitThread : public SxSystemThread
+{
+   private:
+      int num;
+   public:
+      virtual void main () {
+         SxThread::sleep (2);
+         cout << "Inside the new thread" << endl;
+      }
+};
+SysWaitThread t;
+t.start ();
+cout << "Inside main thread" << endl;
+t.wait ();
+cout << "Back in the main thread" << endl;
+}}}
+
+p1. Above example shows a simple usage of @wait@ function. It starts a separate
+    thread and inside the thread it sleeps for 2 seconds while the main thread
+    waits for the thread to finish by calling @wait@ function.
+
+{{{expect(stdout,sxsysthread.threadWait)
+Inside main thread
+Inside the new thread
+Back in the main thread
+}}}
+
+h3. Thread Priority
+
+p1. An @SxSystemThread@ can have following possible values of priority.
+
+   * Idle
+   * Lowest
+   * Low
+   * Normal
+   * High
+   * Highest
+   * SameAsParent
+
+p1. The thread priority can be set by providing one of these values to
+    the @start@ function of the thread object. The default value of the
+    priority is @SameAsParent@. Following example shows how to utilize this option.
+
+{{{cpp(sxsysthread.threadPriority)
+class SysPrioThread : public SxSystemThread
+{
+   private:
+      int num;
+   public:
+      virtual void main () {
+         // do something CPU intensive
+         SxThread::sleep (1);
+         cout << "Inside the new thread" << endl;
+      }
+};
+SysPrioThread t;
+t.start (SxSystemThread::High);
+cout << "Inside main thread" << endl;
+t.wait ();
+}}}
+
+p1. The above code yields the following output:
+
+{{{expect(stdout,sxsysthread.threadPriority)
+Inside main thread
+Inside the new thread
+}}}
+
+h3. Handling Exceptions, @hasException()@, @getException()@
+
+p1. The @hasException@ function returns true if the thread object encountered
+    an exception during it's execution. If @hasException@ returns true then
+    the exception can be retrieved using @getException@ function of the
+    thread object. The following code shows a simple example that
+    causes an exception.
+
+{{{
+class SysExcepThread : public SxSystemThread
+{
+   private:
+      int num;
+   public:
+      virtual void main () {
+         SxString data = SxFileIO::readLines ("unknownfile");
+      }
+};
+SysExcepThread t;
+t.start ();
+t.wait ();
+if (t.hasException ()) {
+   std::cout << ""Can't open file 'unknownfile' for reading" << std::endl;
+}
+}}}
+
+p1. The above code results in the following output:
+
+{{{
+Can't open file 'unknownfile' for reading
+}}}
+
+a. SxMutex
+h2. Thread Locking
+
+p1. The @SX\_MUTEX@ macro provides a mechanism for a thread to get exclusive
+    access to a part of code. The first thread reaching the block of code
+    surrounded by @SX\_MUTEX@ will get the exclusive access to the block of code.
+    Any other thread that tries to execute that block while another thread is
+    still executing it, will block at this point until the first thread is done.
+    Such synchronized access is commonly used to modify a variable(s) that is
+    shared among multiple threads, hence ensuring an expected output.
+    In order to use @SX\_MUTEX@ macro, following header file must be included:
+
+{{{cpp(sxmutex)
+#include<SxMutex.h>
+#include<SxSystemThread.h>
+}}}
+
+p1. The code below shows an example usage of @SX\_MUTEX@:
+
+{{{cpp(sxmutex.lockUnlock)
+static int sharedData = 0;
+static SxMutex m;
+class MyThread : public SxSystemThread
+{
+   private:
+      int incr;
+   public:
+      virtual void main () {
+         int c = 100;
+         while (c > 0) {
+            SX_MUTEX(m) {
+               sharedData += incr;
+            }
+            c--;
+         }
+      }
+      void setIncrement (int v) {
+         incr = v;
+      }
+};
+MyThread t1,t2;
+t1.setIncrement (2);
+t2.setIncrement (-2);
+t1.start ();
+t2.start ();
+t1.wait ();
+t2.wait ();
+cout << "Final value: " << sharedData << endl;
+}}}
+
+p1. The code given in above example shows two threads that are modifying
+    a global variable shared among them. One thread increments and the other
+    decrements the value by 2. In such a scenario it is possible that both
+    threads try to modify the value at the same time, in which case the final
+    value will depend on the thread whose write operation is performed in the end.
+    Hence, it is possible to have inconsistent results. The @SX\_MUTEX@ lock
+    ensures that only one thread at a time can modify it's value. After using
+    @SX\_MUTEX@ the final value remains the same as shown below:
+
+{{{expect(stdout,sxmutex.lockUnlock)
+Final value: 0
+}}}
+
+a. SxThreadPool
+h2. @SxThreadPool@
+
+p1. @SxThreadPool@ provides the functionality to create a pool of independent
+    threads that can be used to perform parallel operations by submitting
+    @SxThread@ object.
+
+p1. @SxThreadPool@ is initialized by providing the number of threads in the
+    thread pool. After initialization, @SxThread@ objects corresponding to each
+    thread can be provided by using @submit()@ function of @SxThreadPool@. In
+    order to use @SxThreadPool@, following header file must be included in the
+    code:
+
+{{{cpp(sxthreadpool)
+#include <SxThread.h>
+#include <SxThreadPool.h>
+}}}
+
+p1. The following code shows an example of @SxThreadPool@:
+
+{{{cpp(sxthreadpool.fixture)
+static SxMutex m;
+class MyThread : public SxThread
+{
+   private:
+      int num;
+      int pow;
+   public:
+      void setNum (int v) {
+         num = v;
+      }
+      void setPow (int p) {
+         pow = p;
+      }
+      virtual void main () {
+         int res = 1, p = 0;
+         while (p < pow) {
+            res = res * num;
+            p++;
+         }
+         SX_MUTEX (m) {
+            cout << "pow(" << num << ", " << pow << ") = " << res << endl;
+         }
+      }
+};
+}}}
+{{{cpp(sxthreadpool.fixture.submitTask)
+SxPtr<MyThread> t1 = SxPtr<MyThread>::create();
+SxPtr<MyThread> t2 = SxPtr<MyThread>::create();
+t1->setNum (2);
+t1->setPow (3);
+t2->setNum (5);
+t2->setPow (3);
+SxThreadPool tPool (2);
+tPool.submit (t1);
+tPool.submit (t2);
+t1->wait ();
+t2->wait ();
+tPool.stop ();
+cout << "back in the main function" << endl;
+}}}
+
+p1. Above example code creates two threads and adds them to @SxThreadPool@ to
+    be executed concurrently. Each thread of type @MyThread@ computes the given
+    power of the number provided. After submitting the threads to
+    @SxThreadPool@, they are automatically started by the thread pool. The
+    above code results in following output:
+
+{{{expect(stdout,sxthreadpool.fixture.submitTask)
+pow(2, 3) = 8
+pow(5, 3) = 125
+back in the main function
+}}}
+
+h3. Waiting for thread @wait()@
+
+p1. The @wait@ function of @SxThreadPool@ allows to wait for certain
+    thread that is part of @SxThreadPool@. It takes @SxPtr@ of type
+    @SxThread@ to specify which thread to wait for.
+
+{{{cpp(sxthreadpool.fixture.waitThread)
+SxPtr<MyThread> t1 = SxPtr<MyThread>::create();
+SxPtr<MyThread> t2 = SxPtr<MyThread>::create();
+t1->setNum (4);
+t1->setPow (2);
+t2->setNum (3);
+t2->setPow (3);
+SxThreadPool tPool (2);
+tPool.submit (t1);
+tPool.submit (t2);
+tPool.wait (t1);
+tPool.wait (t2);
+tPool.stop ();
+cout << "back in the main function" << endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxthreadpool.fixture.waitThread)
+pow(4, 2) = 16
+pow(3, 3) = 27
+back in the main function
+}}}
+
+h3. Waiting for all threads @waitAll()@
+
+p1. The @waitAll@ function of @SxThreadPool@ allows to wait for all
+    the unfinished tasks present in the thread pool.
+
+{{{cpp(sxthreadpool.fixture.waitAll)
+SxPtr<MyThread> t1 = SxPtr<MyThread>::create();
+SxPtr<MyThread> t2 = SxPtr<MyThread>::create();
+t1->setNum (1);
+t1->setPow (2);
+t2->setNum (3);
+t2->setPow (4);
+SxThreadPool tPool (2);
+tPool.submit (t1);
+tPool.submit (t2);
+tPool.waitAll ();
+tPool.stop ();
+cout << "back in the main function" << endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxthreadpool.fixture.waitAll)
+pow(1, 2) = 1
+pow(3, 4) = 81
+back in the main function
+}}}
+
+h3. Exception Handling
+
+p1. By default an exception thrown within the @main()@ function of any thread
+    will terminate the application with @SX\_EXIT@. The exception stack will be
+    shown if the application was running in debug mode with @SX\_DEBUG@.
+
+p1. In order to avoid @SX\_EXIT@ and handle exceptions, the
+    @handleException@ function must be overriden in @MyThread@ class as
+    shown below:
+
+{{{cpp(sxthreadpool.exception)
+static SxMutex m;
+class MyThread : public SxThread
+{
+   public:
+      MyThread (uint32_t taskID_) : SxThread(taskID_) { }
+      virtual void main () {
+        SX_THROW ("exception from MyThread");
+      }
+      virtual void handleException (const SxException &e) {
+        SX_MUTEX (m) {
+         cout << "thread #" << tag << " throws: " << e.toString () << endl;
+        }
+      }
+};
+}}}
+
+p1. To identify threads a @tag@ can be passed to @create()@:
+
+{{{cpp(sxthreadpool.exception.threadThrows)
+MyThread t1(1);
+MyThread t2(2);
+SxThreadPool tPool (2);
+tPool.submit (t1.getThis ());
+tPool.wait (t1.getThis ());
+tPool.submit (t2.getThis ());
+tPool.wait (t2.getThis ());
+tPool.stop ();
+cout << "back in the main function" << endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxthreadpool.exception.threadThrows)
+thread #1 throws: exception from MyThread
+thread #2 throws: exception from MyThread
+back in the main function
+}}}
+
+p1. Note the above example uses a integer number as @tag@. This is converted by
+    the "$":SxString class, since @tag@ is an instance of it. Hence, @tag@ can
+    be used to do much more than identification, such as passing flags.
+
+p1. Further note the @SX\_MUTEX@ lock in the example. Its purpose is to not
+    scramble the output lines. This is unrelated to exceptions. See "$":SxMutex
+    for more.
+
+h3. Check Thread State with @isRunning()@
+
+p1. The @isRunning@ function of @SxThreadPool@ allows to check if a particular
+    thread in the thread pool is still running. This function takes the pointer
+    to @SxProcUnit@/@SxThread@ as parameter to specify the particular thread.
+
+include <SxEventBus.sxdoc>

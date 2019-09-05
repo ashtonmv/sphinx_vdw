@@ -1,0 +1,48 @@
+// ---------------------------------------------------------------------------
+//
+//      The ab-initio based multiscale library
+//
+//                  S / P H I / n X
+//
+//      Copyright:  Max-Planck-Institute for Iron Research
+//                  40237 Duesseldorf, Germany
+//
+//      Contact:    https://sxlib.mpie.de
+//      Authors:    see sphinx/AUTHORS
+//      License:    see sphinx/LICENSE
+//
+// ---------------------------------------------------------------------------
+set validation;
+
+waves           { type="group"; maxItems=1;
+   file         { type="string"; }
+}
+
+spread          { type="group"; maxItems=1;
+   alpha        { type="real"; min=0; }
+   dSpread      { type="real"; min=0; }
+   maxSteps     { type="int"; min=0; }
+}              
+               
+bands           { type="group"; maxItems=1;
+   nBottom      { type="int"; min=1; }
+   nTop         { type="int"; min=1; }
+}
+
+initialization  { type="group"; maxItems=1; optional;
+   gauss        { type="group"; minItems=1;
+      coords    { type="vector"; dim=3; }
+      width     { type="real"; min=0; }
+      label     { type="string"; optional; }
+      relative  { type="flag"; optional; }
+   }
+}
+
+graphics        { type="group"; maxItems=1; optional;
+   repetition   { type="vector"; dim=3; }
+   translation  { type="vector"; dim=3; }
+}
+
+// Enable possibility to use definitions made in an input file for
+// electronic minimisation ...
+//include <std/sphinx.std>;

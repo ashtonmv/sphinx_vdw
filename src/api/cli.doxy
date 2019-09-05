@@ -1,0 +1,131 @@
+/** \page    page_cli          Command Line Interface
+
+\section     cli_intro         Introduction
+
+   Many programs are able to read input arguments from the command line.
+   Parsing the command line arguments in C/C++ is rather complicated. For
+   that reason the SPHInX package comes with a command line interface (CLI)
+   which simplifies the development of SPHInX executables. By using
+   this CLI the development effort reduces to almost one code line per supported
+   command line argument. So, SPHInX add-ons can be invoked like, e.g.
+   \verbatim
+      sx2pdb -i in.sx -o ZnO-0001.pdb
+   \endverbatim
+
+\section     cli_conventions   Command Line Argument Conventions
+
+   SPHInX executables should obey the UN*X argument conventions. That are
+   basically:
+   -# Single letter arguments with a single '-' \n
+      \verbatim
+         sxexe -i -h -l -m
+      \endverbatim
+   -# Word-like arguments with a double '-' \n
+      \verbatim
+         sxexe --input abc.sx --output def.sx
+      \endverbatim
+   -# A help screen must give a brief overview about the arguments with
+      '-h' and '--help'
+      \verbatim
+         sxexe -h
+         sxexe --help
+      \endverbatim
+
+\section   cli_parsing       Parsing the command line
+
+   The usage of the CLI is very simple:
+   -# Include the header file of class SxCLI:
+      \verbatim
+          #include <SxCLI.h>
+      \endverbatim
+   -# Instantiate a SxCLI object with the C-like command line arguments:
+      \verbatim
+         int main (int argc, char **argv)
+         {
+            SxCLI cli (argc, argv);
+      \endverbatim
+   -# For each argument specify:
+         \verbatim
+            float f = cli.option ("-f|--float",
+                                  "number", 
+                                  "a real number").toFloat (0.);
+         \endverbatim
+         -# the letter or word to invoke it, e.g. "-i|--input" would
+            specify to work with both either "-i" or "--input"
+         -# short description of the argument which will appear in the short
+            help screen, e.g. "Number", "String", ...
+         -# long description of the argument which will appear in the long
+            help screen, e.g. "Energy cutoff in Hartree"
+         -# map the result to the expected data type with a
+            converting functions like
+            - toBool ()
+            - toInt ()
+            - toFloat ()
+            - toDouble ()
+            - toLong () etc
+         -# repeat this procedure for each input argument
+    -# Finalize the parsing sequence with the statement
+       \verbatim
+          cli.finalize ();
+       \endverbatim
+
+\section   cli_example          Example
+
+\code
+#include <SxCLI.h>
+#include <SxString.h>
+
+int main (int argc, char** argv)
+{
+   SxCLI cli (argc, argv); // Command Line Parsing
+
+   // init vars from options
+   int i      = cli.option ("-i|--integer",
+                            "number",
+                            "an integer number").toInt(0,0,100);
+   float f    = cli.option ("-f|--float",
+                            "number", 
+                            "a real number").toFloat (0.);
+   SxString s = cli.option ("-s", 
+                            "string",
+                            "some string").toString("string1");
+   bool sayHi = cli.option ("--hi", "prints hi").toBool ();
+   double d   = cli.option ("--double", 
+                            "number", 
+                            "a very exact number").toDouble (); 
+   // d is required, because no default is given
+   
+   // Declare help option before argument (if no arguments, the help option
+   // is generated automatically
+   cli.helpOption ();
+   
+   // arguments are always last!
+   SxString command = cli.argument ("command", 
+                                    "some imaginary action").toString ();
+   
+   // now, printUsage contains all options (print only unless error occurred)
+   if (!cli.error && (cli.arguments.getSize () == 0)) 
+      cli.printUsage ();
+
+   cout << "----------" << endl;
+   
+   cli.finalize ();
+   
+   cout << "Integer: " << i << endl; 
+   cout << "Float: "   << f << endl; 
+   cout << "Double: "  << d << endl; 
+   cout << "String: "  << s << endl; 
+   if (sayHi) cout << "Hi!" << endl;
+   cout << "Command: " << command << endl;
+   cout.flush ();
+\endcode
+
+   Find the complete documentation in the
+   <A HREF="classSxCLI.html#_details">
+     SxCLI Class Description
+   </A>.
+
+   \author Christoph Freysoldt, freysoldt@mpie.de
+   \author Sixten Boeck, boeck@mpie.de
+
+*/

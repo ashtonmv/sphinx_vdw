@@ -1,0 +1,23 @@
+pseudoPot           { type="group"; maxItems=1; optional; 
+  species           { type="group"; minItems=1; 
+     name           { type="string"; }
+     element        { type="string"; }
+     skElementName  { type="string"; optional;}
+     potential      { type="string"; }
+     scheme         { type="enum"; val="H,TM"; optional; }
+     xc             { type="int"; min=0; max=16; optional; }
+     valenceCharge  { type="real"; min=0; max=104; }
+     lMax           { type="int"; min=0; max=3; }
+     lLoc           { type="int"; min=0; max=3; }
+     lcaoOrbitals   { type="vector"; }
+     atomicRhoOcc   { type="list"; minRank=0; maxRank=2; }
+     rGauss         { type="real";  min=0;}
+     reciprocalMass { type="real"; min=0; }
+     dampingMass    { type="real"; min=0; }
+     ionicMass      { type="real"; min=0; }
+     realSpaceProjectors { type="flag"; optional; }
+     gyromagneticRatio { type="real"; optional; }
+     rhoNucleus { type="real"; optional; }
+  }
+}
+

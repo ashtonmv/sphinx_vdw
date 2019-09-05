@@ -1,0 +1,29 @@
+/** \brief embedding LaTeX into the documentation
+
+- Fractions   \f$ \frac{1}{2} \f$
+- Functions   \f$ \sin \alpha \cos \beta \tan \gamma \f$
+- Indicies    \f$ \Psi_{i \sigma \mathbf k} \f$
+- Bra and Ket \f$ \langle \Psi | H | \Psi \rangle \f$
+- Matrices
+  \f[
+     \mathbf{M} = \left( 
+                     \begin{matrix}
+                        11 & 12 & 13 \\
+                        21 & 22 & 23 \\
+                        31 & 32 & 33
+                     \end{matrix}
+                  \right)
+  \f]
+- Branching assignments / arrays
+  \f[
+     S(i) = \left\{ 
+               \begin{array}{cl}
+                   -1   &   i < 0  \\
+                    0   &   i = 0  \\
+                    1   &   i > 0
+             \end{array}
+         \right.
+  \f]
+
+ */
+  void latex ();

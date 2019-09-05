@@ -1,0 +1,18 @@
+
+printTD { type = "group"; optional;
+		fromDispersion { type = "flag"; optional;}
+      interpolation {type = "string"; optional;}
+		p { type = "real"; optional;}
+      grueneisen { type = "group"; optional;
+        file  {type = "string"; optional;}
+         B0 {type = "real"; optional;}
+         V0 {type = "real"; optional;}
+         B0Prime {type = "real"; optional;}
+      }
+		T { type = "group"; 
+		    startT { type = "real";}
+			 endT { type = "real";}
+			 samplePoints { type = "int";}
+		}
+	file { type = "string";}
+	}

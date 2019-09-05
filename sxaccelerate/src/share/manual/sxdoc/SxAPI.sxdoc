@@ -1,0 +1,21 @@
+h1. SxAccelerate Overview
+
+p1. The SxAccelerate project has been organized in terms of the following
+    layers
+
+    sxutil := General purpose utilities related to memory management,
+              container classes, string handling, signal/slot handling,
+              timers, or channel redirection.
+    sxipc  := Interprocess communications such as threads, processes,
+              semaphors etc.
+    sxfs   := Cross platform file system layer to provide basic functionality 
+              to mimic shell scripts in C++
+    sxmath := High performance numeric and algebra functions such as
+              BLAS, LAPACK, FFT calls
+    sxmpi  := Message Passing Interface functions
+
+p1. Every layer is handled as static or shared library.
+
+p1. In the following sections the various aspects of these layers are 
+    discussed in detail.
+

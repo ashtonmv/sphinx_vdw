@@ -1,0 +1,302 @@
+/** \page page-names   SPHInX Developer's Conventions
+
+\section names_intro         Introduction
+   Everybody, who intends to modify SPHInX has to respect the following 
+   conventions! Otherwise the modifications will not become part of future 
+   releases of SPHInX!
+
+\section names_tmpl          Creating new *.h and *.cpp files
+
+   Use the following provided file templates:
+   - C/C++ header files: src/include/SxTemplate.h
+   - C/C++ source files: src/util/SxTemplate.cpp
+   Don't forget to modify the \b ifndef entries in the new header file!
+   Otherwise it won't compile.
+
+\section names_dutchMountains  Dutch mountain Style Guide
+   - Tabulators are not allowed. They have to be repleaced by 3 spaces.
+   - The maximum width is resitricted to 80 columns.
+   - Assignments are aligned. Spaces go between operators!
+   - Punctuation in strings: All punctuation charactors (',;.') follow 
+     directly the last word.
+     After that a single space blank is expected.
+   - Function and variable names don't contain underscores ('_')! Words are
+     separated 
+     by capitalletters, see below.
+
+\subsection names_loops         Loops: for, while, do
+   - Between arument list block '(..)' and the block opening '{' are 2 spaces!
+   - If the arument list block is too large use separate lines instead
+
+   \verbatim
+      for (int i = 0; i < 10; i++)  {
+         // text block
+      }   
+   \endverbatim
+   or
+   \verbatim
+      SxList<?>::Iterator it;
+      for (it  = list.begin (); 
+           it != list.end ();
+           it++)  
+      {
+         // text block
+      }   
+   \endverbatim
+
+\subsection names_branch       branches: if, switch-case
+   If and switch statements are similar to loops. Here are some examples
+   simple if statement
+   \verbatim
+      if ( var < fabs (epsilon) )  doSomething ();
+      else                         doSomethingElse ();
+   \endverbatim
+
+   long if block
+   \verbatim
+      if ( var < fabs (epsilon) )  {
+         // text block
+      }  else  {
+         // text block
+      }   
+   \endverbatim
+
+   switch block
+   \verbatim
+      switch (var)  {
+         case 1  : doSomething ();
+                   break;
+         case 1  : doSomething ();
+                   break;
+         default : doSomething ();
+                   break;         
+      }   
+   \endverbatim
+
+\subsection names_blockComments   Comments
+   Within the program text a comment that refers only to the next line has to
+   be in C++ style
+   \verbatim
+      // just a loop
+      for (i = 0; i < length; i++)  { ... }
+   \endverbatim
+
+   If the comment refers to the next paragraph of the source code use '---'.
+   \verbatim
+      // --- sort all entries
+      for (i = 0; i < length; i++)  { 
+         ... 
+      }
+   \endverbatim
+
+\section    names_names     Names
+   In general all kind of names (functions, classes, constants) should
+   be intuitive and neither too short nor too long. Bad examples of names
+   are:
+     - jkl
+     - wi221
+     - array
+     - list
+     - vector
+     - helpList
+     - dummyHelpTmpVar
+     - firstMatchFoundInTheListNotEqualToZero
+
+
+\subsection names_classNames   Class names
+   - Every class that belongs to SPHInX has to have the prefix 'Sx'. 
+     The next character it capital. If the class name consists of more than
+     one word the next word is separated by a capital letter again. 
+     Underscores ('_') are not allowed!
+     Examples: SxPWHamiltonian, SxRadBasis.
+
+\subsection names_memberfuncs     Member functions
+   - Member functions begin with lowercase letters always. All new words starts
+     with uppercase letters. Underscores ('_') are not allowed!
+     Examples: SxHamiltonian::getEnergy ()
+   - The function body starts in a new line   
+   \verbatim
+   void SxClassName::functionName (...)
+   {
+      // function body
+   }
+   \endverbatim
+
+   - Aggregate arguments will be supplied by 'const references'.
+   \verbatim
+     void SxClassName::functionName (const SxList<int> &list)
+     { 
+        // function body
+     }   
+   \endverbatim
+   - Validate argument list. See debug page.
+   \verbatim
+     void SxClassName::sqrt (double arg)
+     { 
+        CHECK_VAR (arg >= 0., arg);
+
+        // function body
+     }
+   \endverbatim
+
+   - If it is unavoidable to return values using the argument list, it is
+     strictly forbidden to use references. Use (validated) pointers instead!
+   \verbatim
+     void SxClassName::functionName (SxList<int> *returnList, double *returnArg)
+     { 
+        CHECK (returnList);
+        CHECK (returnArg);
+        
+        // function body
+        returnList = ...;
+        returnArg  = ...;
+     }   
+   \endverbatim
+      
+\subsection names_membervars      Member variables
+   - Member variables (defined in the header file) starts with lowercase
+     letters.  Words are separated by capital ones. Underscores ('_') are not
+     allowed.
+
+   - function arguments which shadow a class member append an underscrore ('_').
+     \verbatim
+     void SxClassName::setElements (int nElements_)
+     {
+        nElements = nElements_;
+     }
+     \endverbatim
+     instead of
+     \verbatim
+     void SxClassName::setElements (int nElements)
+     {
+        this->nElements = nElements_;
+     }
+     \endverbatim
+
+\subsection names_derefer         Dereferrencing
+   - Adressing members of objects works without whitespaces
+   \verbatim
+      myObject.aChild.someFunction ();
+      myObjectPtr->aChildPtr->someFunction ();
+   \endverbatim
+   - If the dereferencing chain exceeds the 80 columns width reconsider
+     your approach. Your object tree might be too big.
+     However, in such cases the line break occurs before the dereferring 
+     opertor (. or ->):
+   \verbatim
+      myObject.child1.child2.child3.
+              .child4.someFunction ();
+      myObjectPtr->childPtr1->childPtr2
+                 ->childPtr3->someFunction ();
+   \endverbatim
+
+\subsection names_const           Constants
+   - Constants are written in capital letters. Words are separated by
+     underscores ('_'), e.g.
+   \verbatim
+     PI, SQRT2, EPS_ELEC_LOOP
+   \endverbatim
+
+\subsection names_enums           Enums
+   - Any enum should be part of the class that uses it.
+   - Boolean arguments in function should be avoided, rather use enums
+     with mnemnonic names, e.g.
+   \verbatim
+     waves.read(io, KeepNStates);
+     waves.read(io, NStatesFromFile);
+   \endverbatim
+   rather than
+   \verbatim
+     waves.read(io, true);
+     waves.read(io, false);
+   \endverbatim
+     Violations of this rule in the existing code are due to historic
+     reasons.
+   - Enum values start with capital letters. Words are separated by
+     capital letters, all other letters are lower case. 
+     Underscores ('_') are not allowed.
+     The enum names have the same convention.
+     Example:
+   \verbatim
+     enum Directions { None, Forward, Reverse, Both };
+   \endverbatim
+     Capital letter abbreviations are allowed if they are generally
+     accepted (e.g. LDA).
+
+\subsection names_vectors         Exception: Vectors and matrices
+   - Vectors and matrices are treated as simple variables (see above). If the
+     name is just one character it has to be written in capital letter, e.g.
+   \verbatim
+     // SxMatrix<?> H;  // the Hamiltonian
+   \endverbatim
+
+
+\section    names_listComments    Comments about lists and arrays
+   - In case of 'lists of lists' or 'arrays of arrays' the author has to  
+     document the indices and/or dimensions
+   \verbatim
+      SxList<SxList<SxList<double> > >  forces;  // :iSpecies,:iAtom,:{xyz}
+   \endverbatim
+   would mean: the first index specifies the index of species, the second
+   the index of corresponding atom. The last comment determines the dimension
+   (x y z -> 3 dimensions). To extract the force acting on the 5th atom of 
+   the 3rd species to y-direction, write
+   \verbatim
+   double yForce = forces(2)(4)(1);
+   \endverbatim
+
+
+\section names_api     HTML API Documentation
+
+   Every structure, class, type, function, or whatsoever has to be well
+   documented! As documentation tool SPHInX uses doxygen 
+   (http://www.doxygen.org).
+   This means that the documentation is done inside the header file.
+      - \em every \em item is documented with a \b \brief tag, 
+        a short description 
+        about the item.
+      - a class or structure has additionally 
+        - the name synopsis.
+        - a \em detailed description on its purpose.
+      - All kind of items which perform mathematics have to document the
+        equations in \f$\LaTeX\f$ style.
+      - Functions with parameters have to 
+        - use the \b \param tag to explain the input variables.
+        - it has to be pointed out if pointers are used as return variables 
+          explicitly.
+        - Agregate values (e.g. arrays of arrays) are additionally explained
+          with a information about the \b storage \b order
+        - return variables have to use the \b \return tag
+          to explain the returned value.
+      - when useful make cross references with "See Also". Use the \b sa
+        tag. Note that referring to a member function or member variable has to
+        be done with the full qualified name, e.g. 
+        \b sa SxMyClass::foo instead of \b sa foo
+      - Documentation lines are manually wrapped at 80 columns.
+      - TODO entries will be written twice:
+        - in the corresponding header file as \b todo tag and
+        - in the C++ source file with "//TODO"
+      - make (PNG) images when useful. Place them to src/api/images
+        including the original file (OpenOffice, Corel, etc.)
+
+
+    and last but not least:
+
+      - The documentation has to be useful! Make it not too short and not
+        too long. If necessary use pictures (\b \image tag) or write an own
+        "related page".
+
+    \par Example:
+    The pseudo class SxDemoDoc contains the most frequent documentation
+    elements. It can be used as template.
+
+
+\section   names_changes   Changes of this style guide
+
+   In order to improve the readability of the SPHInX code it is possible
+   that even these rules can be modified. However, changes are highly unlikely.
+   Any modifications in the style guide will be announced in the developers
+   mailing list.
+
+\author Sixten Boeck
+*/

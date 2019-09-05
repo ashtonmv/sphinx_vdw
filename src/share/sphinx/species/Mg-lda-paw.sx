@@ -1,0 +1,41 @@
+name           = "Magnesium";
+potType        = "AbInit";
+element        = "Mg";
+potential      = <potentials/Mg_lda.paw>; 
+reciprocalMass = 24.305;
+dampingMass    = 0.7;
+ionicMass      = 24.305;
+valenceCharge  = 2;
+atomicRhoOcc   = [2,0,0,0];
+
+/* AtomPAW Generation File
+Mg 12
+LDA-PW loggrid 2000
+3 3 0 0 0 0    ! Up to 3s, 3p
+1 0 2.0        ! Electronic configuration [Ne] 3s2 3p0
+2 0 2.0
+2 1 6.0
+3 0 2.0 
+3 1 0.0
+0 0 0
+c              ! 1s core
+c              ! 2s core
+v              ! 3s core
+c              ! 2p core
+v              ! 3p valence
+1              ! Basis contains s partial waves
+2.6            ! rpaw = rshape = rveff = rcore = 2.6
+y
+0.6
+n
+y
+2.0
+n
+custom rrkj gramschmidthortho sinc
+3 1.8  
+2.6
+2.6
+2.6
+2.6
+0              ! END
+*/

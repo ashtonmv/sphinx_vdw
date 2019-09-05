@@ -1,0 +1,18 @@
+parameterSet  {type="group"; optional; minItems=1;
+   material   {type="string";}
+   useForPreconditioner  {type="flag"; optional;}
+   vacuum  {type="flag"; optional;}
+   parameter  {type="group"; minItems=1;
+      name    {type="string";}
+      value   {type="double";}
+      bowing  {type="double"; optional;}
+   }
+   latticeConstants {type="vector"; dims=[3]; optional;}
+   elasticTensor {type="matrix"; dims=[6,6]; optional;}
+
+}
+
+charge  {type="group"; optional;
+   file {type="string";}
+   prefactor {type="double";}
+}

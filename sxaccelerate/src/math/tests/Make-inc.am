@@ -1,0 +1,59 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = chunksize fft1d fft3d-1d fft3d sxgemm3mtune sxgemmmtune 
+
+chunksize_SOURCES   = $(AUX_SRC)
+chunksize_SOURCES  += chunksize.cpp 
+chunksize_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+chunksize_LDADD     =  $(SXIMPORTLIBS)
+chunksize_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+chunksize_LDADD    +=  $(SXIMPORTOBJS)
+
+fft1d_SOURCES   = $(AUX_SRC)
+fft1d_SOURCES  += fft1d.cpp 
+fft1d_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+fft1d_LDADD     =  $(SXIMPORTLIBS)
+fft1d_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+fft1d_LDADD    +=  $(SXIMPORTOBJS)
+
+fft3d_1d_SOURCES   = $(AUX_SRC)
+fft3d_1d_SOURCES  += fft3d-1d.cpp 
+fft3d_1d_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+fft3d_1d_LDADD     =  $(SXIMPORTLIBS)
+fft3d_1d_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+fft3d_1d_LDADD    +=  $(SXIMPORTOBJS)
+
+fft3d_SOURCES   = $(AUX_SRC)
+fft3d_SOURCES  += fft3d.cpp 
+fft3d_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+fft3d_LDADD     =  $(SXIMPORTLIBS)
+fft3d_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+fft3d_LDADD    +=  $(SXIMPORTOBJS)
+
+sxgemm3mtune_SOURCES   = $(AUX_SRC)
+sxgemm3mtune_SOURCES  += SxGemm3mTune.cpp 
+sxgemm3mtune_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxgemm3mtune_LDADD     =  $(SXIMPORTLIBS)
+sxgemm3mtune_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+sxgemm3mtune_LDADD    +=  $(SXIMPORTOBJS)
+
+sxgemmmtune_SOURCES   = $(AUX_SRC)
+sxgemmmtune_SOURCES  += SxGemmmTune.cpp 
+sxgemmmtune_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxgemmmtune_LDADD     =  $(SXIMPORTLIBS)
+sxgemmmtune_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+sxgemmmtune_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/math -I$(top_srcdir)/math
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(top_builddir)/mpi -I$(top_srcdir)/mpi
+AM_CPPFLAGS += -I$(top_builddir)/io -I$(top_srcdir)/io
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

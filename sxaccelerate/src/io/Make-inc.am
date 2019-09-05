@@ -1,0 +1,39 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxFileParser.h \
+                  SxIO.h \
+                  SxParser.h \
+                  SxPlugin.h \
+                  SxPluginLoader.h \
+                  SxPluginManager.h \
+                  SxSimpleParser.h \
+                  SxSymbolTable.h
+
+lib_LTLIBRARIES       = libsxio.la
+libsxio_la_SOURCES  = $(AUX_SRC)
+libsxio_la_SOURCES += SxFileParser.cpp \
+   SxIO.cpp \
+   SxParser.cpp \
+   SxPluginLoader.cpp \
+   SxPluginManager.cpp \
+   SxSimpleParser.cpp \
+   SxSymbolTable.cpp
+
+libsxio_la_LIBADD   = $(SXIMPORTLIBS)
+libsxio_la_LIBADD  += 
+libsxio_la_LIBADD  += $(SXIMPORTOBJS)
+libsxio_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxio_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/ipc -I$(top_srcdir)/ipc
+AM_CPPFLAGS += -I$(top_builddir)/fs -I$(top_srcdir)/fs
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

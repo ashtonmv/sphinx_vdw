@@ -1,0 +1,368 @@
+/* util/SxUnixConfig.h.in.  Generated from configure.ac by autoheader.  */
+
+
+#ifndef _SX_UNIX_CONFIG_H_
+#define _SX_UNIX_CONFIG_H_
+
+
+/* Define if building universal (internal helper macro) */
+#undef AC_APPLE_UNIVERSAL_BUILD
+
+/* absolute path to the NVIDIA CUDA toolkit */
+#undef CUDA
+
+/* C++ compiler */
+#undef CXX
+
+/* C++ compiler flags */
+#undef CXXFLAGS
+
+/* C++ compiler version */
+#undef CXXVERSION
+
+/* compile package in DEBUG mode - RELEASE mode otherwise */
+#undef DBG_MODE
+
+/* Distribution Major Version */
+#undef DIST_MAJOR
+
+/* Distribution Minor Version */
+#undef DIST_MINOR
+
+/* Distribution ID */
+#undef DIST_NAME
+
+/* Operating system ID */
+#undef DIST_OS
+
+/* Distribution Patch Version */
+#undef DIST_PATCH
+
+/* Distribution Repository Version */
+#undef DIST_REPO_VER
+
+/* Distribution Version */
+#undef DIST_VERSION
+
+/* Distribution Version Integer Number */
+#undef DIST_VERSION_L
+
+/* FORTRAN77 compiler */
+#undef F77
+
+/* FORTRAN77 compiler flags */
+#undef FFLAGS
+
+/* limit number of compiler errors before aborting */
+#undef GCCERRORLIMIT
+
+/* Debugger */
+#undef GDB
+
+/* 32bit environment */
+#undef HAS_32BIT
+
+/* 64bit environment */
+#undef HAS_64BIT
+
+/* System byte order */
+#undef HAS_BIG_ENDIAN
+
+/* Define to 1 if you have the <arpa/inet.h> header file. */
+#undef HAVE_ARPA_INET_H
+
+/* Define to 1 if you have the declaration of `strerror_r', and to 0 if you
+   don't. */
+#undef HAVE_DECL_STRERROR_R
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#undef HAVE_FCNTL_H
+
+/* Define to 1 if gfortran does not come with gcc bug 33647 */
+#undef HAVE_GFORTRAN_COPY_STRING
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `atlas' library (-latlas). */
+#undef HAVE_LIBATLAS
+
+/* Define to 1 if you have the `f2c' library (-lf2c). */
+#undef HAVE_LIBF2C
+
+/* Define to 1 if you have the `fftw3' library (-lfftw3). */
+#undef HAVE_LIBFFTW3
+
+/* Define to 1 if you have the `gfortran' library (-lgfortran). */
+#undef HAVE_LIBGFORTRAN
+
+/* Define to 1 if you have the `hdf5' library (-lhdf5). */
+#undef HAVE_LIBHDF5
+
+/* Define to 1 if you have the `netcdf' library (-lnetcdf). */
+#undef HAVE_LIBNETCDF
+
+/* Define to 1 if you have the `lround' function. */
+#undef HAVE_LROUND
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `mkstemp' function. */
+#undef HAVE_MKSTEMP
+
+/* Define to 1 if you have the <netdb.h> header file. */
+#undef HAVE_NETDB_H
+
+/* Define to 1 if you have the <netinet/in.h> header file. */
+#undef HAVE_NETINET_IN_H
+
+/* Define to 1 if you have the `posix_memalign' function. */
+#undef HAVE_POSIX_MEMALIGN
+
+/* Define to 1 if you have the `round' function. */
+#undef HAVE_ROUND
+
+/* Define to 1 if you have the <signal.h> header file. */
+#undef HAVE_SIGNAL_H
+
+/* Define to 1 if you have the `sincos' function. */
+#undef HAVE_SINCOS
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strerror_r' function. */
+#undef HAVE_STRERROR_R
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/resource.h> header file. */
+#undef HAVE_SYS_RESOURCE_H
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#undef HAVE_SYS_SOCKET_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <sys/wait.h> header file. */
+#undef HAVE_SYS_WAIT_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <winsock2.h> header file. */
+#undef HAVE_WINSOCK2_H
+
+/* Define to 1 if you have the <winsock.h> header file. */
+#undef HAVE_WINSOCK_H
+
+/* Setup HPUX Compilation */
+#undef HPUX
+
+/* Setup Linux Compilation */
+#undef LINUX
+
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
+#undef LT_OBJDIR
+
+/* compile code to exploit all features of the current CPU */
+#undef MACHINE_SPECIFIC
+
+/* Setup MACOSX Compilation */
+#undef MACOSX
+
+/* Memory tracer tool */
+#undef MEMTRACER
+
+/* absolute path to the Intel MKL top level folder */
+#undef MKLPATH
+
+/* absolute paths to top level folder for external libraries */
+#undef NUMLIBS
+
+/* check that numlibs can be used */
+#undef NUMLIBS_CHECKS
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Package type */
+#undef PKG_TYPE
+
+/* CPU type */
+#undef PROCESSOR
+
+/* compile package in the profile mode */
+#undef PRO_MODE
+
+/* Repository processor id */
+#undef REPOPROC
+
+/* The size of `void*', as computed by sizeof. */
+#undef SIZEOF_VOIDP
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if strerror_r returns char *. */
+#undef STRERROR_R_CHAR_P
+
+/* Setup SunOS Compilation */
+#undef SUNOS
+
+/* Path to build tree */
+#undef SXACCELERATE_BUILD
+
+/* Path to source tree */
+#undef SXACCELERATE_SRC
+
+/* Binary target directory */
+#undef SXBINTARGET
+
+/* Copyright information */
+#undef SXCOPYRIGHT
+
+/* SxQ directory */
+#undef SXQDIR
+
+/* Setup Android Compilation */
+#undef SX_ANDROID
+
+/* Setup iOS Compilation */
+#undef SX_IOS
+
+/* Setup mobile compilation */
+#undef SX_MOBILE
+
+/* Output of uname(1) */
+#undef UNAME
+
+/* Darwin ATLAS */
+#undef USE_ACCELERATE_FRAMEWORK
+
+/* compile package with AMD Core Math Library support */
+#undef USE_ACML
+
+/* compile package with ACML's FFT support */
+#undef USE_ACML_FFT
+
+/* compile package with ATLAS support */
+#undef USE_ATLAS
+
+/* compile package with FFTW support */
+#undef USE_FFTW
+
+/* compile package with GotoBLAS support */
+#undef USE_GOTO
+
+/* compile package with NVIDIA CUDA support */
+#undef USE_GPU
+
+/* compile package with HDF5 support */
+#undef USE_HDF5
+
+/* compile package with Intel Math Kernel Library support */
+#undef USE_INTEL_MKL
+
+/* compile package with MKL's FFT support */
+#undef USE_MKL_FFT
+
+/* compile package with Message-Passing Interface support */
+#undef USE_MPI
+
+/* compile package with support for NetCDF4 IO */
+#undef USE_NETCDF4
+
+/* compile package with OpenMP support */
+#undef USE_OPENMP
+
+/* compile package with support for parallel NetCDF4 IO */
+#undef USE_PARALLEL_NETCDF4
+
+/* compile package with PCRE2 support */
+#undef USE_PCRE2
+
+/* whether to compile sxmath */
+#undef USE_SXMATH
+
+/* build SxQDOC documentation */
+#undef USE_SXQDOC
+
+/* compile package with logging support */
+#undef USE_SX_LOG
+
+/* Version number of package */
+#undef VERSION
+
+/* User who compiled package */
+#undef WHOAMI
+
+/* compile with tools */
+#undef WITH_APPS
+
+/* Append directory to lib, libexec, bin, sbin. */
+#undef WITH_DBGDIR
+
+/* compile with source code examples */
+#undef WITH_EXAMPLES
+
+/* compile S/PHI/nX with source code tests */
+#undef WITH_TESTS
+
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+#  undef WORDS_BIGENDIAN
+# endif
+#endif
+
+/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
+   `char[]'. */
+#undef YYTEXT_POINTER
+
+
+#define SX_REGISTER_CLASS(name) void name##_register() { name var; } \
+                                extern char SX_NO_OPERATION
+#endif /* _SX_UNIX_CONFIG_H_ */
+

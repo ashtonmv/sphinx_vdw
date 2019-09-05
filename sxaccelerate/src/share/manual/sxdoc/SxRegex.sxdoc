@@ -1,0 +1,426 @@
+a.SxRegex
+h3. Regular Expressions
+
+p1. A regular expression provides an efficient way to find substrings matching
+    a given pattern. A regular expression describes the pattern using a standard
+    syntax. For example, the following code snippet shows a regular expression
+    that matches 1 or more digits:
+
+{{{
+(\d)+
+}}}
+
+p1. In the above code '\\d' represents a digit and + sign represents that there
+    should be 1 or more digits present in the string in order for the match to
+    be successful.
+
+p1. In the same way, the following regular expression shows a pattern that will
+    match any string consisting of English alphabets either capital or small
+    letters.
+
+{{{
+([A-Za-z])+
+}}}
+
+p1. The specific patterns enclosed in round brackets are called capture groups.
+    The capture groups are used to fetch specific substrings of the matched
+    string once the match is successful. Regular expressions can be very
+    efficient in finding out if a string matches specific pattern.
+    For example, the following regular expression matches any date of
+    the form '01-Jan-2018'.
+
+{{{
+(\d{2})-([A-Za-z]{3})-(\d{4})
+}}}
+
+p1. In the above example the first capture group matches exactly 2 digits
+    representing the 'day' part of a date. Whereas the second capture group
+    matches exactly 3 alphabets representing the 'month' part of a date.
+    The third capture group matches exactly four digits representing the
+    'year' part of a date.
+
+
+p1. The @SxRegex@ class provides the functionality for Perl style regular
+    expressions. A regular expression in @SxRegex@ can be compiled with
+    following options.
+
+m := Multiline. ^ and $ match newlines within data.
+i := Case insensitive match.
+x := Ignore whitespace.
+s := Singleline. Dot (.) matches anything including new lines.
+U := Ungreedy. Invert greediness of quantifiers.
+u := Unicode/UTF-8. Interpret strings as UTF-8 encoded Unicode rather than ASCII.
+A := Anchor. Match only at the first position.
+P := POSIX. Return the matches in the order POSIX regexec () would return.
+l := literal. Prepend /Q and append /E to pattern.
+
+p1. It should be noted that @SxRegex@ uses PCRE2 library, which requires that
+    each backslash '\\' be escaped by an extra backslash along with it. Also,
+    as C requires each backslash character to be escaped by using an extra
+    backslash, it results into each backslash in a regular expression being
+    replaced by 4 backslashes in order to correctly parse the regular
+    expression in @SxRegex@.
+
+ C := \\ --> \\\\
+ PCRE2 := \\ --> \\\\
+ SxRegex := \\ --> \\\\\\\\
+
+p1. In order to use this class @SxRegex@ header file must be included into
+    the code as shown below:
+
+{{{cpp(sxregex)
+#include <SxList.h>
+#include <SxArray.h>
+#include <SxString.h>
+#include <SxRegex.h>
+}}}
+
+p1. The following sections describe the common functionality of the @SxRegex@ class:
+
+h4. Capture Count @getCaptureCount@
+
+p1. The @getCaptureCount@ function returns the number of sub patterns that
+    are captured in the given pattern. As shown in the following code snippet.
+
+{{{cpp(sxregex.captureCount)
+SxRegex regex("(\\\\d{5})-(\\\\d)+");
+cout << regex.getCaptureCount () << endl;
+}}}
+
+p1. Above code returns @2@ which is the number of captured sub patterns in the
+    total pattern string.
+
+{{{expect(stdout,sxregex.captureCount)
+2
+}}}
+
+h4. Finding Match @match@
+
+p1. In order to find out if a sample string matches the pattern, @match@
+    function can be used. It takes the sample string as argument and returns
+    the list of strings consisting of complete matched string and captured
+    substrings. If the sample string matched the pattern, the first element
+    of the returned consists of the complete matched string and rest of the
+    elements contain the captured sub patterns. An example of @match@ is shown
+    in following code.
+
+{{{cpp(sxregex.match)
+SxRegex regex("(\\\\d)+");
+SxList<SxString> matches = regex.match ("123");
+if (matches.getSize() > 1) {
+   SxString numStr = matches(1);
+   cout << "Found match: " << numStr << endl;
+}
+}}}
+
+p1. which results in the following captured sub pattern:
+
+{{{expect(stdout,sxregex.match)
+Found match: 123
+}}}
+
+h4. Find All matches @matchAll@
+
+p1. In order to find out all possible parts of sample string that match the pattern, @matchAll@ function can be used. It takes the sample string as argument and returns the list containing lists of strings representing all matches.
+
+{{{
+SxRegex regex ("(\\\\d)+");
+SxList<SxList<SxString>> allMatches = regex.matchAll ("221,998,334,643,112");
+if (allMatches.getSize () > 0){
+   for (auto it = allMatches.begin (); it != allMatches.end (); ++it){
+      bool isFirst = true;
+      for (auto it2 = (*it).begin (); it2 != (*it).end (); ++it2){
+         if (isFirst){
+            isFirst = false;
+            continue;
+         }
+         cout << "Found match: " << (*it2) << endl;
+      }
+   }
+}
+}}}
+
+p1. Above example code results in following output:
+
+{{{
+221
+998
+334
+643
+112
+}}}
+
+h4. Matching offsets @matchToOffsets@
+
+p1. The @matchToOffset@ function allows to find out the offsets in the
+    sample string where different captured sub patterns are found. It also
+    returns the length of each captured sub pattern. The first element contains
+    the whole matched string and rest of the elements are the captured sub patterns.
+
+{{{
+SxRegex regex ("(\\\\d)+-(\\\\w+)-(\\\\d)+");
+SxArray<SxRegex::Match> substrings;
+ssize_t count = regex.matchToOffsets ("01-Jan-2018", 0, &substrings);
+for (ssize_t i = 0; i < count; ++i){
+   cout << "sub pattern offset: " << substrings(i).getOffset ()
+        << " and length: " << substrings(i).getLength () << endl;
+}
+}}}
+
+p1. Above code results in the following output. It first prints the offset and
+    length of the complete matched string and then the captured sub patterns.
+
+{{{
+sub pattern offset: 0 and length: 11
+sub pattern offset: 0 and length: 2
+sub pattern offset: 3 and length: 3
+sub pattern offset: 7 and length: 4
+}}}
+
+h4. Matching to map @matchToMap@
+
+p1. The @matchToMap@ function allows to find matches along with their names. It
+    returns a @SxMap@ object that maps each captured group name to the matched
+    substring. Consider the following example:
+
+{{{
+SxRegex regex ("(?<day>\\\\d+)-(?<month>\\\\w+)-(?<year>\\\\d+)");
+SxMap<SxString,SxString> map = regex.matchToMap ("18-March-2018");
+std::cout << "day: " << map("day") << std::endl;
+std::cout << "month: " << map("month") << std::endl;
+std::cout << "year: " << map("year") << std::endl;
+}}}
+
+p1. which yields,
+
+{{{
+day: 18
+month: March
+year: 2018
+}}}
+
+h4. Debugging
+
+p1. The @SxRegex@ class handles different types of errors by throwing exceptions,
+    which can be caught by using a try-catch block. These exceptions can occur
+    during regular expressions compilation and finding the corresponding
+    matches. Some of the common exception tags are given below:
+
+RegexCompilationFailed := This error occurs if the given regular expression cannot be compiled.
+RegexUnknownOption  := This error occurs when an unsupported option is provided to @SxRegex@ object.
+RegexCaptureOutOfRange := This error occurs when number of capture group requested is out of range.
+RegexNamedCaptureNotFound := This error occurs when the requested named capture group is not found.
+
+p1. The following code snippet shows an example of "RegexUnknownOption" tagged
+    exception:
+
+{{{
+try {
+   SxRegex regex("(\\\\d)+", "1");
+} catch (SxException ex) {
+   ex.printStack ();
+}
+}}}
+
+p1. The above code results in exception while parsing the provided options for
+    the regular expression as shown below:
+
+{{{
+1: [RegexUnknownOption] Unknown regex option '1'. Available options are [mixsUuAPl]. (SxRegex.cpp:280)
+2: [RegexCompilationFailed] Cant't compile regex pattern '(\\d)+' with options '1' (SxRegex.cpp:250)
+}}}
+
+p1. Similarly, exception can occur if the regular expression itself is not
+    valid/compilable, as shown by the following example:
+
+{{{
+try {
+   SxRegex regex ("[");
+} catch (SxException ex) {
+   ex.printStack ();
+}
+}}}
+
+p1. The above code yields the following exception:
+
+{{{
+1: [RegexCompilationFailed] Pattern compilation error in '[', col=1: missing terminating ] for character class (SxRegex.cpp:338)
+2: [RegexCompilationFailed] Cant't compile regex pattern '[' (SxRegex.cpp:250)
+}}}
+
+a. SxSed
+h3. Replacing Substrings
+
+p1. The @SxSed@ class allows text substitutions based on the given pattern. 
+    It takes the pattern, substitution and options strings as three separate arguments 
+    or as a single string in the following format "s/pattern/substitution/options".
+    It supports the following options:
+
+g := Global
+m := Multiline
+i := Case insensitive match
+x := Ignore whitespace and # comments in the pattern
+s := Single line
+U := Invert greediness of the quantifiers
+u := Interpret strings as UTF-8 strings
+A := Match only at the first position
+
+h4. Named back-references
+
+p1. The named back-references allow to define a name for a capture group, which
+    can be used to refer to that capture group later in the regular expression
+    or in replacement string.
+
+h5. Defining name for back-reference
+
+p1. In order to be able to use back-reference, first it has to be defined. In
+    @SxSed@ capture groups can be named in one of the following ways:
+
+* (?<name>...)
+* (?'name'...)
+* (?P<name>...)
+
+h5. Using backreferences
+
+p1. Once named back-references are defined, they can be referred/used within
+    the regular expression in one of the following ways:
+
+* \\k<name>
+* \\k'name'
+* \\g{name}
+* (?P=name)
+
+h5. Insertion in replacement string
+
+p1. The named back-references can be placed in the replacement string in one of
+    the following ways:
+
+* $+{name}
+* ${name}
+* \\k<name>
+* \\g<name>
+
+h4. Numerical back-references
+
+p1. The numerical back-references are assigned to each group automatically. A
+    numerical back-reference can be placed in a regular expression by placing
+    the number between curly braces and preceded by '\\g', for example, \\g{name}.
+    Similarly, a numerical back-reference can be placed in a replacement string
+    by preceding the number by a '$' sign, for example, $2.
+
+p1. In order to use @SxSed@ class the following header file must be included:
+
+{{{cpp(sxsed)
+#include <SxSed.h>
+}}}
+
+p1. The following example shows both ways to create an @SxSed@ object.
+
+{{{cpp(sxsed.create)
+SxSed sed("s/day/night/");
+SxSed sed2("day", "night", "");
+}}}
+
+p1. In order to return the substituted string the @subst@ function can be
+    used as follows:
+
+{{{cpp(sxsed.create.subst)
+std::cout << sed.subst ("day time") << std::endl;
+std::cout << sed2.subst ("day time") << std::endl;
+}}}
+
+p1. above code results in following output:
+
+{{{expect(stdout,sxsed.create.subst)
+night time
+night time
+}}}
+
+h4. Substitution with numerical back-references
+
+p1. The following code shows an example of substitution using numerical
+    back-references:
+
+{{{
+SxSed sed("s#(\\\\d+)/(\\\\d+)/(\\\\d+)#$3-$1-$2#");
+std::cout << sed.subst ("01/02/2018") << std::endl;
+}}}
+
+p1. In the above code different sections of input string are separated by
+    '#' character and numerical back-references are used to refer to capture
+    groups in replacement string. It results in the following string output:
+
+{{{
+2018-01-02
+}}}
+
+h4. Substitution using named backreferences
+
+p1. The following code shows an example of substitution using numerical
+    back-references:
+
+{{{
+SxSed sed("s/(?<bar>(\\\\d+))-(?P=bar)/$+{bar}./");
+std::cout << sed.subst("1-1") << std::endl;
+}}}
+
+p1. The above code first defines a name for the capture group '(?<name>)'
+    syntax and later refers to it using '(?P=name)' syntax. Finally, the named
+    back-reference is used in replacement string using '$+{name}' syntax.
+    The above code yields the following output:
+
+{{{
+1.
+}}}
+
+h4. Debugging
+
+p1. The @SxSed@ class handles different types of errors by throwing exceptions,
+    which can be caught by using a try-catch block. These exceptions can occur
+    during regular expressions compilation and string substitution. Some of the
+    common exception tags apart from the ones from @SxRegex@ are given below:
+
+RegexSyntaxError := This error occurs when the input string does not follow the allowed format.
+RegexSubstitutionFailed := This error occurs if the string substitution fails.
+RegexBackRefDelimiterError := This error occurs when back-reference does not use correct delimiter.
+
+p1. The following code snippet shows an example of "RegexSyntaxError"
+    tagged exception:
+
+{{{
+try {
+   SxSed sed("s/(\\d+)#$1-$1/");
+} catch (SxException ex) {
+   ex.printStack ();
+}
+}}}
+
+p1. The above code results in exception while parsing the input string,
+    as shown below:
+
+{{{
+1: [RegexSyntaxError] Command is not in perl-style format. Enter a command in the same format as this example: s/pattern/substitution/options (SxSed.cpp:227)
+2: [RegexCompilationFailed] Cant't compile sed command '' (SxSed.cpp:116)
+}}}
+
+p1. The above exception occurs because input string format was not followed
+    correctly, which is: "s/../../..". In similar manner, exception can occur
+    if wrong delimiter is used to refer to a named back-reference in replacement
+    string, as shown by the following example:
+
+{{{
+try {
+SxSed sed("s/(?<bar>(\\d+)).(?P=bar)/\\gbar>./");
+} catch (SxException ex) {
+   ex.printStack ();
+}
+}}}
+
+p1. The above code missed the starting '<' character while referring to a
+    back-reference in substitution string. Hence, the code yields the
+    following exception:
+
+{{{
+1: [RegexBackRefDelimiterError] Unknown delimiter '98' to read a named backreference. Available syntax is ${name} $+{name} \k<name> \g<name> (SxSed.cpp:338)
+2: [RegexCompilationFailed] Cant't compile sed command '' (SxSed.cpp:116)
+}}}

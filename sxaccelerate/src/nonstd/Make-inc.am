@@ -1,0 +1,25 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxNonStd.h \
+                  sxfileno.h \
+                  sxputenv.h
+
+lib_LTLIBRARIES       = libsxnonstd.la
+libsxnonstd_la_SOURCES  = $(AUX_SRC)
+libsxnonstd_la_SOURCES += sxfileno.cpp \
+   sxputenv.cpp
+
+libsxnonstd_la_LIBADD   = $(SXIMPORTLIBS)
+libsxnonstd_la_LIBADD  += 
+libsxnonstd_la_LIBADD  += $(SXIMPORTOBJS)
+libsxnonstd_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxnonstd_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

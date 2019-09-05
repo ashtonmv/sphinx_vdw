@@ -1,0 +1,68 @@
+input { type = "group"; 
+      inputStructure    { type = "string"; optional;}
+		inputHessian      { type = "string";}
+		inputPeriodicity  { type = "string"; optional;}
+		inputHistory      { type = "string"; optional;}
+		inputEigenvalues  { type = "string"; optional;}
+		inputBasisHessian { type = "string"; optional;}
+      inputStructure2   { type = "string"; optional;}
+		inputPeriodicity2  { type = "string"; optional;}
+}
+
+system { type = "group"; 
+	class { type = "string";}
+	sigma { type = "int"; optional;}
+	nTurns { type = "int"; optional;}
+}
+
+performance {type = "group"; 	
+   isDynamical { type = "flag"; optional;}
+   freezeMode           { 
+         type="string"; type="enum";val="z,xyz,trans,notr"; 
+      }
+   oldCalc {type = "flag"; optional;}
+	vibRots {type ="int";optional;}
+	freezeIt {type = "real"; optional;}
+	setZero  {type = "real"; optional;}
+	applyPeriodicity {type = "flag"; optional;}
+	applyAveraging {type = "flag"; optional; }
+	supercellCutoff {type = "int";optional;}
+	vdwCorrection {type="string";optional;}
+	lowCoop {type = "flag"; optional;}
+   fromRefineHessian {type = "vector";optional;}
+   replaceCurvature {type = "list"; minRank = 1; maxRank = 2; optional;}
+
+}
+
+output { type = "group";
+	
+   include <std/printMolden.std>;
+	
+	
+   printEV { type = "group"; optional;
+		file { type = "string";}
+	}
+	
+   printFC { type = "group"; optional;
+		file { type = "string";}
+	}
+	
+  	printNuMu { type = "group"; optional;
+		file { type = "string";}
+	}
+
+   include <std/tdOutput.std>;
+  
+	printAH { type = "group"; optional;
+		ahId { type = "int"; }
+		file { type = "string";}
+	}
+
+	printHessian { type = "group"; optional;
+		file { type = "string";}
+	}
+
+   include <std/dispersion.std>;
+   include <std/printFC.std>;
+}	
+	

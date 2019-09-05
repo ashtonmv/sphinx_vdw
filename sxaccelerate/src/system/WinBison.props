@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup
+    Condition="'$(WinBisonBeforeTargets)' == '' and '$(WinBisonAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <WinBisonBeforeTargets>Midl</WinBisonBeforeTargets>
+    <WinBisonAfterTargets>CustomBuild</WinBisonAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <WinBisonDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(WinBisonDependsOn)</WinBisonDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <WinBison>
+      <CommandLineTemplate>$(MSYSDIR)\usr\bin\bison -y -p%(Filename)_ -d %(Filename).ypp -o $(IntDir)\%(Filename).tab.cpp</CommandLineTemplate>
+      <Outputs>$(IntDir)\%(Filename).tab.hpp; $(IntDir)\%(Filename).tab.cpp</Outputs>
+    </WinBison>
+  </ItemDefinitionGroup>
+</Project>

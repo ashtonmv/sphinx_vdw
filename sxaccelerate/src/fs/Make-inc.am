@@ -1,0 +1,57 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxDir.h \
+                  SxFS.h \
+                  SxFSAction.h \
+                  SxFSAuthorAction.h \
+                  SxFSConfigureAction.h \
+                  SxFSConvertAction.h \
+                  SxFSCopyAction.h \
+                  SxFSCreateAction.h \
+                  SxFSDeleteAction.h \
+                  SxFSError.h \
+                  SxFSExploreAction.h \
+                  SxFSMoveAction.h \
+                  SxFSNavigateAction.h \
+                  SxFSTest.h \
+                  SxFile.h \
+                  SxFileIO.h \
+                  SxFileInfo.h \
+                  SxSymLink.h
+
+lib_LTLIBRARIES       = libsxfs.la
+libsxfs_la_SOURCES  = $(AUX_SRC)
+libsxfs_la_SOURCES += SxDir.cpp \
+   SxFile.cpp \
+   SxFileInfo.cpp \
+   SxFileIO.cpp \
+   SxFSAction.cpp \
+   SxFSAuthorAction.cpp \
+   SxFSConfigureAction.cpp \
+   SxFSConvertAction.cpp \
+   SxFSCopyAction.cpp \
+   SxFSCreateAction.cpp \
+   SxFSDeleteAction.cpp \
+   SxFSError.cpp \
+   SxFSExploreAction.cpp \
+   SxFSMoveAction.cpp \
+   SxFSNavigateAction.cpp \
+   SxFSTest.cpp \
+   SxSymLink.cpp
+
+libsxfs_la_LIBADD   = $(SXIMPORTLIBS)
+libsxfs_la_LIBADD  += @SX_SHORTCUT_LIBS@
+libsxfs_la_LIBADD  += $(SXIMPORTOBJS)
+libsxfs_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxfs_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

@@ -1,0 +1,36 @@
+/** \page    page_req         Requirements
+
+   In order to compile the SPHInX package the following programs have to
+   be installed. They also have to be located in the UNIX search path:
+    - GNU g++ (latest version)
+    - GNU gcc (latest version)
+    - GNU make
+    - GNU autoconf
+    - GNU flex
+    - GNU bison
+    - GNU ranlib
+    - GNU ar
+
+   The following external packages are recommended but not required:
+   -# Debugging Tools
+      - GNU Debugger gdb 
+      - valgrind 2.0.0 or higher (http://valgrind.kde.org)
+      - The Data Display Debugger ddd (http://www.gnu.org/software/ddd)
+   -# Documenting tools
+      - doxygen (http://www.doxygen.org)
+      - graphviz (http://www.research.att.com/sw/tools/graphviz/download.html)
+      - LaTeX
+      - psutils
+   -# Multi language mixing
+      - Fortran compiler (GNU g77, NAG f90, Intel ifc, or Portland Group pgf90)
+   -# User environment
+      - gvim (http://www.vim.org)
+      - MySQL client and header files (http://www.mysql.org)
+      - PHInaX (http://www.phinax.de)
+
+   In some computer systems the \b make command is refered as \b gmake. For 
+   this reason we always write \b (g)make. According to your system please use
+   \b make or \b gmake, respectively.
+
+   \author Sixten Boeck
+*/

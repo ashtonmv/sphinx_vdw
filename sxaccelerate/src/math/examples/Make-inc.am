@@ -1,0 +1,60 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = neural_net sxeigen sxmatrix sxmemory sxpipes sxvector 
+
+neural_net_SOURCES   = $(AUX_SRC)
+neural_net_SOURCES  += neural_net.cpp
+neural_net_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+neural_net_LDADD     =  $(SXIMPORTLIBS)
+neural_net_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+neural_net_LDADD    +=  $(SXIMPORTOBJS)
+
+sxeigen_SOURCES   = $(AUX_SRC)
+sxeigen_SOURCES  += sxeigen.cpp
+sxeigen_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxeigen_LDADD     =  $(SXIMPORTLIBS)
+sxeigen_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+sxeigen_LDADD    +=  $(SXIMPORTOBJS)
+
+sxmatrix_SOURCES   = $(AUX_SRC)
+sxmatrix_SOURCES  += sxmatrix.cpp
+sxmatrix_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmatrix_LDADD     =  $(SXIMPORTLIBS)
+sxmatrix_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+sxmatrix_LDADD    +=  $(SXIMPORTOBJS)
+
+sxmemory_SOURCES   = $(AUX_SRC)
+sxmemory_SOURCES  += sxmemory.cpp
+sxmemory_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmemory_LDADD     =  $(SXIMPORTLIBS)
+sxmemory_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+sxmemory_LDADD    +=  $(SXIMPORTOBJS)
+
+sxpipes_SOURCES   = $(AUX_SRC)
+sxpipes_SOURCES  += sxpipes.cpp
+sxpipes_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxpipes_LDADD     =  $(SXIMPORTLIBS)
+sxpipes_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+sxpipes_LDADD    +=  $(SXIMPORTOBJS)
+
+sxvector_SOURCES   = $(AUX_SRC)
+sxvector_SOURCES  += sxvector.cpp
+sxvector_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxvector_LDADD     =  $(SXIMPORTLIBS)
+sxvector_LDADD    +=  @SX_BLAS_LIBS@ @SX_FFT_LIBS@
+sxvector_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/math -I$(top_srcdir)/math
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/fs
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(top_builddir)/mpi -I$(top_srcdir)/mpi
+AM_CPPFLAGS += -I$(top_builddir)/io -I$(top_srcdir)/io
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

@@ -1,0 +1,54 @@
+// --------------------------------------------------------------------------
+// SFHIngX  -  Zinkblend structure
+//
+// Sixten Boeck, boeck@fhi-berlin.mpg.de
+// 08/12/2002
+//
+// Reference: Landold-Bernstein
+//
+// --------------------------------------------------------------------------
+// Arguments:
+//    aLat                lattice parameter a [Bohr]
+//    species_1           filename of 1st species file
+//    species_2           filename of 2nd species file
+// --------------------------------------------------------------------------
+
+
+needs aLat;
+needs species_1;
+needs species_2;
+
+include <structures/fcc.sx>;
+
+species {
+   include species_1;
+   //atom { coords = [0,0,0]; relative; }
+   atom { coords = [0,0,0]; relative; }
+}
+
+species {
+   include species_2;
+   atom { coords = [1/4,1/4,1/4]; relative; }
+   //atom { coords = [3/4,3/4,3/4]; relative; }
+}
+
+/*
+slab {
+   name = "111";
+
+   orig = [0,0,0];
+   a1 = ...;
+   a2 = ..;
+   a3 = ..;
+}
+
+slab {
+   name = "sqrt(3) x sqrt(3)";
+
+   orig = [0,0,0];
+   a1 = ...;
+   a2 = ..;
+   a3 = ..;
+}
+*/
+

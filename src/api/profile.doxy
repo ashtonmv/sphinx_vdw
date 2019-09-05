@@ -1,0 +1,95 @@
+/**\page    page_profile     Profiling SPHInX
+
+  to be continued...
+
+  */   /*
+
+  When the SPHInX package has been carefully debugged and the executables 
+  in the RELEASE mode are too slow the runtime performance can be analyzed 
+  in the SPHInX PROFILE mode.
+
+\section    prof_req         Requirements
+ 
+   To analyze the performance of SPHInX executables on Linux platforms
+   the following packages have to be installed:
+   -# valgrind
+   -# kcachegrind
+
+   Both can be downloaded from http://www.sourceforge.org. On Linux SuSE
+   distributions it can be installed directly from the CDs/DVDs.
+
+\section    prof_prepare     Preparations
+
+   Before performing any runtime analysis the package has to be compiled
+   in the PROFILE mode:
+   \verbatim
+      cd src
+      (g)make cleanall
+      ./configure --enable-profile --with-addons
+      (g)make
+   \endverbatim
+
+   For more information about using the configure script please have a look
+   at \ref page_make.
+
+\section    prof_analysis    Analysis
+
+   Since the analysis run of the executables is really slow the input files
+   should be choosen in a way that the system under considerations as small 
+   as possible.
+
+\subsection prof_env         Setting up the Environment
+
+   Starting an executable in the PROFILE mode is slightly different to the
+   other modes. Usually SPHInX executables are invoked from a wrapper
+   shell script file. These shell scripts are used to set up the environment
+   variables LD_LIBRARY_PATH and SX_INCLUDE_PATH properly.
+   Since we don't want to profile the shell scripts but the actual executables
+   it is not possible to use the wrappers. Thus setup the required variables
+   manually, e.g.
+   \verbatim
+      setenv LD_LIBRARY_PATH ~/sphinx/src/lib
+      setenv SX_INCLUDE_PATH ~/sphinx/src/SPHInX
+   \endverbatim
+   The next step is to call the graphical profiler in background. On
+   Linux systems we use \em kcachegrind:
+   \verbatim
+      kcachegrind &
+   \endverbatim
+
+\subsubsection prof_setup     Setting up kcachegrind
+   The first step of using \em kcachegrind is to register the directories
+   which contain the SPHInX source code. In \em kcachegrind do
+   \verbatim
+      Settings -> Configure kcachegrind
+   \endverbatim
+   A panel appears and the source directories
+      - <SPHInX>/src/base
+      - <SPHInX>/src/io
+      - <SPHInX>/src/comm
+      - <SPHInX>/src/util
+      - <SPHInX>/src/examples
+      - <SPHInX>/src/add-ons
+      - <SPHInX>/src/include
+   can be added to the known source directories.
+
+\subsection prof_start       Starting the Executable
+
+   Now the executubale (that one with the *.x extention) can be started. To
+   collect the runtime performance data it is started from the program
+   \em calltree, e.g.
+   \verbatim
+      calltree ~/sphinx/src/bin/sphinx.x
+   \endverbatim
+
+\subsection prof_kgrind      Using kcachegrind
+
+   The executables will run (rather slowly) and at any time the current state
+   can be analyzed. To do so \em calltree has to write the runtime performance
+   data files. Since \em kcachegrind and \em calltree are connected this 
+   can be done in the graphical profiler \em kcachegrind
+   \verbatim
+      File -> Force Dump
+   \endverbatim
+
+  \author Sixten Boeck */

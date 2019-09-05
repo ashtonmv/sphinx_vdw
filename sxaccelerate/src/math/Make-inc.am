@@ -1,0 +1,103 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxBlasLib.h \
+                  SxComplex.h \
+                  SxConstants.h \
+                  SxCubicSpline.h \
+                  SxCubicSpline.hpp \
+                  SxDifferential.h \
+                  SxDirTensor3.h \
+                  SxDirTensor3.hpp \
+                  SxExponentialRegression.h \
+                  SxFFT.h \
+                  SxFFT1d.h \
+                  SxFFT2d.h \
+                  SxFFT2d1d.h \
+                  SxFFT3d.h \
+                  SxFitFunc.h \
+                  SxGaussIJ.h \
+                  SxGaussQuad.h \
+                  SxGemmm.h \
+                  SxGridMap3.h \
+                  SxIdx.h \
+                  SxInfNan.h \
+                  SxInterpolation1D.h \
+                  SxInterpolationND.h \
+                  SxInverseRegression.h \
+                  SxLinearRegression.h \
+                  SxLogarithmicRegression.h \
+                  SxMat.h \
+                  SxMath.h \
+                  SxMathLib.h \
+                  SxMatrix.h \
+                  SxMatrix3.h \
+                  SxMesh3D.h \
+                  SxNaturalCubicSpline.h \
+                  SxOctreeMap.h \
+                  SxOperator.h \
+                  SxOperator.hpp \
+                  SxPolynomialRegression.h \
+                  SxPowerRegression.h \
+                  SxPrecision.h \
+                  SxProjPairMatrix.h \
+                  SxRandom.h \
+                  SxSphereGrid.h \
+                  SxSymMat.h \
+                  SxSymMatrix.h \
+                  SxTensor3.hpp \
+                  SxTypeCaster.h \
+                  SxTypeMapper.h \
+                  SxVec.h \
+                  SxVector.h \
+                  SxVector3.h \
+                  SxYlm.h \
+                  sxavx.h
+
+lib_LTLIBRARIES       = libsxmath.la
+libsxmath_la_SOURCES  = $(AUX_SRC)
+libsxmath_la_SOURCES += SxBlasLib.cpp \
+   SxDifferential.cpp \
+   SxExponentialRegression.cpp \
+   SxFFT.cpp \
+   SxFFT1d.cpp \
+   SxFFT2d.cpp \
+   SxFFT2d1d.cpp \
+   SxFFT3d.cpp \
+   SxFitFunc.cpp \
+   SxGaussIJ.cpp \
+   SxGaussQuad.cpp \
+   SxGemmm.cpp \
+   SxInfNan.cpp \
+   SxInterpolation1D.cpp \
+   SxInterpolationND.cpp \
+   SxInverseRegression.cpp \
+   SxLinearRegression.cpp \
+   SxLogarithmicRegression.cpp \
+   SxMathLib.cpp \
+   SxNaturalCubicSpline.cpp \
+   SxPolynomialRegression.cpp \
+   SxPowerRegression.cpp \
+   SxProjPairMatrix.cpp \
+   SxRandom.cpp \
+   SxSphereGrid.cpp \
+   SxYlm.cpp
+
+libsxmath_la_LIBADD   = $(SXIMPORTLIBS)
+libsxmath_la_LIBADD  += @SX_FFT_LIBS@ @SX_BLAS_LIBS@
+libsxmath_la_LIBADD  += $(SXIMPORTOBJS)
+libsxmath_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxmath_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/mpi -I$(top_srcdir)/mpi
+AM_CPPFLAGS += -I$(top_builddir)/io -I$(top_srcdir)/io
+AM_CPPFLAGS += -I$(top_builddir)/mpi -I$(top_srcdir)/mpi
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

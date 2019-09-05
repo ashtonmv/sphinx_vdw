@@ -1,0 +1,10 @@
+/** \brief Adding images to the documentation
+
+Often it is useful to include images into the documentation. The file
+format is PNG. It has to be located in the folder src/api/images.
+Each file has to be specified twice (LaTeX and HTML):
+
+   \image html  refcounting-1.png
+   \image latex refcounting-1.png
+*/
+void images ();

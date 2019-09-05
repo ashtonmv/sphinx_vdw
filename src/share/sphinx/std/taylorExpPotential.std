@@ -1,0 +1,11 @@
+taylorExpPotential { type ="group";optional;
+   lambda { type = "real"; optional;}
+
+   hessian {type = "group"; 
+//      include <std/matrix.std>;
+      file { type = "string"; optional;}
+   }
+   equTau { type ="group";
+      include <std/structure.std>;
+   }
+}

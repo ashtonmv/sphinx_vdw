@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Publish|Win32">
+      <Configuration>Publish</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Publish|x64">
+      <Configuration>Publish</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <RootNamespace>***NAME***</RootNamespace>
+    <Keyword>WinProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'" Label="Configuration">
+    <ConfigurationType>***CONFIG_TYPE***</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>***CONFIG_TYPE***</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>***CONFIG_TYPE***</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Publish|x64'" Label="Configuration">
+    <ConfigurationType>***CONFIG_TYPE***</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>***CONFIG_TYPE***</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>***CONFIG_TYPE***</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(SolutionDir)\sxaccelerate\src\system\WinFlex.props" />
+    <Import Project="$(SolutionDir)\sxaccelerate\src\system\WinBison.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Publish|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\Publish\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Publish|x64'">$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\Publish\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Publish|x64'">$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Publish|x64'">true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+   <LocalDebuggerEnvironment>PATH=%PATH%;$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\$(Configuration)</LocalDebuggerEnvironment>
+   <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+   <LocalDebuggerEnvironment>PATH=%PATH%;$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\$(Configuration)</LocalDebuggerEnvironment>
+   <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;***DEPINCS***;$(SXBUILDDIR)\$(SolutionName)\obj\sxutil\$(Platform)\$(Configuration);$(SXNUMLIBS32)\include;$(MKLPATH)\include;$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration);$(SolutionDir)\sxaccelerate\src\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories> <PreprocessorDefinitions>MSVC;WIN32;***MACROS***;_DEBUG;_WINDOWS;_USRDLL;_EXPORT_***NAME***;SX_LOG_ID="***SX_LOG_ID***";SX_LOG_HASH=***SX_LOG_HASH***;SXMATH;SXMATH;USE_PCRE2;USE_MKL_FFT;USE_INTEL_MKL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalOptions>/vmm /vmg %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\$(Configuration);$(SXNUMLIBS32)\lib;$(MKLPATH)\lib\ia32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>***DEPLIBS***;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+<!-- BEGIN MSVC_Env_win32d --> <CustomBuildStep>
+     <Command>SET SLNDIR=$(SolutionDir)
+SET SLNDIR=%SLNDIR:\=\\%
+echo #define SX_SOLUTION_PATH "%SLNDIR%" &gt; %SXBUILDDIR%\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Command>
+     <Outputs>$(SXBUILDDIR)\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Outputs>
+     <TreatOutputAsContent>true</TreatOutputAsContent>
+     <Message>Build src/util/SxWinEnv.h</Message>
+   </CustomBuildStep><!-- END MSVC_Env_win32d -->
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;***DEPINCS***;$(SXBUILDDIR)\$(SolutionName)\obj\sxutil\$(Platform)\$(Configuration);$(SXNUMLIBS32)\include;$(MKLPATH)\include;$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration);$(SolutionDir)\sxaccelerate\src\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MSVC;WIN32;***MACROS***;NDEBUG;_WINDOWS;_USRDLL;_EXPORT_***NAME***;SX_LOG_ID="***SX_LOG_ID***";SX_LOG_HASH=***SX_LOG_HASH***;SXMATH;SXMATH;USE_PCRE2;USE_MKL_FFT;USE_INTEL_MKL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\$(Configuration);$(SXNUMLIBS32)\lib;$(MKLPATH)\lib\ia32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>***DEPLIBS***;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+<!-- BEGIN MSVC_Env_win32p --> <CustomBuildStep>
+     <Command>SET SLNDIR=$(SolutionDir)
+SET SLNDIR=%SLNDIR:\=\\%
+echo #define SX_SOLUTION_PATH "%SLNDIR%" &gt; %SXBUILDDIR%\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Command>
+     <Outputs>$(SXBUILDDIR)\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Outputs>
+     <TreatOutputAsContent>true</TreatOutputAsContent>
+     <Message>Build src/util/SxWinEnv.h</Message>
+   </CustomBuildStep><!-- END MSVC_Env_win32p -->
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;***DEPINCS***;$(SXBUILDDIR)\$(SolutionName)\obj\sxutil\$(Platform)\$(Configuration);$(SXNUMLIBS32)\include;$(MKLPATH)\include;$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration);$(SolutionDir)\sxaccelerate\src\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MSVC;WIN32;***MACROS***;NDEBUG;_WINDOWS;_USRDLL;_EXPORT_***NAME***;SX_LOG_ID="***SX_LOG_ID***";SX_LOG_HASH=***SX_LOG_HASH***;SXMATH;SXMATH;USE_PCRE2;USE_MKL_FFT;USE_INTEL_MKL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\$(Configuration);$(SXNUMLIBS32)\lib;$(MKLPATH)\lib\ia32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>***DEPLIBS***;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+<!-- BEGIN MSVC_Env_win32r --> <CustomBuildStep>
+     <Command>SET SLNDIR=$(SolutionDir)
+SET SLNDIR=%SLNDIR:\=\\%
+echo #define SX_SOLUTION_PATH "%SLNDIR%" &gt; %SXBUILDDIR%\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Command>
+     <Outputs>$(SXBUILDDIR)\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Outputs>
+     <TreatOutputAsContent>true</TreatOutputAsContent>
+     <Message>Build src/util/SxWinEnv.h</Message>
+   </CustomBuildStep><!-- END MSVC_Env_win32r -->
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;***DEPINCS***;$(SXBUILDDIR)\$(SolutionName)\obj\sxutil\$(Platform)\$(Configuration);$(SXNUMLIBS)\include;$(MKLPATH)\include;$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration);$(SolutionDir)\sxaccelerate\src\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MSVC;WIN32;WIN64;***MACROS***;_DEBUG;_WINDOWS;_USRDLL;_EXPORT_***NAME***;SX_LOG_ID="***SX_LOG_ID***";SX_LOG_HASH=***SX_LOG_HASH***;SXMATH;USE_PCRE2;USE_MKL_FFT;USE_INTEL_MKL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalOptions>/vmm /vmg %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\$(Configuration);$(SXNUMLIBS)\lib;$(MKLPATH)\lib\intel64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>***DEPLIBS***;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+<!-- BEGIN MSVC_Env_win64d --> <CustomBuildStep>
+     <Command>SET SLNDIR=$(SolutionDir)
+SET SLNDIR=%SLNDIR:\=\\%
+echo #define SX_SOLUTION_PATH "%SLNDIR%" &gt; %SXBUILDDIR%\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Command>
+     <Outputs>$(SXBUILDDIR)\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Outputs>
+     <TreatOutputAsContent>true</TreatOutputAsContent>
+     <Message>Build src/util/SxWinEnv.h</Message>
+   </CustomBuildStep><!-- END MSVC_Env_win64d -->
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Publish|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;***DEPINCS***;$(SXBUILDDIR)\$(SolutionName)\obj\sxutil\$(Platform)\$(Configuration);$(SXNUMLIBS)\include;$(MKLPATH)\include;$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration);$(SolutionDir)\sxaccelerate\src\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MSVC;WIN32;WIN64;***MACROS***;NDEBUG;_WINDOWS;_USRDLL;_EXPORT_***NAME***;SX_LOG_ID="***SX_LOG_ID***";SX_LOG_HASH=***SX_LOG_HASH***;SXMATH;USE_PCRE2;USE_MKL_FFT;USE_INTEL_MKL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\$(Configuration);$(SXNUMLIBS)\lib;$(MKLPATH)\lib\intel64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>***DEPLIBS***;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+<!-- BEGIN MSVC_Env_win64p --> <CustomBuildStep>
+     <Command>SET SLNDIR=$(SolutionDir)
+SET SLNDIR=%SLNDIR:\=\\%
+echo #define SX_SOLUTION_PATH "%SLNDIR%" &gt; %SXBUILDDIR%\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Command>
+     <Outputs>$(SXBUILDDIR)\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Outputs>
+     <TreatOutputAsContent>true</TreatOutputAsContent>
+     <Message>Build src/util/SxWinEnv.h</Message>
+   </CustomBuildStep><!-- END MSVC_Env_win64p -->
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;***DEPINCS***;$(SXBUILDDIR)\$(SolutionName)\obj\sxutil\$(Platform)\$(Configuration);$(SXNUMLIBS)\include;$(MKLPATH)\include;$(SXBUILDDIR)$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration);$(SolutionDir)\sxaccelerate\src\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MSVC;WIN32;WIN64;***MACROS***;NDEBUG;_WINDOWS;_USRDLL;_EXPORT_***NAME***;SX_LOG_ID="***SX_LOG_ID***";SX_LOG_HASH=***SX_LOG_HASH***;SXMATH;USE_PCRE2;USE_MKL_FFT;USE_INTEL_MKL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SXBUILDDIR)$(SolutionName)\bin\$(Platform)\$(Configuration);$(SXNUMLIBS)\lib;$(MKLPATH)\lib\intel64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>***DEPLIBS***;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+<!-- BEGIN MSVC_Env_win64r --> <CustomBuildStep>
+     <Command>SET SLNDIR=$(SolutionDir)
+SET SLNDIR=%SLNDIR:\=\\%
+echo #define SX_SOLUTION_PATH "%SLNDIR%" &gt; %SXBUILDDIR%\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Command>
+     <Outputs>$(SXBUILDDIR)\$(SolutionName)\obj\$(ProjectName)\$(Platform)\$(Configuration)\SxWinEnv.h</Outputs>
+     <TreatOutputAsContent>true</TreatOutputAsContent>
+     <Message>Build src/util/SxWinEnv.h</Message>
+   </CustomBuildStep><!-- END MSVC_Env_win64r -->
+  </ItemDefinitionGroup>
+  <ItemGroup>
+<!-- BEGIN Header -->    <ClInclude Include="***Header.filename***" /><!-- END Header -->
+  </ItemGroup>
+  <ItemGroup>
+<!-- BEGIN Lex -->    <WinFlex Include="***Lex.filename***" /><!-- END Lex -->
+  </ItemGroup>
+  <ItemGroup>
+<!-- BEGIN Yacc -->    <WinBison Include="***Yacc.filename***" /><!-- END Yacc -->
+  </ItemGroup>
+  <ItemGroup>
+<!-- BEGIN Source -->    <ClCompile Include="***Source.filename***" /><!-- END Source -->
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(SolutionDir)\sxaccelerate\src\system\WinFlex.targets" />
+    <Import Project="$(SolutionDir)\sxaccelerate\src\system\WinBison.targets" />
+  </ImportGroup>
+</Project>

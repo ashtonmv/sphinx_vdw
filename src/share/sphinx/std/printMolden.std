@@ -1,0 +1,6 @@
+	printMolden { type = "group"; optional;
+		file { type = "string";}
+		replicZ { type = "int";optional;} 
+		zExt { type = "real";optional;}
+	}
+

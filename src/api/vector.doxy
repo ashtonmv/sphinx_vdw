@@ -1,0 +1,564 @@
+/** \page       page_vector    SPHInX Algebra Library
+
+\section        vec_intro      Introduction
+
+   The SPHInX Algebra Library is the numerical kernel of the entire
+   package. Understanding its usage is crucial for successful code
+   developments with SPHInX.
+
+   The idea of the algebra library is simple: The developer has a framework 
+   to program algebraic equations as confortable as in high level toolkits 
+   such as Mathematica or Maple. Internally this library maps the correspnding
+   function calls to the proper numeric libraries available on the machine.
+   The developer should not have to focus on data types conversions or memory
+   management.  The library is also be able to find a large number of 
+   potential inconsistencies at run time (see \ref page_debug).
+
+\subsection     vec_blas       BLAS - The Basic Linear Algebra System
+
+   In algebraic equations with vector and matrix operations involved 
+   data of sub or block matrices are often copied between the RAM and the
+   CPU level caches. By introducing blocked matrix operations such that
+   the corresponding blocks fits into the (fast) CPU level caches this
+   communication can be reduced significantly. This idea is realized in the
+   BLAS - the Basic Linear Algebra System. Most computer vendors offer their
+   (commercial) libraries which are optimized for the platforms. Unfortunately,
+   the interfaces and the amount of function calls is not standardized.
+   An alternative approach is ATLAS (http://www.netlib.org/atlas) which is
+   available for free for almost all platforms.
+   In SPHInX a unified interface has been developed which allows to use
+   either the ATLAS or, if peak performance is required, to adapt the 
+   vendor libraries easily (\ref SxMath).
+
+   The BLAS calls are organized in three levels:
+      - Level 1: Vector - Vector operations
+      - Level 2: Vector - Matrix operations
+      - Level 3: Matrix - Matrix operations
+
+   Higher levels can take more advantage of the level caches, and hence, are
+   more efficient.
+
+   
+\subsection     vec_lapack     LAPACK - The Linear Algebra PACKage
+
+   On top of the BLAS libraries LAPACK - the Linear Algebra PACKage is
+   available within the numeric libraries. As for BLAS the LAPACK calls are
+   not standardized either. Thus, in SPHInX the LAPACK calls are available
+   in the unified numeric interface, too (\ref SxMath).
+   In LAPACK function calls for diagonalizing matrices, solving eigensystems,
+   and computing Cholesky decompositions, and many other more are available.
+
+\subsection     vec_link       SPHInX Template Linkage
+
+  The developer writes an line of concatenated vector/matrix functions,
+  e.g.
+  \verbatim
+     V = A + B.inverse().transpose() * sqrt(C);
+  \endverbatim
+  with V, A, B, and C being vectors or matrices. At compile time the
+  corresponding BLAS/LAPACK function calls will be textually replaced
+  (slow stack operations can be avoided). Due to a smart memory management
+  the functions can be called as efficient as FORTRAN subroutines. Standard
+  C/C++ functions are rather slow due to redundant stack operations.
+
+\subsection     vec_porting    Porting to Vendor Libraries
+
+  The Algebra class itself is platform indenpendant. Only the BLAS/LAPACK
+  function calls depend on the system. As already mentioned above the free
+  ATLAS library is available for almost all computer systems. However, if
+  a new vendor library should be supported in SPHInX this can be done
+  in the only file \ref SxMath.h. Simple preprocessor statments can be
+  used to separate the different function calls. Porting becomes basically
+  some cut-and-paste work.
+
+\section        vec_usage      Using the SPHInX Algebra Library
+
+  The SPHInX Algebra Library is rather simple to use particulary if the
+  developer knows Mathematica. However, there are some pitfalls which 
+  are due to the memory management. Do not use the libarry before understanding
+  these drawbacks.
+
+\subsection     vec_init       Initialization of the SPHInX Algebra Library
+
+  Before any function of the Algebra Library can be used it has to be 
+  initialized. To do so add \b once in the code
+
+  \verbatim
+     #include <SFHIngXUT.h>
+     ...
+     int main (...)
+     {
+        // --- initialize the SPHInX Algebra Library
+        initSFHIngXUT ();
+        initSFHIngXMath ();
+     }
+  \endverbatim
+
+  Forgetting this initialization can cause hardly traceable bus errors! Also
+  make sure this initialization is performed only once in the code.
+
+\subsection     vec_types      Vector types
+In C/C++ there are various data types available, such as \b int, \b float, 
+and \b double. In SPHInX additionally ::SxComplex8 and ::SxComplex16 are 
+used to represent complex variables.
+The SPHInX Algebra Class has to have more information about those types
+accessable. So relationships between the various data types can be formed.
+To do so in SPHInX various vector types are introduced. They begin with
+uppercase letters. That are \b Int, \b Float, \b Double, \b Complex8, 
+and \b Complex16.
+   
+\subsection     vec_new        Constructing Vectors and Matrices
+SPHInX vectors and matrices are C++ class templates, i.e., they template
+argument has to be provided at compile time. This argument specifies the
+type of the vector/matrix elements. 
+\verbatim
+   SxVector<Int>       intVec;    // Int vector with int elements
+   SxVector<Float>     floatVec;  // Float vector with float elements
+   SxVector<Double>    doubleVec; // Double vector with double elements
+   SxVector<Complex8>  c8Vec;     // Complex8 vector with SxComplex8 elements
+   SxVector<Complex16> c16Vec;    // Complex16 vector with SxComplex16  elements
+\endverbatim
+
+Such vectors have an empty data array. To allocate memory the number of
+elements can be provided:
+\verbatim
+   SxVector<Double> smallVec (10);
+   SxVector<Double> largeVec (10000);
+\endverbatim
+
+The vector elements are allocated but not initialized. In order to preset the
+elements with a certain value (e.g. 0) use
+
+\verbatim
+   SxVector<Double> smallVec (10, 0.);
+   SxVector<Double> largeVec (10000, 0.);
+\endverbatim
+
+Note that a vector which is assigned from a vector operation has not to be
+allocated. It works to allocated the memory but it is not necessary:
+
+\verbatim
+   SxVector<Double> vec(10);
+   for (int i=0; i < 10; i++)  vec(i) = 2. * i;
+   
+   SxVector<Double> A(10);        // allocation here not needed
+   A = 2 * vec;                   // A gets the memory from result of "2 * vec"
+
+   // better:
+   SxVector<Double> B = 2 * vec;  // B is allocated automatically
+\endverbatim
+
+\subsection     vec_print      Printing Vectors and Matrices
+Vectors can be printed in C and in C++ fashion:
+
+\verbatim
+   SxVector<Double> myVec = ...;
+
+   // C like - unformatted output
+   myVec.print ();
+
+   // C like - formatted output
+   myVec.print (true);
+
+   // C++ streaming
+   cout << myVec << endl;
+\endverbatim
+
+
+\subsection     vec_func       Calling Functions
+Functions which are available in C/C++ for scalar operations have been
+overloaded to work with SPHInX vectors and matrices as well. The corresponding
+functions are applied elementwisely. 
+\verbatim
+   SxVector<Double> vec = ...;
+   cout << "Vector functions\n";
+   cout << "sqrt(vec) = " << sqrt(vec);
+   cout << "exp(vec)  = " << exp(vec);
+   cout << "erf(vec)  = " << derf(vec);
+   cout << "sin(vec)  = " << sin(vec);
+   cout << "cos(vec)  = " << cos(vec);
+   cout << "sinh(vec) = " << sinh(vec);
+   cout << "cosh(vec) = " << cosh(vec);
+   cout << endl;
+\endverbatim
+
+\subsection     vec_operators  Built-in Functions and Operators
+Special vector and matrix functions are defined as member functions and
+have to be accessed with '.', e.g.
+
+\verbatim
+   SxVector<Complex16> vec (10);
+   SxMatrix<Complex16> mat (10, 10);
+   vec.randomize ();
+   mat.randomize ();
+   cout << "sum(vec)    = " << vec.sum() << endl;
+   cout << "vec^\dagger ="  << vec.conj() << endl;
+   cout << "mat^\dagger ="  << mat.adjoint() << endl;
+\endverbatim
+
+
+\subsection     vec_temp       Concatenating Functions
+
+The resulting vectors can be used as input vector for new vector operations.
+No further memory management has to be considured, e.g.
+
+\verbatim
+   SxMatrix<Complex16> mat (10, 10);
+   mat.randomize ();
+   
+   SxMatrix<Complex16> conjMat, transConjMat;
+
+   conjMat  = mat.conj();
+   transMat = transConjMat.transpose ();
+
+   cout << "mat^\dagger = " << mat.transConjMat << endl;
+\endverbatim
+
+or better:
+
+\verbatim
+   SxMatrix<Complex16> mat (10, 10);
+   mat.randomize ();
+   
+   cout << "mat^\dagger = " << mat.conj().transpose() << endl;
+\endverbatim
+
+\section        vec_pitfalls   The Pitfalls
+
+The SPHInX Algebra Library allows to create efficient and very readable
+source code. This could be accomplished only with using a programming technique
+known as reference counting. It is absolutely crucial for the developer to 
+understand this technique and avoid certain constructions.
+
+\subsection     vec_rc         Reference Counting
+
+When creating C/C++ functions that return large aggregate values (such as
+vectors or matrices) there are slow and redundant stack operations involved.
+Let's consider a simple function which returns a vector. For demonstration
+we want to assign a vector with a function return value, e.g.
+
+\verbatim 
+ Vector A = myFunction (...)
+\endverbatim 
+
+In this case the following operations would be performed:
+  
+  -# In function \em myFunction
+     -# Allocate memory for a local vector V
+     -# Compute some vector operation, e.g. V(i) = ...;
+     -# Copy the resulting vector V (elementwisely) onto the stack
+     -# Destroy the local vector V
+  -# In the calling routine
+     -# Assign the A (elementwisely) from the stack
+     -# Destroy the content of the stack
+
+The same memory content has now been copied twice, from V to the stack and
+then from the stack to A. Assuming large vectors (in order of hundreds of
+megabyte) and a combination of many operations this redundant copy
+operations slows down the procedure significantly.
+The solution is \em reference \em counting. Instead of dealing with the
+vectors themselves internally the pointers to them are taken into account. 
+
+In the reference counting model a vector A is now internally represented as a 
+pointer and its reference counter. The pointer refers to the data array whereas
+its reference counter contains the number of pointers referring to the data
+array:
+     
+      \image html  refcounting-1.png
+      \image latex refcounting-1.eps width=8cm
+
+In this case an empty vector A is created. Since the element vector is empty
+the pointer is set to NULL. The reference counter is set also to 0.
+
+If a vector B is initialized with let's say 10 elements the pointer would
+refer to an array containing 10 elements. Since now there is one pointer
+referring to the array, the reference counter is set to 1:
+
+      \image html  refcounting-2.png
+      \image latex refcounting-2.eps width=8cm
+
+An assignment of vector C = B would be performed in the following steps:      
+
+ - Create an empty vector C, B is initialized already:
+      \image html  refcounting-3.png
+      \image latex refcounting-3.eps width=8cm
+
+ - Decrement the reference counter of vector C. Since it is already 0
+   the data array normally would be deallocated. But it is set to NULL, thus
+   no deallocation is necessary.
+   After that the pointer to the C is set to the B array and B's reference
+   counter is used for vector C from now on.
+   The data array of vector B is now used twice, by B itself and by C. Hence,
+   B's (and C's) reference counter has to be increased. It is now 2:
+
+      \image html  refcounting-4.png
+      \image latex refcounting-4.eps width=8cm
+
+ - Now let's assume B is to be removed, e.g. B was declared locally within 
+   the scope of the function \em myFunction and the program reaches the 
+   \b return statement. Then B's reference counter is decremented. Since 
+   its value is still greater than 0 (C's pointer is referring to B as well)
+   B's array remains.  Otherwise all pointers that still refer to this data
+   array (here vector C) would become invalid!
+   B's member variables are removed. The data array and the reference counter
+   will be managed from C:
+   
+
+      \image html  refcounting-5.png
+      \image latex refcounting-5.eps width=8cm
+
+      \image html  refcounting-6.png
+      \image latex refcounting-6.eps width=8cm
+
+
+The same example as above but with reference counting would read like
+
+  -# In function \em myFunction
+     -# Allocate memory for a local vector V
+     -# Compute some vector operation, e.g. V(i) = ...;
+     -# Copy \em pointer to the resulting vector V onto the stack
+     -# Destroy the \em pointer the local vector V
+  -# In the calling routine
+     -# Assign the \em pointer to A from the stack
+     -# Destroy the content of the stack
+
+
+           
+
+Regardless the size of the vector only 2 pointers are copied now. Thus, instead
+of copying hundreds of megabyte only 16 bytes (in 32bit mode a pointer has 8
+byte) are copied in total.
+
+\subsubsection  vec_pf_rc      Examples
+
+Reference counting speeds up the evaluation of functions. But sometimes the
+usage of reference counting objects can cause nasty troubles.
+
+Everything works well until vectors/matrices are assigned only to temporary
+vectors/matrices, e.g.
+
+\verbatim
+   SxVector<Double> A;
+   SxVector<Double> B = ...;
+   SxVector<Double> C = ...;
+   A = 2 * B + C;
+\endverbatim
+
+In this case the result of "2 * B + C" is stored in a temporary vector and
+then A is assigned to this temporary vector. Of course, the temporary vector
+is not used any more directly, only A is accessed.
+
+This gets different if a simple "A = B" statement occur, i.e.,
+\verbatim
+NgVector<Double> B = ...;
+NgVector<Double> C;
+C = B;   // <-- should always be avoided!!!
+\endverbatim
+
+Similar to the explanation above C will be referenced with B:
+
+      \image html  refcounting-4.png
+      \image latex refcounting-4.eps width=8cm
+
+But in contrast to the previous example here B is not removed afterwards. In
+this case both vectors point to identically the same data array. Thus, B and
+C suddenly become just two different names for the \b same vector!!!
+
+\b wrong:
+
+\verbatim
+   B(5) = 1.;
+   C(5) = 2.;
+   cout << "B[5] = " << B(5) << endl;
+   cout << "C[5] = " << C(5) << endl;
+\endverbatim
+
+One propably would expect an output like
+
+\verbatim
+   B[5] = 1.
+   C[5] = 2.
+\endverbatim
+
+But due to B had been set to be identical to C the output is (unexpectedly):
+
+\verbatim
+   B[5] = 2.   <-- would expect 1. 
+   C[5] = 2.
+\endverbatim
+
+By explicit calls of the constructor the two vectors can be decoupled:
+
+\b correct:
+
+\verbatim
+   SxVector<Double> B = ...;
+   SxVector<Double> C;
+   C = SxVector<Double> (B);   // <-- decouple reference counter of B and C
+\endverbatim
+
+One shouldn't forget that lists or arrays of vectors/matrices can be 
+(unintentionally) equalized as well, e.g. instead of using B and C 
+alternatively an array of vectors would behave similar:
+
+\verbatim
+   SxArray<SxVector<Double> >   array(2);  // inititialize 2 vectors: B and C
+   array(0)(5) = 1.;    //   B[5] = 1.;
+   array(1)(5) = 2.;    //   C[5] = 2.;
+   cout << "Array[0][5] = " << array(0)(5) << endl;
+   cout << "Array[1][5] = " << array(1)(5) << endl;
+\endverbatim
+
+The output is unexpected, too:
+
+\verbatim
+   Array[0][5] = 2.   <-- would expect 1.
+   Array[0][5] = 2.
+\endverbatim
+
+This can be a potential problem within loops. In the following example
+(unintentionally) the array would be multiplied with 2:
+
+\b wrong:
+
+\verbatim
+   int i, nVectors = ...;
+   SxVector<Double>  vec;
+   SxArray<SxVector<Double> >   array(nVectors);
+
+   for (i=0; i < nVectors; i++)  {
+      vec  = array[i];  // vec and array[i] are now identical
+      vec *= 2;         // is the same as array[i] = array[i] * 2;
+   }
+\endverbatim
+
+\b correct:
+
+\verbatim
+   int i, nVectors = ...;
+   SxVector<Double>  vec;
+   SxArray<SxVector<Double> >   array(nVectors);
+
+   for (i=0; i < nVectors; i++)  {
+      vec  = SxVector<Double> (array[i]);  // explicit constructor, decouples
+                                           // vec and array[i]
+      vec *= 2;                            // only vec is modified now
+   }
+\endverbatim
+
+This is the only pitfall when using reference counting objects. To overcome
+it simply try to avoid those simple assignments.
+
+\subsection     vec_dot        Scalar products and matrix multiplications
+\subsubsection  vec_dot_chop   chop() and the '^' operator
+
+Another potential source of problems can be the usage of the '^' operator
+for vectors. Since in principle the algebra library doesn't distinguish
+between the function call for scalar product (vector ^ vector) and a
+matrix multiplication (matrix ^ matrix) the result is always a matrix.
+This matrix becomes a 1x1 matrix in case of a scalar product. To extract
+this element to get a scalar variable the result has to be chopped using
+
+\verbatim
+   SxVector<Double> a = ...;
+   SxVector<Double> b = ...;
+   double c = (a ^ b).chop();  // extract the element from the 1x1 matrix
+\endverbatim
+
+\subsection     vec_nan        Producing NaNs and INFs
+
+The next source of errors is the production of NaN (not a number) or INF
+(infinity) values. NaNs and INFs are special states of floating point numbers
+which occur during invalid numerics, such is division by zero etc. In the
+DEBUG mode those situations are analyzed and reported. However, there are
+cases which can cause NaNs or INFs which are not obvious.
+Both NaNs and INFs are nothing but bit patterns as any other number. When 
+memory for a vector is allocated it is not nullified by default in order
+to safe CPU time. The contents of the newly allocated memory depends on the data
+which was safed on the same memory area before. Hence, it is a random bit 
+pattern. There is a probability that some memory cells have by chance the
+bit patterns of INFs or NaNs!
+For example, let's assume a vector should be initialized with zeros. One
+could assume that multiplication with zeros should work.
+
+\b wrong:
+
+\verbatim
+SxVector<Double> vec (10);   // allocate 10 elements (not initialized)
+vec *= 0.;                   // multiply vector with zeros to nullify it
+\endverbatim
+
+This can work in many cases but sometimes the vector might contain INFs
+or NaNs. Since INF*0 = INF and NaN*0 = NaN the resulting vector still could
+contain NaNs or INFs. The program would crash from time to time! The problem
+would not be reproducable! In order to avoid those situations in the DEBUG
+mode after allocation all vectors are initialized with NaNs and such errors
+could be traced easily (using the VALIDATE_VECTOR macro).
+
+\b correct:
+
+The correct way of initializing vectors with zeros would be:
+
+\verbatim
+SxVector<Double> vec (10, 0.);  // allocate vector with 10 elements and
+                                // initialize them with zeros
+\endverbatim
+
+or alternatively with 
+
+\verbatim
+SxVector<Double> vec (10); // allocate vector with 10 elements
+...
+vec.set (0.);
+\endverbatim
+
+which is equivalent to
+\verbatim
+SxVector<Double> vec (10); // allocate vector with 10 elements
+...
+vec = 0.;
+\endverbatim
+
+
+\subsubsection  vec_dot_braket About BRAs and KETs
+
+When vectors or matrices are of complex data types (::Complex8, ::Complex16)
+the left vector of the scalar product has to be conjugated. In case of
+vectors the SPHInX Algebra Library does this conjugation automatically:
+
+\b wrong:
+\verbatim
+   SxVector<Complex16>  a = ...;
+   SxVector<Complex16>  b = ...;
+   SxComplex16 c = (a.conj() ^ b).chop();  // whould be | a > | b >
+\endverbatim
+
+
+\b correct:
+\verbatim
+   SxVector<Complex16>  a = ...;
+   SxVector<Complex16>  b = ...;
+   SxComplex16 c = (a ^ b).chop();        // c = < a | b >
+\endverbatim
+
+For matrices the developer has to perform explicitly conjugations and
+adjoints of matrices:
+
+\verbatim
+   SxMatrix<Complex16>  a = ...;
+   SxMatrix<Complex16>  b = ...;
+   SxMatrix<Complex16>  c = (a.adjoint() ^ b).chop();  // c = < a^\dagger | b >
+\endverbatim
+
+\subsection     vec_examples   Programming examples
+
+The SPHInX source distribution comes with several small example and 
+demonstration programs to show how to work with the various SPHInX libraries.
+They can be found in src/examples.
+
+- Dealing with vectors          [\ref vector.cpp]
+- Simple matrix operations      [\ref matrix.cpp]
+- Slighly more advanced algebra [\ref eigen.cpp]
+
+\author Sixten Boeck
+*/

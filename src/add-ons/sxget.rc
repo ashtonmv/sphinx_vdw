@@ -1,0 +1,353 @@
+$energy  energy.dat
+$zenergy energy.dat.gz
+$log     sphinx.log
+$zlog    sphinx.log.gz
+$eps     eps.dat
+$zeps    eps.dat.gz
+$waves   waves.sxb
+$dos     tdos.dat
+$relax   relaxHist.dat
+$murndat murn.dat
+$dielec  sxdielec.log
+$residue residue.dat
+$rhodat  rho.dat
+$potdat  vElStat.dat
+
+energy "final total energy (Hartree)
+energy !energy
+energy tail -1 $energy | awk '{print $3}'
+E=energy
+e=energy
+
+zenergy "final total energy (Hartree) from zipped file"
+zenergy !zenergy
+zenergy zcat $zenergy | tail -1 | awk '{print $3}'
+zE=zenergy
+ze=zenergy
+
+freeEnergy "Final free energy (Hartree)
+F=freeEnergy
+freeEnergy !log
+freeEnergy sed -ne '/^F(/h;${x;s/.*=//p}' $log
+
+volume "cell volume (bohr**3)
+volume !log
+volume grep 'Omega:' $log | sed -e's/^.*Omega://;s/Bohr.*$//'
+vol=volume
+omega=volume
+
+zvolume "cell volume (bohr**3) from zipped file
+zvolume !zlog
+zvolume zcat $zlog | grep 'Omega:' | sed -e's/^.*Omega://;s/Bohr.*$//'
+zvol=zvolume
+zomega=zvolume
+
+murn=murndata
+murndata "necessary information for sxmurn: cell volume and total energy
+murndata !energy log
+murndata sxget --quiet -energy $energy -log $log volume energy
+
+zmurn=zmurndata
+zmurndata "necessary information for sxmurn: cell volume and total energy
+zmurndata !zenergy zlog
+zmurndata sxget --quiet -zenergy $zenergy -zlog $zlog zvolume zenergy
+
+volume0 "Equilibrium volume taken from Murnaghan fit output
+volume0 !murndat
+volume0 grep "V0" $murndat | awk '{print $6}'
+vol0=volume0
+
+energy0 "Equilibrium energy taken from Murnaghan fit output
+energy0 !murndat
+energy0 grep "E0" $murndat | awk '{print $6}'
+eTot0=energy0
+
+B0 "Equilibrium bulk modulus taken from Murnaghan fit output
+B0 !murndat
+B0 grep "B0 =" $murndat | awk '{print $6}'
+b0=B0
+
+B0p "Equilibrium bulk modulus derivative taken from Murnaghan fit output
+B0p !murndat
+B0p grep "derivative B0" $murndat | awk '{print $7}'
+b0p=B0p
+
+totaltime "total calculation time
+totaltime ! log
+totaltime grep "Total [tT]ime" $log | sed -e's/|//' | awk '{print $3}'
+t-time = totaltime
+
+ztotaltime "total calculation time from zipped file
+ztotaltime ! zlog
+ztotaltime zcat $zlog | grep "Total [tT]ime" | sed -e's/|//' | awk '{print $3}'
+zt-time = ztotaltime
+
+weights " kpoint weights, 1 k-point per line
+weights ! waves
+weights ncdump -v kWeights $waves
+weights | sed -e'1,/data:/d;s/kWeights *=//;s/,/ /g;/;/{s/;//;q;}'
+weights | awk '{for (i=1; i <=NF; i++) print $i;}'
+
+kVec " k-vectors (cartesian coordinates), 1 k-point per line
+kVec ! waves
+kVec ncdump -v kVec $waves
+kVec | sed -e'1,/data:/d;s/kVec *=//;s/,/ /g;/;/{s/;//;q;};'
+
+epsw " eigenvalues, 1 per line, ordering from waves file, in eV
+epsw ! waves
+epsw ncdump -v eps $waves
+epsw | sed -e'1,/data:/d;s/eps *=//;s/,/ /g;/;/{s/;//;q;}'
+epsw | awk '{for (i=1; i <=NF; i++) print ($i * 27.211383);}'
+
+foccw " eigenvalues, 1 per line, ordering from waves file
+foccw ! waves
+foccw ncdump -v focc $waves
+foccw | sed -e'1,/data:/d;s/focc *=//;s/,/ /g;/;/{s/;//;q;}'
+foccw | awk '{for (i=1; i <=NF; i++) print $i;}'
+
+bandgap " get (indirect) band gap (all states with focc larger 0.1 are
+bandgap " considered occupied)
+bandgap ! waves
+bandgap sxget foccw epsw -waves $waves --quiet
+bandgap | $PERL -e'my ($min,$max);
+bandgap   while (<>) {
+bandgap     my ($occ, $eps) = split;
+bandgap     if ($occ < 0.1) {
+bandgap       $min = $eps if (!defined $min || $eps < $min);
+bandgap     } else {
+bandgap       $max = $eps if (!defined $max || $eps > $max);
+bandgap     }
+bandgap   }
+bandgap   print $min-$max;'
+gap = bandgap
+
+vbm " get valence band maximum (all states with focc larger 0.1 are
+vbm " considered occupied)
+vbm ! waves
+vbm sxget foccw epsw -waves $waves --quiet
+vbm | $PERL -e'my ($min,$max);
+vbm   while (<>) {
+vbm     my ($occ, $eps) = split;
+vbm     if ($occ > 0.1) {
+vbm       $max = $eps if (!defined $max || $eps > $max);
+vbm     }
+vbm   }
+vbm   print $max;'
+
+cbm " get conduction band minimum (all states with focc larger 0.1 are
+cbm " considered occupied)
+cbm ! waves
+cbm sxget foccw epsw -waves $waves --quiet
+cbm | $PERL -e'my ($min,$min);
+cbm   while (<>) {
+cbm     my ($occ, $eps) = split;
+cbm     if ($occ < 0.1) {
+cbm       $min = $eps if (!defined $min || $eps < $min);
+cbm     }
+cbm   }
+cbm   print $min;'
+
+nSpin " get number of spin
+nSpin ! waves
+nSpin ncdump -h $waves | sed -ne'/nSpin *=/{s/^.*=//;s/;$//;p;}'
+
+cutoff "cut off energy (Rydberg)
+cutoff !log
+cutoff grep 'Energy cut-off' $log | sed -e's/^.*://;s/Ry.*$//'
+ecut = cutoff
+
+zcutoff "cut off energy (Rydberg)
+zcutoff !zlog
+zcutoff zcat $zlog | grep 'Energy cut-off' | sed -e's/^.*://;s/Ry.*$//'
+zecut = zcutoff
+
+nk "number of k-points after symmetry reduction
+nk ! eps
+nk tail -1 $eps | awk '{print $1}'
+
+klabels "kpoint labels (kpoint number, label)
+klabels ! log eps
+klabels sed -ne "/| ik=.*\*.*@/{s/ *, *iSpin=[0-9]*//;s/^| ik=//p};" $log
+klabels | sort -g | uniq
+klabels | sed -e's/^ *\([0-9]*\)[^*]*\*\(.*\)\*.*/\1 \2/g'
+
+bspar "xmgrace parameter file for bandstructure
+bspar ! log eps
+bspar (sxget nk -eps $eps --quiet;
+bspar  sxget klabels -eps $eps -log $log --quiet)
+bspar | $PERL -e'
+bspar    my $nk = <STDIN>; chomp $nk;
+bspar    my @labels = <STDIN>;
+bspar    print "with g0\n";
+bspar    print "world xmin 1\n";
+bspar    print "world xmax $nk\n";
+bspar    print "xaxis tick major grid on\n";
+bspar    print "xaxis ticklabel type spec\n";
+bspar    print "xaxis tick type spec\n";
+bspar    print "xaxis tick spec ",scalar(@labels),"\n";
+bspar    my $idx = 0;
+bspar    foreach (@labels)  {
+bspar       chomp; s/^\s+//;
+bspar       my ($ik, $label) = split;
+bspar       print "xaxis tick major $idx, $ik\n";
+bspar       print "xaxis ticklabel $idx, \"$label\"\n";
+bspar       $idx++;
+bspar    }'
+
+fermi "Fermi energy in eV (use only for self-consistent runs!)
+fermi !log
+fermi grep 'Fermi energy' $log | sed -ne'${s/^.*[:=]//;s/eV//;p;q;}'
+
+epsrange "Minimum and maximum eps
+epsrange ! eps
+epsrange awk '!/#/{for (i = 2; i < NF; i++) print $i;}' $eps
+epsrange | sort -n | sed -ne'1p;$p'
+
+dospar "xmgrace parameter file for density of states
+dospar ! log dos
+dospar (grep -v '^#' $dos | sed -ne'1p;$p' | cut -f1;
+dospar  sxget --quiet -eps $log fermi)
+dospar | $PERL -e'
+dospar    my $min = <STDIN>; chomp $min;
+dospar    my $max = <STDIN>; chomp $max;
+dospar    my $fermi = <STDIN>; chomp $fermi;
+dospar    print "with g0\n";
+dospar    print "world xmin $min\n";
+dospar    print "world xmax $max\n";
+dospar    print "title \"Density of states\"\n";
+dospar    print "xaxis  label \"E [eV]\"\n";
+dospar    print STDERR "---------\nfor fermi energy line, type:\n\n";
+dospar    print STDERR "   echo \"$fermi -1e5\\n $fermi 1e5\" ";
+dospar    print STDERR "| xmgrace $dos -autoscale none -\n--------\n";';
+
+relstruct "Relaxed structure after structure optimization
+relstruct ! relax
+relstruct sed -ne'/^@/x;/^@/!H;${H;x;p}' $relax
+relstruct | sed -ne'/structure/,/#/p;'
+relstruct | grep -v '#.*#'
+
+epsconv "convergence of eigenvalues during SCF cycle
+epsconv ! log
+epsconv grep -e 'eig \[eV\]' -e 'ik=' $log
+epsconv | sed -e's/^.*ik= *//;s/ @.*//;N;s/\n|.*://;s/ \+/	/g'
+
+nperk "Get number of states per k-point
+nperk ! eps
+nperk awk '!/#/{print NF - 1}' $eps
+
+nStates "Get number of states for 1st k-point (cf. nperk)
+nStates ! eps
+nStates sxget --quiet -eps $eps nperk | head -1
+
+editcommands "Edit the command file
+editcommands gvim `sxget config 2>&1 | sed -ne3p`
+
+epstensor "Dielectric tensor
+epstensor ! dielec
+epstensor sed -ne'/dielectric tensor/{n;s/[{}(),]\+/ /g;p;q;}' $dielec
+epstensor | awk '{for (i=1; i < NF; i++) if ($i*$i < 1e-12) $i = 0;
+epstensor         printf "%10.6f%10.6f%10.6f\n",$1,$3,$5;
+epstensor         printf "%10.6f%10.6f%10.6f\n",$7,$9,$11;
+epstensor         printf "%10.6f%10.6f%10.6f\n",$13,$15,$17;}'
+
+nSteps "number of steps for last electronic minimizer
+nSteps ! energy
+nSteps tail -1 $energy | awk '{print $1 + 1}'
+
+structDef "Structure definition as <name> <coords>
+structDef ! log
+structDef sed -ne'/Def.*super cell/,/+--/{s/,//;p;}' $log
+structDef | awk '/zv/     { name = $2};
+structDef        /[0-9]:/ { printf "%s %f %f %f\n", name, $3, $4, $5; }'
+
+meshlinepar3 "This produces an xmgrace parameter file marking the
+meshlinepar3 "z-positions of the atoms as special labels. It may be used
+meshlinepar3 "for the output of sxmeshline -a a3 when a3 = z
+meshlinepar3 ! log
+meshlinepar3 sxget --quiet -log $log structDef
+meshlinepar3 | awk '{ printf "xaxis tick major %u, %f\n", it, $4;
+meshlinepar3          printf "xaxis ticklabel %u, \"%s\"\n", it, $1;
+meshlinepar3          it++;};
+meshlinepar3        END { printf "xaxis tick spec type both\n
+meshlinepar3                      xaxis ticklabel angle 270\n
+meshlinepar3                      xaxis tick spec %u\n", it; }'
+
+wvecut "Cutoff energy from waves.sxb
+wvecut ! waves
+wvecut ncdump -h $waves | grep ':eCut' | sed -e's/^.*=//;s/;.*//'
+
+directgaps "get direct band gaps (all states with focc larger 0.1 are
+directgaps "considered occupied)
+directgaps ! waves
+directgaps sxget foccw epsw -waves $waves --quiet 
+directgaps | awk '{if ($1 > 0.1) e=$2; 
+directgaps         else if (e != "#") { print $2-e; e="#"; };
+directgaps        }'
+dgaps=directgaps
+
+nStepsBS "average number of steps for bandStructure minimizer
+nStepsBS ! log
+nStepsBS grep eBand $log | sed -ne '/(1)/{g;p;};h;$p' | sed -ne's/.*(//;s/).*//p'
+nStepsBS | awk '{sum += $1;}; END { print sum / NR; }'
+
+surfarea "Surface area (area enclosed by a1 and a2)
+surfarea ! log
+surfarea sed -ne's/|.*a[12]://p' $log | sed -e'N;s/\n//;s/[Bb]ohr//g;' 
+surfarea | awk '{
+surfarea   x = $2 * $6 - $3 * $5; 
+surfarea   y = $3 * $4 - $1 * $6; 
+surfarea   z = $1*$5-$2 * $4; 
+surfarea print sqrt(x*x+y*y+z*z);}'
+
+resplot "Show logarithmic plot of residue.dat with xmgrace.
+resplot ! residue
+resplot sed -e'/^0/i'\\ -e'&' $residue | xmgrace -log y -
+
+meshsize "number of points in FFT mesh
+meshsize ! log
+meshsize grep 'FFT mesh' $log | awk '{print $3 * $5 * $7; exit}'
+nr=meshsize
+
+restime "Merge energy.dat and residue.dat into a <time> <residue> list
+restime ! energy residue
+restime paste $energy $residue 
+restime | awk -vOFS="\t" '{if ($NF < 0) print $2,$6; else print $2,$6,$7}'
+
+xrestime "Same as restime, but print "&" line and reset time to zero
+xrestime "whenever the step number is 0 (so xmgrace will produce one line
+xrestime "for each part)
+xrestime ! energy residue
+xrestime sed -e'/^-1 */d' $energy | paste - $residue 
+xrestime | awk '{
+xrestime   if ($1==0) {zero = $2; print "&";} ;
+xrestime   print $2-zero, $6
+xrestime }'
+
+fftmesh "Get FFT mesh size
+fftmesh ! log
+fftmesh grep 'FFT mesh.*x.*x.*' $log | sed -e's/.*://;q'
+
+structconv "Structure optimization convergence
+structconv ! log
+structconv grep -e 'rms *(' -e '|f' $log
+
+vaclevel "Get vacuum level (potential at minimum density)
+vaclevel ! rhodat potdat
+vaclevel paste $rhodat $potdat
+vaclevel | awk -vmin=1e5 '{if ($2 < min) {min = $2; pot=$4;}}; END {print pot;}'
+
+eLCAO "Get LCAO energy
+eLCAO ! log
+eLCAO grep 'Val' $log | tail -1 | awk '{print $3}'
+
+zeLCAO "Get LCAO energy from zipped file
+zeLCAO ! zlog
+zeLCAO zcat $zlog | grep 'Val' | tail -1 | awk '{print $3}'
+
+ecuteff "Get effective cutoff (avg. over k-points)
+ecuteff ! log
+ecuteff sed -ne'/Ecut(eff)/{s/.*= *//p;q;}' $log
+
+gcuteff "Get effective G cutoff (global G-basis)
+gcuteff ! log
+gcuteff sed -ne'/effective G basis cutoff:/{s/.*: *//p;q;}' $log

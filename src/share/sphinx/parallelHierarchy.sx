@@ -1,0 +1,112 @@
+//
+//  Default settings for the hierarchical parallelization.
+//  Users may provide own versions in the run directory.
+//
+
+format parallelHierarchy;
+
+nr=0;   // "0" ^= use all available MPI processes
+np=nr;  // SxPAWExchange::compute()
+mp=nr;  // SxPAWExchange::apply() 
+
+level {
+   name="top-level";
+   siblings=1;
+   workers=1;
+   members=nr;
+
+   level {
+      name="top-all";
+      siblings=1;
+      workers=nr;
+      members=nr;
+   }
+
+   level {
+      name="k-points";
+      siblings=1;
+      workers=nr;
+      members=nr;
+   }
+
+   level {
+      name="loopmpi";
+      siblings=1;
+      workers=nr;
+      members=nr;
+   }
+
+   // parallelization of SxPAWExchange::compute(), leaf work sharing
+   level {
+      name="pawxc:comp:ik";
+      siblings=1;
+      workers=1;
+      members=np;
+      //
+      level {
+         name="pawxc:comp:iq";
+         siblings=1;
+         workers=1;
+         members=np;
+         //
+         level {
+            name="pawxc:comp:iSpin";
+            siblings=1;
+            workers=1;
+            members=np;
+            //
+            level {
+               name="pawxc:comp:j";
+               siblings=1;
+               workers=1;
+               members=np;
+               //
+               level {
+                  name="pawxc:comp:i";
+                  siblings=1;
+                  workers=1;
+                  members=np;
+                  //
+                  level {
+                     name="pawxc:comp:iSym";
+                     siblings=1;
+                     workers=np;
+                     members=np;
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   // parallelization of SxPAWExchange::apply(), leaf work sharing
+   level {
+      name="pawxc:apply:iState"; // loop located at SxPAWHamiltonian:1497
+      siblings=1;
+      workers=1;
+      members=mp;
+      //
+      level {
+         name="pawxc:apply:iq";
+         siblings=1;
+         workers=1;
+         members=mp;
+         //
+         level {
+            name="pawxc:apply:i";
+            siblings=1;
+            workers=1;
+            members=mp;
+            //
+            level {
+               name="pawxc:apply:iSym";
+               siblings=1;
+               workers=mp;
+               members=mp;
+            }
+         }
+      }
+   }
+
+}
+

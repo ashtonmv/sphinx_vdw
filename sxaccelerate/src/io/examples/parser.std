@@ -1,0 +1,13 @@
+set validation;
+topLevelDefs;
+structure         { type="group"; nItems=1; 
+   i              { type="int"; min=0; max=10; }
+   d              { type="real"; min=-1e5; max=1e5; }
+   s              { type="string"; }
+   cell           { type="matrix"; dims=[3,3]; }
+   doSomething    { type="flag"; optional; }
+   atom           { type="group"; minItems=1; 
+      coords      { type="vector"; dim=3; }
+      label       { type="string"; optional; }
+   }
+}

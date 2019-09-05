@@ -1,0 +1,29 @@
+// --------------------------------------------------------------------------
+// SFHIngX  -  simple cubiclattice
+//             sc, gamma-Mn
+//
+// Alexey Dick, dick@fhi-berlin.mpg.de
+// 08/13/2002
+//
+// Reference: Landold-Bernstein
+//
+// --------------------------------------------------------------------------
+// Argument:
+//    aLat                lattice parameter a [Bohr]
+// --------------------------------------------------------------------------
+
+needs aLat;
+
+// --- definition of the primitive unit cell
+cell = aLat * [ [1,  0, 0],        // - a1 -
+                [0,  1, 0],        // - a2 -
+                [0,  0, 1] ];      // - a3 -
+
+
+// --- high symmetry k-points
+global G, X, M, R;
+G = pi/aLat * [0, 0, 0];
+X = pi/aLat * [0, 1, 0];
+M = pi/aLat * [1, 1, 0];
+R = pi/aLat * [1, 1, 1];
+

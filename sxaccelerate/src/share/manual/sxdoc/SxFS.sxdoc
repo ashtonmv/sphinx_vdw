@@ -1,0 +1,18 @@
+h1. File I/O
+
+p1. @SxAccelerate@ provides a variety of file system related functionalities. The main classes are as follows:
+
+@SxFSAction@ := @SxFSAction@ provides a set of static functions to perform basic file system related Unix commands in a cross-platform manner.
+
+@SxFileInfo@ := With @SxFileInfo@ information about files and directories can be enquired, e.g. permissions and metadata information.
+
+@SxFile@ := This class is used to perform elementary functions related to files, e.g. create temp files/symlinks,check for existence and copy files.
+
+@SxDir@ := With @SxDir@ basic operations regarding directories can be performed.
+
+@SxFileIO@ := @SxFileIO@ allows to perform general purpose file I/O operations such as create, read and write.
+
+
+include <SxFileIO.sxdoc>
+
+include <SxFSAction.sxdoc>

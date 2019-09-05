@@ -1,0 +1,124 @@
+h1. Logging
+
+p1. For most applications, providing additional runtime log information
+    becomes very useful to understand unexpected behavior of the
+    application. Log files typically address end-users, not developers.
+
+p1. Most logging systems provide a set of verbosity levels such as
+
+    * critical
+    * error
+    * warning
+    * info
+    * debug
+
+p1. and so on. However, a warning or info level is not really useful.
+    Usually it is ignored by most users and no actions are called
+    for. Therefore, in @SxAccelerate@ a different approach for selecting
+    the verbosity level has been chosen. The class hierarchy itself
+    typically defines a level of detail. Output of classes which are
+    very low in the class hierarchy are corresponding with a high
+    verbosity level and vice versa. The C++ class hierarchy itself
+    is being compiled into a set of share libraries such as
+   
+    * @sxutil@,
+    * @sxipc@, or 
+    * @sxfs@.
+
+p1. The main program which determines the context of log information best
+    can then define which libraries should be added to the log output. The
+    user can overview these settings if necessary.
+
+h2. Logging with @SX\_LOG@
+
+p1. In order to use @SX\_LOG@, the following header file must be included into
+    the program.
+
+{{{
+#include <SxLog.h>
+}}}
+
+p1. In order to enable @SX\_LOG@ in a given program or component, the following
+    two compiler flags must be defined:
+
+    * @SX\_LOG\_ID@   := This flag defines the unique name of the program/component.
+    * @SX\_LOG\_HASH@ := This flag stores the unique hash of the program/component.
+
+p1. @SX\_LOG@ takes C-string containing the message as parameter. It results
+    in the logged message which contains the program identifier along with the
+    provided message. The following code shows an example of it's usage:
+
+{{{
+SX_LOG ("step one completed");
+// perform step 2;
+SX_LOG ("step two completed");
+}}}
+
+h2. Controlling verbosity level, @SxLog@
+
+p1. In order to control the verbosity level, the logging from the individual
+    shared libraries can be enabled by using the function @SxLog::enable@. This
+    function takes C-string parameter specifying the name of shared library to
+    be enabled.
+
+{{{
+SX_LOG ("user input being processed");
+SxLog::enable ("sxutil");
+SX_LOG ("logging sxutil");
+SX_LOG ("user input verified");
+}}}
+
+p1. Similarly, logging can be disabled for a certain shared library by using the
+    @SxLog::disable@ function. This function takes the name of the shared library
+    as a C-string parameter.
+
+{{{
+SxLog::enable ("sxutil");
+SxLog::enable ("sxipc");
+SX_LOG ("Logging sxutil and sxipc");
+SxLog::disable ("sxipc");
+SX_LOG ("Logging sxutil only");
+}}}
+
+h2. Overwriting verbosity level, @SxCLI --log-component=list@
+
+p1. The verbosity level set in the program code can be overwritten
+    by the @log-component@ flag of @SxCLI@ which takes the comma separated
+    list of shared libraries for which the logging should be enabled. This
+    flag must be provided as command line argument to the program.
+
+h2. Enabling log file output
+
+p1. The file logging can also be enabled by setting the
+    environment variable @SX\_LOG\_STDOUT@, where default log name would
+    be chosen to be @ProgramName.log@.
+
+p1. The default location for log file can be changed by using @log@ flag
+    of @SxCLI@, which can be used as @SxCLI --log <fileName>@.
+
+h2. Platform-dependent logging
+
+h3. Terminal-based platforms: Logging to files
+
+p1. @SxRedirect@, @SxLogBuf@
+
+h3. Android
+
+p1. Logcat
+
+h3. iOS
+
+p1. NSLog
+
+h2. Debugging output of log messages
+
+p1. Identifying the source of log line: @SX\_DBG\_MSG@
+
+h2. Advanced topic: Iterator logging
+
+p1. @it.foo().SX\_LOG (...).bar()@
+
+h2. Limitations
+
+p1. Only cpp files, headers / templates logged in component of instantiation
+

@@ -1,0 +1,17 @@
+/** \brief writing bullet and enumeration lists
+
+    This is a nested list
+    - item 1
+    - item 2
+       - item 2.1
+          - item 2.1.1
+       - item 2.2
+           -# numbered item 2.2.1
+           -# numbered item 2.2.2
+       - item 2.3
+    - item 3
+
+    \warning Empty lines reset the list counters!
+
+    */
+    void lists ();

@@ -1,0 +1,12 @@
+/** @{
+
+    \brief Using one documenation block for some functions
+
+     \verbinclude docgroup.txt
+
+    This documentation block is written only once but used for many
+    functions. To do so all functions have to be defined in the same group */
+void sameDocForFunctions1 ();
+void sameDocForFunctions2 ();
+void sameDocForFunctions3 ();
+/** @} */

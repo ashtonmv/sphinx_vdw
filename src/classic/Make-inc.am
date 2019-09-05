@@ -1,0 +1,34 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxClassic.h SxEAM.h SxForst.h SxForstData.h SxStillingerWeber.h SxTaylorExpPotential.h SxVDW.h
+
+
+lib_LTLIBRARIES       = libsxclassic.la
+libsxclassic_la_SOURCES  = $(AUX_SRC)
+libsxclassic_la_SOURCES += SxEAM.cpp SxForst.cpp SxForstData.cpp SxStillingerWeber.cpp SxTaylorExpPotential.cpp SxVDW.cpp 
+libsxclassic_la_LIBADD   = $(SXIMPORTLIBS)
+libsxclassic_la_LIBADD  += 
+libsxclassic_la_LIBADD  += $(SXIMPORTOBJS)
+libsxclassic_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxclassic_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/geom -I$(top_srcdir)/geom
+AM_CPPFLAGS += -I$(top_builddir)/dirac -I$(top_srcdir)/dirac
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/io
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/io
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/ipc
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/fs
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/math
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/util
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/util
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/nonstd
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/mpi
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/mpi
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

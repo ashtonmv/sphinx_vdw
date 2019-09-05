@@ -1,0 +1,106 @@
+// ---------------------------------------------------------------------------
+//
+//      The ab-initio based multiscale library
+//
+//                  S / P H I / n X
+//
+//      Copyright:  Max-Planck-Institute for Iron Research
+//                  40237 Duesseldorf, Germany
+//
+//      Contact:    https://sxlib.mpie.de
+//      Authors:    see sphinx/AUTHORS
+//      License:    see sphinx/LICENSE
+//
+// ---------------------------------------------------------------------------
+
+harmonicPotential { type="group"; maxItems=1;
+   symmetry          { type="group"; maxItems=1; optional;
+      operator       { type="group"; minItems=1; maxItems=48; optional;
+         S           { type="matrix"; dims=[3,3]; }
+      }
+   }
+   maxDist              { type="real"; optional; }
+   beta              { type="real"; optional; }
+   species           { type="group";
+      name           { type="string"; optional; }
+      element        { type="string"; }
+      valenceCharge  { type="real"; optional; }
+      reciprocalMass { type="real"; min=0; optional; }
+      dampingMass    { type="real"; min=0; optional; }
+      ionicMass      { type="real"; min=0; optional; }
+
+      chargeTensor   { type="matrix"; optional;
+                       dims=[3,3]; xor="chargeTensor,valenceCharge"; }
+
+      neighbor       { type="group"; optional;
+         coords      { type="vector"; dim=3; }
+         maxDist     { type="real"; min = 0; optional; }
+         atomType    { type="string"; optional; } // type of neighbor
+         symmetries  { type="vector"; optional; } // generate other neighbors
+         matSyms     { type="vector"; optional; }
+         Hesse       { type="matrix"; dims=[3,3]; optional;}
+         equivalenceId { type="integer"; optional; min = 1; }
+      }
+   }
+   bulkHesse { type="list"; rank=3; optional; }
+   dielecConstant    { type="real"; optional; }
+   //dielecMatrix      { type="matrix"; optional; 
+   //                    dims=[3,3]; xor="dielecConstant,dielecMatrix"; }
+
+   defect { type="group"; optional;
+      center { type="vector"; dim=3; }
+      symmetries  { type="vector"; optional; } // generate other neighbors
+      neighbor       { type="group";
+         coords      { type="vector"; dim=3; }
+         chargeTensor   { type="matrix"; dims=[3,3]; }
+         defectHesse { type="list"; rank=2; optional; }
+      }
+   }
+   // --- information about equivalent atoms
+   equivalence { type="group"; optional;
+      include <std/structure.std>;
+      equivalenceClass { type="group"; minItems = 1;
+         matSym { type="vector"; optional;}
+      }
+      equivalenceIds { type="vector"; }
+      mappingSym     { type="vector"; }
+   }
+
+}
+include <std/structure.std>;
+
+main { type="group"; optional;
+   include <std/qn.std>;
+   include <std/linqn.std>;
+}
+
+phonon { type="group"; optional;
+   kPoint            { type="group"; minItems=1;
+                       xor="kPoint,kPoints";
+      coords         { type="vector"; dim=3; }
+      label          { type="string"; optional; }
+      weight         { type="real"; min=0; max=1; optional; }
+      relative       { type="flag"; optional; }
+   }
+   kPoints           { type="group"; minItems=1;
+                       xor="kPoint,kPoints"; not="folding";
+      // relative may be given for all k-points
+      relative    { type="flag"; optional; }
+      dK          { type="real"; optional; }
+      from           { type="group"; nItems=1;
+         coords      { type="vector"; dim=3; }
+         label       { type="string"; optional; }
+//       paths usually in cart. coords
+         relative    { type="flag"; optional; }
+      }
+      to             { type="group"; minItems=1;
+         coords      { type="vector"; dim=3; }
+         nPoints     { type="int"; optional; min = 0; xor="nPoints,dK"; }
+         dK          { type="real"; optional; xor="nPoints,dK"; }
+         label       { type="string"; optional; }
+//       paths usually in cart. coords
+         relative    { type="flag"; optional; }
+      }
+   }
+   folding           { type="vector"; dim=3; optional; }
+}

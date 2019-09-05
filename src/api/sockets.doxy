@@ -1,0 +1,124 @@
+/** \page   page_sockets    TCP/IP Communication with SPHInX
+
+\section  sock_intro    Introduction
+
+   SPHInX comes with a crossplatform TCP/IP handler which easily can
+   be used to communicate with running SPHInX jobs via any TCP/IP connection
+   such as telnet, http, or wap. 
+   This feature can be used for example to read the current state of a 
+   program (retrieve its variables), suspend and resume the program, and
+   also change variables during the run. Special commands can be emitted to
+   cause program stops, to save certain data and so on.
+   One application based on the SPHInX communicator is IsiX, the web and
+   wap interface for SPHInX.
+
+\section  sock_cmd      SPHInX command protocol
+
+   The SPHInX protocol is very simple. Information are sent by strings
+   separated by spaces. The first argument is the name of the target object
+   followed by commands interpreted by the target object. Usually that are
+   "get" for read access and "set" for write access. 
+
+   \verbatim
+       SxHamSolver get energy
+   \endverbatim
+
+   would cause the object SxHamSolver to interprete the arguments "get" and
+   "energy". The command
+
+   \verbatim
+      SxHamSolver set deltaT 10
+   \endverbatim
+   would case the SxHamSolver object to change the variable "deltaT" to the
+   new value 10.
+
+\section  sock_add      Add a communicator
+
+   It is very simple to add a SPHInX TCP/IP communicator to a C++ class.
+   Therefore the C++ class has to be derived from SxObject and the purely
+   abstract function interprete has to be defined:
+
+   \verbatim 
+   // --- myclass.h
+   #include <SxObject.h>
+   ...
+   class MyClass : public SxObject
+   {
+      public:
+         ...
+         virtual void interprete (const SxList<SxString> &, 
+                                  SxConnection *, 
+                                  int);
+         ...
+   \endverbatim 
+
+   Let's define a simple protocol for the class MyClass. It should return
+   a value of a member variable varA with "MyClass get varA" and change its
+   value with "MyClass set varA 123.456".  The corresponding interprete function
+   would look like:
+
+   \verbatim
+   // --- myclass.cpp
+   #include <myclass.h>
+   ...
+   MyClass::MyClass () : SxObject ("MyClass")
+   {
+      ...
+   }
+
+   ...
+
+   void MyClass::interprete (const SxList<SxString> &argList,
+                             SxConnection *connection,
+                             int client)
+   {
+      SxString arg = argList.first ();
+      SxString var;
+      if (arg = "get")  {
+
+         // --- check number of arguments
+         if (argList.getSize() != 2)  {
+            connection->send (client, "ERROR: 2 arguments expected\n");
+            return;
+         }
+
+         var = argList(1);
+         if (var == "varA")  {
+            connection->send (client, SxString(varA) + "\n");
+         } else if (var == "varB")  {
+            connection->send (client, SxString(varB) + "\n");
+         } else {
+            connection->send (client, "ERROR: no such argument for command GET"
+                                    + arg + "\n");
+            return;
+         }
+      } else if (arg == "set")  {
+
+         var = argList(1);
+         if (var == "varA")  varA = argList(2).toDouble();
+         else {
+            connection->send (client, "ERROR: Unknown variable " + arg + "\n");
+            return;
+         }
+         connection->send (client, "OK\n");
+      }  else  {
+         connection->send (client, "ERROR: no such command " + arg + "\n");
+   }
+
+   \endverbatim
+
+   Note that the identifier of the class has to be announced in the constructor.
+
+\section sock_sec   Security 
+
+   The writing features of the SPHInX TCP/IP communicator raise security
+   problems. For example unauthorized users could cause premature program 
+   stops by modififying data in order to gain access to the queuing system.
+   
+   A simple way to prevent this is a (very simple) password authentification.
+   
+   to be continued...
+   
+
+   \author Sixten Boeck
+*/

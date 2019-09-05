@@ -1,0 +1,140 @@
+h1. Signals and slots
+
+p1. The Signal/slot is a mechanism to implement component-based programming/observer pattern.
+    In observer design pattern one object maintains a list of dependent objects
+    and notifies them when a change in system state occurs. The callbacks are
+    used to implement this mechanism in C++. Each object that has registered
+    to be notified of a certain event, provides a callback called 'slot' to
+    the object called 'signal'. The signal is emitted when the specific event
+    occurs, that in turn notifies all the slots. The signal registers the
+    slots/callbacks in the form of pointers to member functions. In order to
+    use signal/slot mechanism following header file needs to be included.
+
+{{{cpp
+#include <SxSigSlots.h>
+#include <SxError.h>
+}}}
+
+p1. The following code shows an example of signal/slot mechanism in @SxAccelerate@
+
+{{{cpp
+class MyButton {
+public:
+   MyButton() { }
+signals:
+   SxSignal<const char *> SX_SIGNAL(clickSignal);   
+};
+class MyUI {
+public:
+   MyUI() : SX_LINK_SLOT(this, showNextScreen)
+   { }
+public slots:
+   SX_SLOT (showNextScreen, const char*);
+};
+void MyUI::showNextScreen(const char *dbgInfo) {
+   SX_UNUSED (dbgInfo);
+   std::cout << "Button click signal received" << std::endl;
+}
+SxPtr<MyButton> btnPtr = SxPtr<MyButton>::create ();
+SxPtr<MyUI> UIPtr = SxPtr<MyUI>::create ();
+sxconnect (btnPtr->clickSignal,SX_GET_SLOT(UIPtr,showNextScreen));
+btnPtr->clickSignal.send ();
+}}}
+
+p1. In the above code a slot is declared by using @SX\_SLOT@ macro, which is
+    later initialized by using the @SX_LINK_SLOT@ macro in the constructor of
+    the class. The @SX\_SLOT@ macro takes the name of slot proceeded by
+    sequence of parameter types as arguments.
+
+p1. The @SX_GET_SLOT@ macro returns the slot object that can be passed to
+    @sxconnect@ when connecting with the signal. This macro requires the
+    @SxPtr@ of the class that contains the slot definition as parameter.
+
+p1. Multiple slots can be registered with one signal if they have the same
+    signature i.e. number and types of parameters, as given in the signal
+    declaration. The above code results in following output when the
+    signal is sent.
+
+{{{
+Button click signal received
+}}}
+
+p1. A slot must always have the last parameter of type @const char\*@ which is
+    used to provide debug information while compiling in debug mode. In release
+    mode this parameter contains @NULL@.
+
+h2. Signal/slot tracing
+
+p1. When an error occurs during a call of slots or inside the slot function,
+    it can be cumbersome to identify the location where a slot was attached
+    to a signal. @sxconnect@ provides this relevant information which can be
+    retrieved in case of an error.
+
+h3. Signal's debug information
+
+p1. A signal's debug information contains all the slots that are connected to
+    it including their individual slot (function) name, line number, file name
+    and the function in which a particular slot was connected. This debug
+    information can be used to locate where a particular slot was registered
+    to the signal. The debug information can be displayed,e.g., by printing
+    the signal object.
+
+{{{cpp
+#include <SxSigSlots.h>
+class MySlider
+{
+   public:
+      MySlider () { }
+
+   signals:
+
+      SxSignal<double, const char *> SX_SIGNAL(valueChanged);
+};
+
+class MySurface
+{
+   public:
+      MySurface () : SX_LINK_SLOT(*this,slotFoo)
+      { }
+   public slots:
+      SX_SLOT (slotFoo, double, const char*);
+};
+void MySurface::slotFoo (double threshold, const char *tag)
+{
+   SX_TRACE (tag);
+   printf ("mysurface::slotfoo received: %g\n", threshold);
+}
+SxPtr<MySlider> slider = SxPtr<MySlider>::create ();
+SxPtr<MySurface> sPtr = SxPtr<MySurface>::create ();
+sxconnect (slider->valueChanged, SX_GET_SLOT(sPtr, MySurface::slotFoo));
+std::cerr << slider->valueChanged << std::endl;
+}}}
+
+p1. The above code snippet results in the following output:
+
+{{{
+'slider->valueChanged' is connected to:
+- 'MySurface::slotFoo' at sxdemo.cpp:5:int main(int, char **)
+}}}
+
+h3. Slot's debug information
+
+p1. Similarly, a slot's debug information is always received as C-string as
+    last parameter to slot function. As shown below, when a signal calls the
+    slot function, the parameters provided to signal along with additional
+    parameter of @tag@ are sent to attached @slots@. Inside the slot function
+    the debug information can be logged using @SX\_TRACE@ function macro.
+
+{{{cpp
+slider->valueChanged.send (5.0);
+}}}
+
+p1. which results in following output:
+
+{{{
+___sxdemo.cpp:21 slotFoo: BEGIN
+'MySurface::slotFoo' is connected to:
+- 'slider->valueChanged' at sxdemo.cpp:5:int main(int, char **)
+___sxdemo.cpp:21 slotFoo: END 0.000 ms
+}}}
+

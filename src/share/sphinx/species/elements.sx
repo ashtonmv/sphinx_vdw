@@ -1,0 +1,911 @@
+# ---------------------------------------------------------------------------
+#
+#              S/PHI/nX  - Chemical Element database
+#
+# ---------------------------------------------------------------------------
+
+format pse;
+
+# --- Unit convertions
+ANGSTROEM = 1.8897261;   // Angstr�m -> Bohr
+
+# gyromagnetic Ratio: CRC Handbook of chemistry and physics - Lide
+#                     CRC Press 2005
+
+# --- list of elements
+chemElements {
+   elem { symbol         = "?";
+          name           = "Unknown";
+          number         = 0;
+          weight         = 0.0;
+          covalentRadius = 1.0;
+          atomicRadius   = 3.0;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "H";
+          name           = "Hydrogen";
+          number         = 1;
+          weight         = 1.00797;
+          covalentRadius = 0.32 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          gyromagneticRatio = 42.5775; // 1^H
+          CPKcolor       = [255,255,255];
+   }
+   elem { symbol         = "He";
+          name           = "Helium";
+          number         = 2;
+          weight         = 4.0026 * ANGSTROEM;
+          covalentRadius = 0.93 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          gyromagneticRatio = -32.4360; // 3^He
+          CPKcolor       = [255,192,203];
+   }
+   elem { symbol         = "Li";
+          name           = "Lithium";
+          number         = 3;
+          weight         = 6.939;
+          covalentRadius = 1.29 * ANGSTROEM;
+          atomicRadius   = 1.55 * ANGSTROEM;
+          gyromagneticRatio = 16.5483; // 7^Li
+          CPKcolor       = [178,34,34];
+   }
+   elem { symbol         = "Be";
+          name           = "Beryllium";
+          number         = 4;
+          weight         = 9.0122;
+          covalentRadius = 0.90 * ANGSTROEM;
+          atomicRadius   = 1.12 * ANGSTROEM;
+          gyromagneticRatio = -5.9842; // 9^Be
+          CPKcolor       = [0,255,255];
+   }
+   elem { symbol         = "B";
+          name           = "Boron";
+          number         = 5;
+          weight         = 10.811;
+          covalentRadius = 0.82 * ANGSTROEM;
+          atomicRadius   = 0.98 * ANGSTROEM;
+          gyromagneticRatio = 13.6630; // 11^B
+          CPKcolor       = [0,255,0];
+   }
+   elem { symbol         = "C";
+          name           = "Carbon";
+          number         = 6;
+          weight         = 12.01115;
+          covalentRadius = 0.77  * ANGSTROEM;
+          atomicRadius   = 0.914 * ANGSTROEM;
+          gyromagneticRatio = 10.7084; // 13^C
+          CPKcolor       = [200,200,200];
+   }
+   elem { symbol         = "N";
+          name           = "Nitrogen";
+          number         = 7;
+          weight         = 14.0067;
+          covalentRadius = 0.75 * ANGSTROEM;
+          atomicRadius   = 0.92 * ANGSTROEM;
+          gyromagneticRatio = 3.0777; // 14^N
+          CPKcolor       = [143,143,255];
+   }
+   elem { symbol         = "O";
+          name           = "Oxygen";
+          number         = 8;
+          weight         = 15.9984;
+          covalentRadius = 0.73 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          gyromagneticRatio = -5.7742; // 17^O
+          CPKcolor       = [240,0,0];
+   }
+   elem { symbol         = "F";
+          name           = "Fluorine";
+          number         = 9;
+          weight         = 18.9984;
+          covalentRadius = 0.72 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          gyromagneticRatio = 40.0776; // 19^F
+          CPKcolor       = [218,165,32];
+   }
+   elem { symbol         = "Ne";
+          name           = "Neon";
+          number         = 10;
+          weight         = 20.183;
+          covalentRadius = 0.71 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          gyromagneticRatio = -3.3631; // 21^Ne
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Na";
+          name           = "Sodium";
+          number         = 11;
+          weight         = 22.9898;
+          covalentRadius = 1.54 * ANGSTROEM;
+          atomicRadius   = 1.90 * ANGSTROEM;
+          gyromagneticRatio = 11.2688; // 23^Na
+          CPKcolor       = [0,0,255];
+   }
+   elem { symbol         = "Mg";
+          name           = "Magnesium";
+          number         = 12;
+          weight         = 24.3128;
+          covalentRadius = 1.36 * ANGSTROEM;
+          atomicRadius   = 1.60 * ANGSTROEM;
+          gyromagneticRatio = -2.6083; // 25^Mg
+          CPKcolor       = [34,139,34];
+   }
+   elem { symbol         = "Al";
+          name           = "Aluminum";
+          number         = 13;
+          weight         = 26.9815;
+          covalentRadius = 1.18 * ANGSTROEM;
+          atomicRadius   = 1.44 * ANGSTROEM;
+          gyromagneticRatio = 11.1031; // 27^Al
+          CPKcolor       = [128,128,144];
+   }
+   elem { symbol         = "Si";
+          name           = "Silicon";
+          number         = 14;
+          weight         = 28.086;
+          covalentRadius = 1.11 * ANGSTROEM;
+          atomicRadius   = 1.32 * ANGSTROEM;
+          gyromagneticRatio = -8.4655; // 29^Si
+          CPKcolor       = [218,165,32];
+   }
+   elem { symbol         = "P";
+          name           = "Phosphorus";
+          number         = 15;
+          weight         = 30.9738;
+          covalentRadius = 1.06 * ANGSTROEM;
+          atomicRadius   = 1.28 * ANGSTROEM;
+          gyromagneticRatio = 17.2515; // 31^P
+          CPKcolor       = [255,165,0];
+   }
+   elem { symbol         = "S";
+          name           = "Sulfur";
+          number         = 16;
+          weight         = 32.064;
+          covalentRadius = 1.02 * ANGSTROEM;
+          atomicRadius   = 1.27 * ANGSTROEM;
+          gyromagneticRatio = 3.2717; // 33^S
+          CPKcolor       = [255,200,50];
+   }
+   elem { symbol         = "Cl";
+          name           = "Chlorine";
+          number         = 17;
+          weight         = 35.453;
+          covalentRadius = 0.99 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          gyromagneticRatio = 4.1765; // 35^Cl
+          CPKcolor       = [0,255,0];
+   }
+   elem { symbol         = "Ar";
+          name           = "Argon";
+          number         = 18;
+          weight         = 39.948;
+          covalentRadius = 0.98 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "K";
+          name           = "Potassium";
+          number         = 19;
+          weight         = 39.102;
+          covalentRadius = 2.03 * ANGSTROEM;
+          atomicRadius   = 2.35 * ANGSTROEM;
+          gyromagneticRatio = 1.9893; // 39^K
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Ca";
+          name           = "Calcium";
+          number         = 20;
+          weight         = 40.08;
+          covalentRadius = 1.74 * ANGSTROEM;
+          atomicRadius   = 1.97 * ANGSTROEM;
+          gyromagneticRatio = -2.8688; // 43^Ca
+          CPKcolor       = [128,128,144];
+   }
+   elem { symbol         = "Sc";
+          name           = "Scandium";
+          number         = 21;
+          weight         = 44.956;
+          covalentRadius = 1.44 * ANGSTROEM;
+          atomicRadius   = 1.62 * ANGSTROEM;
+          gyromagneticRatio = 10.3591; // 45^Sc
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Ti";
+          name           = "Titanium";
+          number         = 22;
+          weight         = 47.90;
+          covalentRadius = 1.32 * ANGSTROEM;
+          atomicRadius   = 1.47 * ANGSTROEM;
+          gyromagneticRatio = -2.4041; // 47^Ti
+          CPKcolor       = [128,128,144];
+   }
+   elem { symbol         = "V";
+          name           = "Vanadium";
+          number         = 23;
+          weight         = 50.942;
+          covalentRadius = 1.22 * ANGSTROEM;
+          atomicRadius   = 1.34 * ANGSTROEM;
+          gyromagneticRatio = 11.2133; // 51^V
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Cr";
+          name           = "Chromium";
+          number         = 24;
+          weight         = 51.996;
+          covalentRadius = 1.18 * ANGSTROEM;
+          atomicRadius   = 1.30 * ANGSTROEM;
+          gyromagneticRatio = -2.4115; // 53^Cr
+          CPKcolor       = [128,128,144];
+   }
+   elem { symbol         = "Mn";
+          name           = "Manganese";
+          number         = 25;
+          weight         = 54.938;
+          covalentRadius = 1.17 * ANGSTROEM;
+          atomicRadius   = 1.35 * ANGSTROEM;
+          gyromagneticRatio = 10.5763; // 55^Mn
+          CPKcolor       = [128,128,144];
+   }
+   elem { symbol         = "Fe";
+          name           = "Iron";
+          number         = 26;
+          weight         = 55.847;
+          covalentRadius = 1.17 * ANGSTROEM;
+          atomicRadius   = 1.26 * ANGSTROEM;
+          gyromagneticRatio = 1.3816; // 57^Fe
+          CPKcolor       = [255,165,0];
+   }
+   elem { symbol         = "Co";
+          name           = "Cobalt";
+          number         = 27;
+          weight         = 58.933;
+          covalentRadius = 1.16 * ANGSTROEM;
+          atomicRadius   = 1.25 * ANGSTROEM;
+          gyromagneticRatio = 10.077; // 59^Co
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Ni";
+          name           = "Nickel";
+          number         = 28;
+          weight         = 58.71;
+          covalentRadius = 1.15 * ANGSTROEM;
+          atomicRadius   = 1.24 * ANGSTROEM;
+          gyromagneticRatio = -3.8114; // 61^Ni
+          CPKcolor       = [165,42,42];
+   }
+   elem { symbol         = "Cu";
+          name           = "Copper";
+          number         = 29;
+          weight         = 63.54;
+          covalentRadius = 1.17 * ANGSTROEM;
+          atomicRadius   = 1.28 * ANGSTROEM;
+          gyromagneticRatio = 11.2982; // 63^Cu
+          CPKcolor       = [165,42,42];
+   }
+   elem { symbol         = "Zn";
+          name           = "Zinc";
+          number         = 30;
+          weight         = 65.37;
+          covalentRadius = 1.25 * ANGSTROEM;
+          atomicRadius   = 1.38 * ANGSTROEM;
+          gyromagneticRatio = 2.6694; // 67^Zn
+          CPKcolor       = [165,42,42];
+   }
+   elem { symbol         = "Ga";
+          name           = "Gallium";
+          number         = 31;
+          weight         = 69.72;
+          covalentRadius = 1.26 * ANGSTROEM;
+          atomicRadius   = 1.41 * ANGSTROEM;
+          gyromagneticRatio = 10.2478; // 69^Ga
+          //CPKcolor       = [255,20,147];
+          CPKcolor       = [20,240,10];
+   }
+   elem { symbol         = "Ge";
+          name           = "Germanium";
+          number         = 32;
+          weight         = 72.59;
+          covalentRadius = 1.22 * ANGSTROEM;
+          atomicRadius   = 1.37 * ANGSTROEM;
+          gyromagneticRatio = -1.4897; // 73^Ge
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "As";
+          name           = "Arsenic";
+          number         = 33;
+          weight         = 74.922;
+          covalentRadius = 1.20 * ANGSTROEM;
+          atomicRadius   = 1.39 * ANGSTROEM;
+          gyromagneticRatio = 7.3150; // 75^As
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Se";
+          name           = "Selenium";
+          number         = 34;
+          weight         = 78.96;
+          covalentRadius = 1.16 * ANGSTROEM;
+          atomicRadius   = 1.40 * ANGSTROEM;
+          gyromagneticRatio = 8.1571; // 77^Se
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Br";
+          name           = "Bromine";
+          number         = 35;
+          weight         = 79.909;
+          covalentRadius = 1.14 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          gyromagneticRatio = 10.7042; // 79^Br
+          CPKcolor       = [165,42,42];
+   }
+   elem { symbol         = "Kr";
+          name           = "Krypton";
+          number         = 36;
+          weight         = 83.80;
+          covalentRadius = 1.12 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          gyromagneticRatio = -1.6442; // 83^Kr
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Rb";
+          name           = "Rubidium";
+          number         = 37;
+          weight         = 85.47;
+          covalentRadius = 2.16 * ANGSTROEM;
+          atomicRadius   = 2.48 * ANGSTROEM;
+          gyromagneticRatio = 4.1254; // 85^Rb
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Sr";
+          name           = "Strontium";
+          number         = 38;
+          weight         = 87.62;
+          covalentRadius = 1.91 * ANGSTROEM;
+          atomicRadius   = 2.15 * ANGSTROEM;
+          gyromagneticRatio = -1.8525; // 87^Sr
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Y";
+          name           = "Yttrium";
+          number         = 39;
+          weight         = 88.905;
+          covalentRadius = 1.62 * ANGSTROEM;
+          atomicRadius   = 1.78 * ANGSTROEM;
+          gyromagneticRatio = -2.0949; // 89^Y
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Zr";
+          name           = "Zirconium";
+          number         = 40;
+          weight         = 91.22;
+          covalentRadius = 1.45 * ANGSTROEM;
+          atomicRadius   = 1.60 * ANGSTROEM;
+          gyromagneticRatio = -3.9748; // 91^Zr
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Nb";
+          name           = "Niobium";
+          number         = 41;
+          weight         = 92.906;
+          covalentRadius = 1.34 * ANGSTROEM;
+          atomicRadius   = 1.46 * ANGSTROEM;
+          gyromagneticRatio = 10.4523; // 93^Nb
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Mo";
+          name           = "Molybdenum";
+          number         = 42;
+          weight         = 95.94;
+          covalentRadius = 1.30 * ANGSTROEM;
+          atomicRadius   = 1.39 * ANGSTROEM;
+          gyromagneticRatio = -2.7874; // 95^Mo
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Tc";
+          name           = "Technetium";
+          number         = 43;
+          weight         = 98;
+          covalentRadius = 1.27 * ANGSTROEM;
+          atomicRadius   = 1.36 * ANGSTROEM;
+          gyromagneticRatio = 9.6294; // 99^Tc
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Ru";
+          name           = "Ruthenium";
+          number         = 44;
+          weight         = 101.07;
+          covalentRadius = 1.25 * ANGSTROEM;
+          atomicRadius   = 1.34 * ANGSTROEM;
+          gyromagneticRatio = -2.1916; // 101^Ru
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Rh";
+          name           = "Rhodium";
+          number         = 45;
+          weight         = 102.905;
+          covalentRadius = 1.25 * ANGSTROEM;
+          atomicRadius   = 1.34 * ANGSTROEM;
+          gyromagneticRatio = -1.3477; // 103^Rh
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Pd";
+          name           = "Palladium";
+          number         = 46;
+          weight         = 106.4;
+          covalentRadius = 1.28 * ANGSTROEM;
+          atomicRadius   = 1.37 * ANGSTROEM;
+          gyromagneticRatio = -1.957; // 105^Pd
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Ag";
+          name           = "Silver";
+          number         = 47;
+          weight         = 107.87;
+          covalentRadius = 1.34 * ANGSTROEM;
+          atomicRadius   = 1.44 * ANGSTROEM;
+          gyromagneticRatio = -1.7331; // 107^Ag
+          CPKcolor       = [128,128,144];
+   }
+   elem { symbol         = "Cd";
+          name           = "Cadmium";
+          number         = 48;
+          weight         = 112.40;
+          covalentRadius = 1.48 * ANGSTROEM;
+          atomicRadius   = 1.54 * ANGSTROEM;
+          gyromagneticRatio = -9.0692; // 111^Cd
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "In";
+          name           = "Indium";
+          number         = 49;
+          weight         = 114.82;
+          covalentRadius = 1.44 * ANGSTROEM;
+          atomicRadius   = 1.66 * ANGSTROEM;
+          gyromagneticRatio = 9.3856; // 115^In
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Sn";
+          name           = "Tin";
+          number         = 50;
+          weight         = 118.69;
+          covalentRadius = 1.41 * ANGSTROEM;
+          atomicRadius   = 1.62 * ANGSTROEM;
+          gyromagneticRatio = -15.9660; // 119^Sn
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Sb";
+          name           = "Antimony";
+          number         = 51;
+          weight         = 121.75;
+          covalentRadius = 1.40 * ANGSTROEM;
+          atomicRadius   = 1.59 * ANGSTROEM;
+          gyromagneticRatio = 10.2551; // 121^Sb
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Te";
+          name           = "Tellurium";
+          number         = 52;
+          weight         = 127.60;
+          covalentRadius = 1.36 * ANGSTROEM;
+          atomicRadius   = 1.60 * ANGSTROEM;
+          gyromagneticRatio = -13.5454; // 125^Te
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "I";
+          name           = "Iodine";
+          number         = 53;
+          weight         = 126.904;
+          covalentRadius = 1.33 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          gyromagneticRatio = 8.5778; // 127^I
+          CPKcolor       = [160,32,240];
+   }
+   elem { symbol         = "Xe";
+          name           = "Xenon";
+          number         = 54;
+          weight         = 131.30;
+          covalentRadius = 1.31 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          gyromagneticRatio = -11.8604; // 129^Xe
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Cs";
+          name           = "Cesium";
+          number         = 55;
+          weight         = 132.903;
+          covalentRadius = 2.35 * ANGSTROEM;
+          atomicRadius   = 2.67 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Ba";
+          name           = "Barium";
+          number         = 56;
+          weight         = 137.34;
+          covalentRadius = 1.98 * ANGSTROEM;
+          atomicRadius   = 2.22 * ANGSTROEM;
+          CPKcolor       = [255,165,0];
+   }
+   elem { symbol         = "La";
+          name           = "Lanthanium";
+          number         = 57;
+          weight         = 138.91;
+          covalentRadius = 1.69 * ANGSTROEM;
+          atomicRadius   = 1.87 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+
+   // ---Lanthanides
+   elem { symbol         = "Ce";
+          name           = "Cerium";
+          number         = 58;
+          weight         = 140.12;
+          covalentRadius = 1.65 * ANGSTROEM;
+          atomicRadius   = 1.81 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Pr";
+          name           = "Praseodynium";
+          number         = 59;
+          weight         = 140.907;
+          covalentRadius = 1.65 * ANGSTROEM;
+          atomicRadius   = 1.82 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Nd";
+          name           = "Neodynium";
+          number         = 60;
+          weight         = 144.24;
+          covalentRadius = 1.64 * ANGSTROEM;
+          atomicRadius   = 1.82 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Pm";
+          name           = "Promethium";
+          number         = 61;
+          weight         = 147;
+          covalentRadius = 1.63 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Sm";
+          name           = "Samarium";
+          number         = 62;
+          weight         = 150.35;
+          covalentRadius = 1.62 * ANGSTROEM;
+          atomicRadius   = 1.81 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Eu";
+          name           = "Europium";
+          number         = 63;
+          weight         = 151.96;
+          covalentRadius = 1.85 * ANGSTROEM;
+          atomicRadius   = 1.99 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Gd";
+          name           = "Gadolinium";
+          number         = 64;
+          weight         = 157.25;
+          covalentRadius = 1.61 * ANGSTROEM;
+          atomicRadius   = 1.79 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Tb";
+          name           = "Terbium";
+          number         = 65;
+          weight         = 158.924;
+          covalentRadius = 1.59 * ANGSTROEM;
+          atomicRadius   = 1.80 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Dy";
+          name           = "Dysprosium";
+          number         = 66;
+          weight         = 162.50;
+          covalentRadius = 1.59 * ANGSTROEM;
+          atomicRadius   = 1.80 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Ho";
+          name           = "Holmium";
+          number         = 67;
+          weight         = 164.93;
+          covalentRadius = 1.58 * ANGSTROEM;
+          atomicRadius   = 1.79 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Er";
+          name           = "Erbium";
+          number         = 68;
+          weight         = 167.934;
+          covalentRadius = 1.57 * ANGSTROEM;
+          atomicRadius   = 1.78 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Tm";
+          name           = "Thullium";
+          number         = 69;
+          weight         = 168.934;
+          covalentRadius = 1.56 * ANGSTROEM;
+          atomicRadius   = 1.77 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Yb";
+          name           = "Ytterbium";
+          number         = 70;
+          weight         = 173.04;
+          covalentRadius = 1.94 * ANGSTROEM;  // atomic radius
+          atomicRadius   = 1.94 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Lu";
+          name           = "Lutetium";
+          number         = 71;
+          weight         = 174.97;
+          covalentRadius = 1.56 * ANGSTROEM;
+          atomicRadius   = 1.75 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+
+
+   elem { symbol         = "Hf";
+          name           = "Hafnium";
+          number         = 72;
+          weight         = 178.49;
+          covalentRadius = 1.44 * ANGSTROEM;
+          atomicRadius   = 1.67 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Ta";
+          name           = "Tantalum";
+          number         = 73;
+          weight         = 180.948;
+          covalentRadius = 1.3 * ANGSTROEM;
+          atomicRadius   = 1.49 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "W";
+          name           = "Tungsten";
+          number         = 74;
+          weight         = 183.85;
+          covalentRadius = 1.30 * ANGSTROEM;
+          atomicRadius   = 1.41 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Re";
+          name           = "Rhenium";
+          number         = 75;
+          weight         = 186.2;
+          covalentRadius = 1.28 * ANGSTROEM;
+          atomicRadius   = 1.37 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Os";
+          name           = "Osmium";
+          number         = 76;
+          weight         = 190.2;
+          covalentRadius = 1.26 * ANGSTROEM;
+          atomicRadius   = 1.35 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Ir";
+          name           = "Iridium";
+          number         = 77;
+          weight         = 192.2;
+          covalentRadius = 1.27 * ANGSTROEM;
+          atomicRadius   = 1.36 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Pt";
+          name           = "Platinum";
+          number         = 78;
+          weight         = 195.09;
+          covalentRadius = 1.30 * ANGSTROEM;
+          atomicRadius   = 1.39 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Au";
+          name           = "Gold";
+          number         = 79;
+          weight         = 196.967;
+          covalentRadius = 1.34 * ANGSTROEM;
+          atomicRadius   = 1.46 * ANGSTROEM;
+          CPKcolor       = [218,165,32];
+   }
+   elem { symbol         = "Hg";
+          name           = "Mercury";
+          number         = 80;
+          weight         = 200.59;
+          covalentRadius = 1.49 * ANGSTROEM;
+          atomicRadius   = 1.57 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Tl";
+          name           = "Thallium";
+          number         = 81;
+          weight         = 204.37;
+          covalentRadius = 1.48 * ANGSTROEM;
+          atomicRadius   = 1.71 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Pb";
+          name           = "Lead";
+          number         = 82;
+          weight         = 207.19;
+          covalentRadius = 1.47 * ANGSTROEM;
+          atomicRadius   = 1.75 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Bi";
+          name           = "Bismuth";
+          number         = 83;
+          weight         = 208.98;
+          covalentRadius = 1.46 * ANGSTROEM;
+          atomicRadius   = 1.70 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Po";
+          name           = "Polonium";
+          number         = 84;
+          weight         = 210;
+          covalentRadius = 1.46 * ANGSTROEM;
+          atomicRadius   = 1.76 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "At";
+          name           = "Astatine";
+          number         = 85;
+          weight         = 210;
+          covalentRadius = 1.45 * ANGSTROEM;
+          atomicRadius   = covalentRadius;  // not defined
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Rn";
+          name           = "Radon";
+          number         = 86;
+          weight         = 222;
+          covalentRadius = 100 * ANGSTROEM;   // n.a.
+          atomicRadius   = covalentRadius;  // not defined
+          CPKcolor       = [255,20,147];
+   }
+
+
+   elem { symbol         = "Fr";
+          name           = "Francium";
+          number         = 87;
+          weight         = 223;
+          covalentRadius = 1.76 * ANGSTROEM;   // ionic radius
+          atomicRadius   = covalentRadius;  // not defined
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Ra";
+          name           = "Radium";
+          number         = 88;
+          weight         = 226;
+          covalentRadius = 1.40 * ANGSTROEM;   // ionic radius
+          atomicRadius   = covalentRadius;  // not defined
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Ac";
+          name           = "Actinium";
+          number         = 89;
+          weight         = 227;
+          covalentRadius = 1.88 * ANGSTROEM;   // atomic radius
+          atomicRadius   = 1.88 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+
+   elem { symbol         = "Th";
+          name           = "Thorium";
+          number         = 90;
+          weight         = 232.038;
+          covalentRadius = 1.65 * ANGSTROEM;
+          atomicRadius   = 1.80 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Pa";
+          name           = "Protactinium";
+          number         = 91;
+          weight         = 231;
+          covalentRadius = 1.61 * ANGSTROEM;   // atomic radius
+          atomicRadius   = 1.61 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "U";
+          name           = "Uranium";
+          number         = 92;
+          weight         = 238.03;
+          covalentRadius = 1.42 * ANGSTROEM;
+          atomicRadius   = 1.38 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Np";
+          name           = "Neptunium";
+          number         = 93;
+          weight         = 242;
+          covalentRadius = 1.3 * ANGSTROEM;    // atomic radius
+          atomicRadius   = 1.3 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Pu";
+          name           = "Plutonium";
+          number         = 94;
+          weight         = 242;
+          covalentRadius = 1.51 * ANGSTROEM;   // atomic radius
+          atomicRadius   = 1.51 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Am";
+          name           = "Americium";
+          number         = 95;
+          weight         = 243;
+          covalentRadius = 1.73 * ANGSTROEM;   // atomic radius
+          atomicRadius   = 1.73 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Cm";
+          name           = "Curium";
+          number         = 96;
+          weight         = 247;
+          covalentRadius = 100 * ANGSTROEM;   // n.a.
+          atomicRadius   = 100 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Bk";
+          name           = "Berkelium";
+          number         = 247;
+          weight         = 97;
+          covalentRadius = 100 * ANGSTROEM;   // n.a.
+          atomicRadius   = 100 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Cf";
+          name           = "Californium";
+          number         = 98;
+          weight         = 249;
+          covalentRadius = 100 * ANGSTROEM;   // n.a.
+          atomicRadius   = 100 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Es";
+          name           = "Einsteinium";
+          number         = 99;
+          weight         = 254;
+          covalentRadius = 100 * ANGSTROEM;   // n.a.
+          atomicRadius   = 100 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Fm";
+          name           = "Fermium";
+          number         = 100;
+          weight         = 253;
+          covalentRadius = 100 * ANGSTROEM;   // n.a.
+          atomicRadius   = 100 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Md";
+          name           = "Mendelevium";
+          number         = 101;
+          weight         = 256;
+          covalentRadius = 100 * ANGSTROEM;   // n.a.
+          atomicRadius   = 100 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "No";
+          name           = "Nobelium";
+          number         = 102;
+          weight         = 254;
+          covalentRadius = 100 * ANGSTROEM;   // n.a.
+          atomicRadius   = 100 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+   elem { symbol         = "Lw";
+          name           = "Lawrencium";
+          number         = 103;
+          weight         = 257;
+          covalentRadius = 100 * ANGSTROEM;   // n.a.
+          atomicRadius   = 100 * ANGSTROEM;
+          CPKcolor       = [255,20,147];
+   }
+
+}

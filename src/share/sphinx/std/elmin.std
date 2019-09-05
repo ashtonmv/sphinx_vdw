@@ -1,0 +1,10 @@
+include <std/sd.std>;
+include <std/ccg.std>;
+include <std/scf.std>;
+include <std/tb.std>;
+include <std/forst.std>;
+include <std/diag.std>;
+include <std/bandstruct.std>;
+include <std/lingrad.std>;
+include <std/sh.std>;
+include <std/lcao.std>;

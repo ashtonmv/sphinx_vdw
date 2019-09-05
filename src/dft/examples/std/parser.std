@@ -1,0 +1,14 @@
+// This file has been extracted automatically from file
+// parser.cpp
+
+structure      { type="group"; nItems=1; 
+   i           { type="integer"; min=0; max=100; }
+   d           { type="real"; min=-100, max=100; }
+   s           { type="string"; }
+   doSomething { type="flag"; optional; }
+   cell        { type="matrix"; dims=[3,3]; }
+   atom        { type="group"; optional; 
+      coords   { type="vector"; dim=[3]; }
+      label    { type="string"; optional; }
+   }
+}

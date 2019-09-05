@@ -1,0 +1,30 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxDemo4.h \
+                  SxDemo4Ast.h \
+                  SxDemo4Parser.h
+
+lib_LTLIBRARIES       = libsxdemo4.la
+libsxdemo4_la_SOURCES  = $(AUX_SRC)
+libsxdemo4_la_SOURCES += SxDemo4Ast.cpp \
+   SxDemo4Parser.cpp
+
+libsxdemo4_la_LIBADD   = $(SXIMPORTLIBS)
+libsxdemo4_la_LIBADD  += 
+libsxdemo4_la_LIBADD  += $(SXIMPORTOBJS)
+libsxdemo4_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxdemo4_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/parserkit -I$(top_srcdir)/parserkit
+AM_CPPFLAGS += -I$(top_builddir)/graph -I$(top_srcdir)/graph
+AM_CPPFLAGS += -I$(top_builddir)/fs -I$(top_srcdir)/fs
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

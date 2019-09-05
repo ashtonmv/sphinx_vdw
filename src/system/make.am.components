@@ -1,0 +1,147 @@
+# ---------------------------------------------------------------------------
+#
+#      The ab-initio based multiscale library
+#
+#                  S / P H I / n X
+#
+#      Copyright:  Max-Planck-Institute for Iron Research
+#                  40237 Duesseldorf, Germany
+#
+#      Contact:    https://sxlib.mpie.de
+#      Authors:    see sphinx/AUTHORS
+#      License:    see sphinx/LICENSE
+#
+# ---------------------------------------------------------------------------
+# SXDIR/src/system/make.am.components
+# ----------------------------------------------------------------------------
+
+# --- numlibs
+FFT      =
+BLAS     =
+REGEX    =
+NETCDF   =
+SHORTCUT =
+
+# --- S/PHI/nX BaseLibs
+SXNONSTD =
+if COND_BUILD_WIN32
+   SXNONSTD += @SXACCELERATE_BUILD@/nonstd/libsxnonstd.la
+endif
+if COND_BUILD_ACCELERATE
+   SXUTIL    = $(SXACCELERATE_BUILD)/util/libsxutil.la
+   SXMATH    = $(SXACCELERATE_BUILD)/math/libsxmath.la
+   SXFS      = $(SXACCELERATE_BUILD)/fs/libsxfs.la
+   SXIPC     = $(SXACCELERATE_BUILD)/ipc/libsxipc.la
+   SXIO      = $(SXACCELERATE_BUILD)/io/libsxio.la
+   SXMPI     = $(SXACCELERATE_BUILD)/mpi/libsxmpi.la
+else
+   SXUTIL    = @SXACCELERATE_BUILD@/lib/@SXBINTARGET@/libsxutil.la
+   SXMATH    = @SXACCELERATE_BUILD@/lib/@SXBINTARGET@/libsxmath.la
+   SXFS      = @SXACCELERATE_BUILD@/lib/@SXBINTARGET@/libsxfs.la
+   SXIPC     = @SXACCELERATE_BUILD@/lib/@SXBINTARGET@/libsxipc.la
+   SXIO      = @SXACCELERATE_BUILD@/lib/@SXBINTARGET@/libsxio.la
+   SXMPI     = @SXACCELERATE_BUILD@/lib/libsxmpi.la
+endif
+
+# --- S/PHI/nX PhysLibs
+SXDIRAC   = $(top_builddir)/dirac/libsxdirac.la
+SXGEOM    = $(top_builddir)/geom/libsxgeom.la
+SXDFT     = $(top_builddir)/dft/libsxdft.la
+SXEXX     = $(top_builddir)/exx/libsxexx.la
+SXCLASSIC = $(top_builddir)/classic/libsxclassic.la
+SXSTRUCT  = $(top_builddir)/struct/libsxstruct.la
+SXEXT     = $(top_builddir)/add-ons/libsxext.la
+SXPLAY    = $(top_builddir)/playground/libsxplay.la
+
+AM_CPPFLAGS += @CXX_PEDANTIC@ -I@NUMLIBS@/include
+
+SXIMPORTLIBS    =
+SXIMPORTLIBS   += $(EXT_LIBS) $(SX_DEPLIBS)
+SXIMPORTLIBS   += @LIBS@
+if COND_BUILD_WIN32
+   AM_CPPFLAGS += @WIN32FLAGS@
+endif
+
+# --- save linkage for external usage
+#scripts_SCRIPTS += $(top_srcdir)/system/sphinx.$(NAME).opts
+#CLEANFILES  += $(top_srcdir)/system/sphinx.$(NAME).opts
+#$(top_srcdir)/system/sphinx.$(NAME).opts:
+#	@test -f $@ -o x"$(MODE)" = x"withBin" \
+#    || echo `echo $(NAME) | tr "[:lower:]" "[:upper:]"`"=\"lib$(NAME).la $(UNIX_NUMLIBS)\"" \
+#    > $@
+
+
+# --- prepare dependencies for UNIX makefiles
+UNIX_DEPDIRS = `$(MAKE) @MAKE_SILENT_ARGS@ unixdepdirs | tail -1`
+UNIX_NUMLIBS = `$(MAKE) @MAKE_SILENT_ARGS@ unixnumlibs | tail -1`
+
+unixdepdirs_:
+	@echo $(SX_DEPLIBS)
+
+unixdepdirs:
+	@$(MAKE) @MAKE_SILENT_ARGS@\
+            SXNONSTD=\@SXACCELERATE_SRC\@/nonstd \
+            SXUTIL='\@SXACCELERATE_SRC\@/util \@SXACCELERATE_BUILD\@/util' \
+            SXMATH=\@SXACCELERATE_SRC\@/math \
+            SXFS=\@SXACCELERATE_SRC\@/fs \
+            SXIPC=\@SXACCELERATE_SRC\@/ipc \
+            SXIO='\@SXACCELERATE_SRC\@/io \@SXACCELERATE_BUILD\@/io' \
+            SXMPI='\@SXACCELERATE_SRC\@/mpi \@SXACCELERATE_BUILD\@/mpi' \
+            SXDIRAC=dirac \
+            SXGEOM=geom \
+            SXDFT=dft \
+            SXEXX=exx \
+            SXCLASSIC=classic \
+            SXSTRUCT=struct \
+            SXEXT=add-ons \
+            unixdepdirs_
+
+unixnumlibs_:
+	@echo $(NUM_DEPLIBS)
+
+unixnumlibs:
+	@$(MAKE) @MAKE_SILENT_ARGS@\
+            FFT="\@SX_FFT_LIBS\@" \
+            BLAS="\@SX_BLAS_LIBS\@" \
+            REGEX="" \
+            NETCDF="\@SX_NETCDF_LIBS\@" \
+            SHORTCUT="" \
+            unixnumlibs_
+
+
+# --- prepare dependencies for MSVC
+MSVC_DEPDIRS = `$(MAKE) @MAKE_SILENT_ARGS@ msvcdepdirs | tail -1`
+MSVC_NUMLIBS = `$(MAKE) @MAKE_SILENT_ARGS@ msvcnumlibs | tail -1`
+
+msvcdepdirs_:
+	@echo $(SX_DEPLIBS)
+
+msvcdepdirs:
+	@$(MAKE) @MAKE_SILENT_ARGS@\
+            SXNONSTD=../../sxaccelerate/src/nonstd \
+            SXUTIL=../../sxaccelerate/src/util \
+            SXMATH=../../sxaccelerate/src/math \
+            SXFS=../../sxaccelerate/src/fs \
+            SXIPC=../../sxaccelerate/src/ipc \
+            SXIO=../../sxaccelerate/src/io \
+            SXMPI=../sxaccelerate/src/mpi \
+            SXDIRAC=dirac \
+            SXGEOM=geom \
+            SXDFT=dft \
+            SXEXX=exx \
+            SXCLASSIC=classic \
+            SXSTRUCT=struct \
+            SXEXT=add-ons \
+            msvcdepdirs_
+
+msvcnumlibs_:
+	@echo $(NUM_DEPLIBS)
+
+msvcnumlibs:
+	@$(MAKE) @MAKE_SILENT_ARGS@\
+            FFT="" \
+            BLAS="mkl_intel_c_dll.lib\;mkl_sequential_dll.lib\;mkl_core_dll.lib"\
+            REGEX=gnurx.lib \
+            NETCDF=netcdf.lib \
+            SHORTCUT= \
+            msvcnumlibs_

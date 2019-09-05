@@ -1,0 +1,133 @@
+/**  \page page_addons         Writing SPHInX Add-Ons
+
+\section   addons_intro        Introduction
+
+  The SPHInX packages basically is a development library for scientific
+  problems. Of course, this library has been created in order to develop
+  actual executables. The modular concept of the SPHInX library has been
+  transformed also to its executables.
+
+\section   addons_addons       Add-ons
+
+  SPHInX add-ons are small executables which are used to perform simple
+  analysis of data, setting up and organizing the calculation jobs. Also the
+  actual DFT code is nothing but an add-on. Add-ons should be small and
+  focus on rather simple problems. Having a huge set of small units is
+  more useful that having just a few but very clever programs. The add-ons
+  use only a well definded set of input and output data types (such as numbers,
+  sx and sxb files). So the output of one add-on can be used as input for 
+  another. So, by this scheme a sort of analysis pipeline can be installed.
+
+\section   addons_interfaces   Interfaces
+
+  As mentioned in the previous paragraph each add-on should be used
+  from other add-ons. This also holds from the programmer's point of view:
+  Each add-on has to be arranged in a single SPHInX class which, of course,
+  can be reused from any other part of the SPHInX library.
+  In principle there are three interfaces
+
+\subsection addons_if_1        Interface 2 - SPHInX Class
+
+  Every add-on is written in a SPHInX class. It provides "set*" and
+  "get*" function to communicate from outside. So, this class can be
+  used from everywhere in the SPHInX hierarchy.
+
+
+\subsection addons_if_2        Interface 2 - Command Line
+
+  This is the executable representation of the add-on. It is basically
+  the "main()" function which reads user input from the command line or
+  some input files. Then in instantiated the add-on object. 
+  If the object gives some output in "main()" that very output should be
+  processed.  That's it!
+
+\subsection addons_if_3        Interface 3 - PHInaX Module
+
+  PHInaX - the graphical user interaface of SPHInX,  comes with a
+  module builder which can create shared objects from SPHInX add-ons.
+  In addition the intrinsic data types of PHInaX and/or its widgets components
+  (buttons, sliders, ...) can be linked with the add-on's "get*" and "set*"
+  functions. So, every add-on can be plugged in as a panel to
+  PHInaX. See also \ref page_phinax.
+
+\section   addons_source       Writing the source code 
+
+  Since every add-on is compiled in several times one has to make precautions
+  in order to avoid multiple linking of the same objects. In SPHInX this
+  is done with C preparser statements:
+
+  \par (1) Create header and source files
+
+   Copy the header template src/include/SxTemplate.h and src/util/SxTemplate.cpp
+   and modify the parameters correspondingly.
+  
+  \par (2) Include reuiqred header files
+  \verbatim
+     # include <...>
+     # include <...>
+     # include <...>
+  \endverbatim
+
+  \par (3) Define the add-on class with "#ifndef STANDALONE"
+  \verbatim
+     #ifndef STANDALONE
+
+     SxMyAddOn::SxMyAddOn () 
+     {
+        ...
+     }
+     
+     SxMyAddOn::~SxMyAddOn () 
+     {
+        ...
+     }
+
+     void SxMyAddOn::foo ()
+     {
+        ...
+     }
+  \endverbatim
+
+  \par (4) Write the "main()" function in the "else" part of the STANDALONE branch
+  \verbatim
+  #else /* STANDALONE */
+  #include <SxCLI.h>
+  int main (int argc, char **argv)
+  {
+     initSFHIngXUT ();
+     initSFHIngXMath ();
+     SxCLI cli (argc, argv);
+     ...
+     cli.finalize ();
+
+     SxMyAddOn addon;
+     addon.set (...);
+
+     bool status = addon.compute (...);
+     if (!status)  {
+        cout << SEPARATOR;
+        cout << "| MyAddOn exited normally.\n"
+        cout << SEPARATOR;
+     }
+
+     return status;
+  }
+  \endverbatim
+
+  \par (4) Close the STANDALONE branch
+  \verbatim
+  # endif /* STANDALONE */
+  \endverbatim
+
+
+\section   addons_make         Compiling add-ons
+
+  The \ref page_make automatically recognizes any new add-on as long as
+  it is located in the src/add-ons folder and has the extension *.cpp.
+  Compile the add-on with
+  \verbatim
+     (g)make
+  \endverbatim
+
+  \author Sixten Boeck
+  */

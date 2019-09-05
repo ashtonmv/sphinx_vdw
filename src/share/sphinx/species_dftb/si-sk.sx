@@ -1,0 +1,9 @@
+name           = "Silicon";
+element        = "Si";
+skElementName  = "Si"; // --- used to identify the SK files for every pair of species in the structure: 
+valenceCharge  = 4;    //     (SK files names = "skElementName"(species_i) + "..."(species_j) + ".sx")
+lMax           = d;
+atomicRhoOcc   = [2,2,0];
+reciprocalMass = 28.086;
+dampingMass    = 0.7;
+ionicMass      = 28.086;

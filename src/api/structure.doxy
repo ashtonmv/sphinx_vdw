@@ -1,0 +1,350 @@
+/** \page page_struct        Atomic Structure Library
+
+\section struct_intro        Introduction
+
+   In the SPHInX package many algorithms have to deal with atomic structures
+   and forces. Normally, equations related to atomic structures
+   and/or forces are slightly complicated to implemented due to many additional
+   indices (species, atom, directions, ...).  That's why in many programs 
+   the corresponding source codes look much more difficult than let's say
+   the quantum mechanics parts.
+   To demonstrate the problem have a look to the damped Newton scheme:
+   \f[
+      \tau^{(i+1)}_{i_s,i_a} 
+         = (1 + \lambda_{i_s}) \tau^{(i)}_{i_s,i_a}
+         - \lambda_{i_s} \tau^{(i-1)}_{i_s,i_a}
+         + \mu_{i_s} \mathbf{F}_{i_s,i_a}(\{\tau_{i_s,i_a}\})
+   \f]
+   The equation itself is very simple. However, due to the species and atoms
+   many \c for loops and \c if statements are required. The SPHInX goal
+   "one code line per equation" cannot be fulfilled.
+   In addition, atomic structure algorithms are using different coordinate
+   systems, some handle XYZ coodinates of the atoms/forces, others use
+   internal coordinates instead, in some schemes both modes are even intermixed.
+
+   The Atomic Structure Library has been designed in order to cope with this
+   problem. It internally manages the required coordinate list and overloads
+   the required operators. It allows access to the actual XYZ representation
+   of the coordinates as well as the degree of freedom coordinates. The standard
+   operators like '+', '-', '*', '/' have been overloaded and internally
+   handled by the optimized \ref page_vector. 
+
+
+
+\section struct_init         Initializing structures
+
+   to be continued...
+
+
+
+
+\section struct_systems      Representations
+
+   Depending on the algorithm sometimes atomic coordinates or forces should
+   be represented as 3-dimensional XYZ vectors, and sometimes as so-called
+   Degree-of-Freedom vectors. The Atomic Structure Library has interfaces
+   for both representations.
+
+\subsection struct_xyz       XYZ
+
+   The first way of representing coordinates is the XYZ representation. In
+   this case atomic coordinates or forces are defined as
+   \f[
+      \tau_{i_s,i_a} = \left( 
+                          \begin{matrix}
+                             \tau_x \\ \tau_y \\ \tau_z
+                          \end{matrix}
+                      \right)
+   \f]
+   or
+   \f[
+      \mathbf{F}_{i_s,i_a} = \left( 
+                                \begin{matrix}
+                                   F_x \\ F_y \\ F_z
+                                \end{matrix}
+                             \right)
+   \f]
+
+   A stright-forward access to each XYZ vector directly, either by the
+   pair \f$ (i_s,i_a) \f$ 
+
+\code
+SxAtomicStructure structure = ...;
+SxVector3<TPrecTauR> tau    = structure(is,ia);
+\endcode
+   
+   or, alternatively, by the atom index running over all atoms 
+   \c iTotalAtom \f$ (i) \f$.
+
+\code
+SxAtomicStructure structure = ...;
+SxVector3<TPrecTauR> tau    = structure(iTotalAtom);
+\endcode
+
+   This approach allows a direct access to the XYZ vectors. However, it usually
+   requires addition loops over \c iSpecies and \c iAtom and performs the
+   operations on scalars. The implementation of the algebraic equation can
+   easily look messy. For that reason a second interface has been created which
+   makes the compiler taking charge of addressing the proper XYZ vectors. It
+   is explained in the following section.
+
+\subsubsection struct_trans_xyz  Translating equations
+
+   As a first step the equations which are to be implemented have to be
+   analyzed with respect to their indices. By putting the atom and species
+   index as data type information they can be handled by the compiler instead.
+   
+   \b Example: 
+
+   We start again from the simple damped Newton scheme:
+   \f[
+      \tau^{(i+1)}_{i_s,i_a} 
+         = (1 + \lambda_{i_s}) \tau^{(i)}_{i_s,i_a}
+         - \lambda_{i_s} \tau^{(i-1)}_{i_s,i_a}
+         + \mu_{i_s} \mathbf{F}_{i_s,i_a}(\{\tau_{i_s,i_a}\})
+   \f]
+
+   Terms which depend only from the species have to be distuingished from
+   those depending also on the atoms. Hence, they are basically objects of 
+   these two type:
+     - depending on species only, e.g.,      \f$ \lambda_{i_s} \f$,
+                                             \f$ \mu_{i_s} \f$
+     - depending on atoms and species, e.g., \f$ \tau_{i_s,i_a} \f$, 
+                                             \f$ \mathbf{F}_{i_s,i_a} \f$ 
+
+   The translation is quite simple. Objects that depend on
+     - species only will become objects of type SxVector<?>
+     - atoms will become objects of type SxAtomicStructure.
+
+
+   Now, the indices information about species and atoms are handled by the
+   data types. Hence, they can be considered as known. The overloaded operators
+   know how to deal with them. Thus, the target equation looks now like
+   \f[
+      \mathbf{\tau}^{(i+1)}
+         = (1 + \lambda) \mathbf{\tau}^{(i)}
+         - \lambda \mathbf{\tau}^{(i-1)}
+         + \mu \mathbf{F}(\{\mathbf{\tau}\})
+   \f]
+
+\code
+// --- terms depending only on :iSpecies
+SxVector<Double> lambda = ...;
+SxVector<Double> mu     = ...;
+
+// --- terms depending on :iSpecies and :iAtom
+SxAtomicStructure tau = ...;
+SxAtomicStructure F   = ...;
+
+// --- implementation of damped Newton equation.
+//     no loops over :iSpecies or :iAtoms required
+tau = (1 + lambda) * tau - lambda * tauOld + mu * F;
+\endcode
+
+  
+\subsection struct_dof       DoF (Degree of Freedom)
+
+   The Degree of Freedom representation is often used. A degree of freedom
+   is \f$ \tau^{i_s,i_a}_d \f$ where \em d is a translation direction x, y, 
+   or z. Hence the atomic coordinates in Degree of Freedom representation read
+   \f[
+      \tau(i_\mathrm{DoF}) = \left(
+                                \tau^{i_s_1,i_a_1}_x,
+                                \tau^{i_s_1,i_a_1}_y,
+                                \tau^{i_s_1,i_a_1}_z,
+                                \cdots
+                                \tau^{i_s_n,i_a_n}_x,
+                                \tau^{i_s_n,i_a_n}_y,
+                                \tau^{i_s_n,i_a_n}_z
+                             \right)^T,
+   \f]
+   the Degree of Freedom force vector would be
+   \f[
+      \mathbf{F}(i_\mathrm{DoF}) = \left(
+                                \F^{i_s_1,i_a_1}_x,
+                                \F^{i_s_1,i_a_1}_y,
+                                \F^{i_s_1,i_a_1}_z,
+                                \cdots
+                                \F^{i_s_n,i_a_n}_x,
+                                \F^{i_s_n,i_a_n}_y,
+                                \F^{i_s_n,i_a_n}_z
+                             \right)^T.
+   \f]
+   A typical application of the Degree of Freedom representation is the
+   quasi Newton update step where the improved geometry \f$ \tau^{(i+1)} \f$
+   can be evaluated from the approximated Hessian matrix \b H:
+   \f[
+      \tau^{(i+1)} = \tau^{(i)} + \mathbf{H}^{-1} \mathbf{F}^{(i)}.
+   \f]
+   The geometry vector \f$ \tau \f$ and the force vector \b F are given in
+   the DoF form.
+   The pseudo source code looks like
+
+\code
+// --- define structure and forces
+SxAtomicStructure structure = ...;
+SxAtomicStructrue forces    = ...;
+
+// --- switch to DoF representation using function coordRef() 
+SxVector<Double> tau = structure.coordRef();
+SxVector<Double> f   = forces.coordRef();
+SxMatrix<Double> H   = ...;   // Hessian matrix
+
+// --- apply equation in DoF reprentation
+tau += H ^ f;
+\endcode
+
+   As demonstrated in the above example the Degree of Freedom vectors
+   are simply defined as SxVector<?> variables. To convert an atomic
+   structure object (or forces) into the Degree of Freedom form the i
+   member function SxAtomicStructure::coordRef can be used. 
+   
+
+\section struct_pitfalls      Pitfalls
+
+\subsection struct_rw   Modifying data
+
+   The function SxAtomicStructure::coordRef returns a \e reference to the
+   \e coordinate data saved in the SxAtomicStructure object. Thus, the
+   \e reference allows both read and write access to the member variable
+   \e coords. As the returned reference is a vector from the \ref page_vector
+   internally \ref vec_rc is being applied. Hence, a normal assignment (=)
+   will \b not modify the original coordinate data! Instead the
+   copy-assignment operator needs to be used (<<=).
+
+   \b wrong:
+\code
+SxVector<Double> x = structure.coordRef();
+x = x + ...;  // possible error: coordinates saved in structure 
+              //                 are kept untouched!
+\endcode
+
+   \b correct:
+\code
+SxVector<Double> x = structure.coordRef();
+x <<= x + ...;  // coordinates saved in structure are also modified
+\endcode
+
+   \b or \b better:
+\code
+SxVector<Double> x = structure.coordRef();
+x += ...;
+\endcode
+
+   In the last code fragment the assigment operator "+=" has been used.
+   Other valid assignment operators are "-=", "*=", and "/=".
+
+\subsection struct_refcount   Reference counting
+
+   The Atomic Structure Library is based on the \ref page_vector. Since the
+   \ref page_vector uses a programming technique called \ref vec_rc also
+   the Atomic Structure Library has to be treated as a reference counting
+   class. That means that some intuitive code statements are disallowed
+   because they will cause serious memory violations. Those errors might
+   be extremely difficult to trace.
+
+   Before continue reading this section first aquainted with \ref vec_rc.
+
+
+   \b wrong:
+   \verbatim
+      vec = funcReturnsStructure().coordRef ();
+   \endverbatim  
+
+   \b correct:
+    \verbatim
+     SxAtomicStructure s = funcReturnsStructure();
+      vec = s.coordRef;
+   \endverbatim
+
+   or 
+ 
+   \b correct:
+   \verbatim
+      vec = funcReturnsReferenceToStructure().coordRef();
+   \endverbatim
+
+
+   Another typical mistake is to assume the assignment oprator performing
+   a real copy. Again, the Atomic Structure Library is based on a reference
+   counting class. Hence, the assignment operator just acts as a pointer
+   assignment. As long as at least one algebraic operation is involved no
+   problem should arrise. All comments made in section \ref vec_pf_rc hold
+   also here:
+
+   \b wrong:
+\code
+SxAtomicStructure A = ...;
+SxAtomicStructure B = A;    // --- B is NOT a copy of A.
+                            /      B is just another name for A.
+                            //     Any modification of B also changes A!!!
+\endcode
+
+   \b correct:
+
+\code
+SxAtomicStructure A = ...;
+SxAtomicStructure B (A, true);    // --- call copy constructor with
+                                  //     deepCopy = true
+\endcode
+
+   \b also \b correct:
+
+\code
+SxAtomicStructure A = ...;
+SxAtomicStructure B;
+B.copy (A);
+\endcode
+
+   As soon as algebraic equations are performed reference counting does not
+   cause further problems
+
+   \b correct:
+\code
+SxAtomicStructure A = ...;
+SxAtomicStructure B = 2 * A;   // --- B referes to the (temporary) object 2 * A
+\endcode
+
+\section struct_filters   Pipelining of Filters, Operators, and Transformations
+
+   Pipelining is a special concept of the SPHInX Atomic Structure Library
+   which allows a simple extension of the library for new needs. A filter
+   is an operator which takes an entire atomic structure or a force object
+   as input and returns a new object of the same size and type, e.g.,
+   the SxStrickyFilter returns only those forces whose atoms are marked as
+   movable (= not sticky). Forces of sticky atoms are set to zero.
+
+   Operators can be concatinated. So an entire operator pipeline can be
+   constructed, e.g.,
+
+     -# Constraint filter: get forces of movable atoms
+     -# Center of mass: substract center of mass coordinates from forces
+     -# High Pass Filter: remove low eigenfrequencies
+     -# Rotation Filter: remove rotation modes
+
+   Note, that the order is important!
+
+   A pseudo code for some sort of quasi-Newton scheme applying filters 
+   could look like
+   \verbatim
+      SxStickyFilter S (...);
+      SxConstraints  C (...);
+      SxCenterOfMass M (...);
+
+      SxOperator F = S << C << M;
+
+      for (it=0; it < nIterations; it++)  {
+         ...
+         x = x - ( Hessian.inverse ^ F*forces );
+         ...
+      }
+   \endverbatim
+
+   More information on filters can be found in SxOperator.
+
+
+
+
+\author Christoph Freysoldt, Sixten Boeck
+
+*/

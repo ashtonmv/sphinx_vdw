@@ -1,0 +1,28 @@
+lcao           { type="group"; nItems=1; optional;
+   file        { type="string";  optional; }
+   maxSteps    { type="int"; min=0; optional;}
+   mixingMethod     { type="int"; min=0; max=2; optional; }
+   nPulaySteps      { type="int"; min=1; max=50; optional; }
+   spinMixing       { type="real"; min=0; max=1; optional; }
+   rhoMixing        { type="real"; min=0; max=1; optional; }
+   linearVacMixing  { type="flag"; optional; }
+   atomicOrbitals { type="flag"; optional; }
+   pulayForces { type="flag"; optional; }
+   dEnergy { type="real"; min=0; optional; }   
+   
+   preconditioner   { type="group"; optional;
+      type           { type="int"; min=0; max=3; }
+      scaling        { type="real"; optional; }
+      dielecConstant { type="real"; optional; not="kerkerDamping"; }
+      kerkerDamping  { type="real"; optional; not="dielecConstant"; }
+      nonDiagonal    { type="group"; optional;
+         eCut           { type="real"; optional; }
+         update         { type="int"; optional; min=1; } 
+         noDiag         { type="flag"; optional; 
+                          not="avgEpsDiag,avgDensityDiag"; }
+         avgDensityDiag { type="flag"; optional; not="avgEpsDiag,noDiag"; }
+         avgEpsDiag     { type="flag"; optional; not="avgDensityDiag,noDiag"; }
+      }
+   }
+
+}             

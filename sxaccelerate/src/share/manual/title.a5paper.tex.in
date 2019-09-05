@@ -1,0 +1,32 @@
+\thispagestyle{empty}\vspace*{.2\textheight}
+
+
+\begin{flushright}
+\textbf{\Huge \includegraphics[width=5cm]{@abs_srcdir@/images/logo.eps}}
+\par\end{flushright}{\Huge \par}
+
+\begin{flushright}
+\textbf{\Huge SxAccelerate @PACKAGE_VERSION@}
+\par\end{flushright}{\Huge \par}
+
+\begin{flushright}
+{\Huge \hrulefill}
+\par\end{flushright}{\Huge \par}
+
+\begin{flushright}
+\emph{\Huge Developer's Guide}
+\par\end{flushright}{\Huge \par}
+
+\newpage{}
+
+\textbf{\Huge \thispagestyle{empty}}{\Huge \par}
+
+{\small Erkrath, 2nd Edition, \today}{\small \par}
+
+\vspace*{11cm}
+While every precaution has been taken in the preparation of this book,
+the publisher assumes no responsibility for errors or omissions, or
+for damages resulting from the use of the information contained herein.
+\vspace{1em}
+
+Please send comments and suggestions to boeck@dacs-labs.com\newpage{}

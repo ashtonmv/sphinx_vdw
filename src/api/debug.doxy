@@ -1,0 +1,169 @@
+/** \page page_debug       Debug Mode
+
+\section dbg_intro         Introduction
+   The debug mode of SPHInX provides the developer with additional program
+   features to check code consistency. In spite this mode slows down the
+   execution it certainly speeds up the developing phase.
+
+\section dbg_step          The debug mode - step by step
+\subsection dbg_ enter      How to enter the debug mode
+   SPHInX is used to be compiled in 'release' mode, i.e. with enabled 
+   optimization flags and using the vendor C++ compiler. In order to switch
+   to the debug mode you have got to recompile the source code of SPHInX.
+   Use the make target 'debug' (instead of 'release'):
+   \par 
+   \verbatim
+
+   cd sphinx/src
+   (g)make debug
+   ...
+
+   \endverbatim
+   The mode is stored unless you call make with the target 'release'. You only
+   have to switch to 'debug' once. The next 'make' will keep the mode (debug or 
+   release). For detailed information inspect the GNUmakefile in sphinx/src.
+
+\subsection dbg_usage     Usage
+   Whenever you want to access the debug function, first you have to include the
+   debug header file
+
+   \par myfile.h
+   \verbatim
+      #include <SxError.h>
+      ...
+   \endverbatim
+
+   After including that header file there are new macros that you can use in
+   order to check whether arguments of your new defined functions are valid.
+   They are called CHECK, CHECK_VAR, CHECK_VARS, and CHECK_3VARS.
+
+   The macro CHECK_VAR has two arguments: (1) an expression, (2) the variable
+   to be printed in case expression is 'false'.
+
+   CHECK_VARS and CHECK_3VARS are similar. CHECK_VARS can
+   print two variables, CHECK_3VARS three.
+
+   \par myfile.cpp
+   \verbatim
+
+      // --- Example 1a: Is pointer valid???
+      void MyClass::foo1 (int *ptr)
+      {
+         CHECK (ptr);  // NULL pointer not allowed
+         *ptr = 1;
+      }
+
+      // --- Example 1b: Is a pointer typecast valid???
+      void MyClass::foo1 (void *ptr)
+      {
+         CHECK (dynamic_cast<int *>(ptr));  // is ptr a pointer to int???
+         
+         int &intVal = (int *)(ptr);
+      }
+
+      // --- Example 2: Is value positive???
+      float MyClass::mySqrtFunction (float x) const
+      {
+         CHECK_VAR (x >= 0., x);
+
+         return sqrt (x);
+      }
+
+      // --- Example 3: Are dimensions correct???
+      float MyClass::scalarProduct (SxVector<Float> a, SxVector<Float> b)
+      {
+         CHECK_VARS (a.getSize() == b.getSize(), a.getSize(), b.getSize());
+
+         float res = 0.;
+         for (int i=0; i < a.getSize(); i++)  res += a(i) * b(i);
+         return res;
+      }
+
+
+      // --- Example 4: Range check
+      float MyClass::midValue (float min, float val, float max)
+      {
+         CHECK_3VAR (min < val &&  val < max , min, val, max);
+
+         ...;
+      }
+
+
+      // --- Example 5: Is denominator of the division valid?
+      float inverse (float x)
+      {
+         CHECK_DIV (x);
+         return 1. / x;
+      }
+
+
+      // --- Example 6: Check if a number is valid (neither NaN nor inf)
+      void aFunction (float x)
+      {
+         CHECK_NUM (x);
+         ...
+      }
+
+
+      // --- Example 7: Validate a complete SxVector<T> (neither NaN nor inf)
+      void aFunction (const SxVector<Float> a)
+      {
+         VALIDATE_VECTOR (a);
+         ...
+      }
+
+   \endverbatim
+
+\section dbg_if   Using debug macros in if branches
+   If the program will be compiled with enabled debug option the above mentioned
+   macros will be substituted with blocks of C/C++ statements. 
+   Hence it is necessary to embrace the macros with parenthesis, e.g.
+   \par
+   \verbatim
+      if ( expr == true )  { EXIT };
+   \endverbatim
+   Without the '{ }' the compiler prompts an error!
+
+\section dbg_analysis  Inspecting SPHInX core files
+
+   The SPHInX assert macros cause intentionally segmentation faults and
+   write so-called core files. Those core files contain the entire state
+   of the program when it crashed. By using a debugger (e.g. ddd) the core
+   file can be analyzed. The debugger gives detailed information about the
+   code line of the corresponding SPHInX assert macro as well as the 
+   stack data from where functions have been called. Additionally, the core
+   files contain the values of all variables at the time when the program
+   stopped. 
+   As described already in \ref page_make SPHInX programs are usually launched
+   from a wrapper shell script. These wrappers initialize some necessary 
+   environment variables. The actual executable (with extension *.x) is started
+   from inside the wrapper. If the program was compiled in the DEBUG mode
+   the wrapper provides an option --debug with the core file name as next
+   argument, e.g.
+   \verbatim
+      myProgram --debug core
+   \endverbatim
+   A typical debug screen looks like
+
+      \image html  ddd.png
+      \image latex ddd.eps width=10cm
+
+   In order to inspect the caller and callee routines the menu item
+   Status -> Backtrace can be used, e.g.
+
+      \image html  ddd-trace.png
+      \image latex ddd-trace.eps with=10cm
+
+   \see SxError
+   \see http://www.gnu.org/software/ddd/#Doc
+
+
+\section dbg_trace  More detailed debug analysis
+
+   The DEBUG mode is able to filter out the most obvious programming bugs
+   which probably is 80% of the debugging business. However SPHInX supports
+   also runtime memory tracing for a more sophisticated memory oriented
+   debugging. More information about can be found in \ref page_leak.
+
+\author Sixten Boeck
+*/

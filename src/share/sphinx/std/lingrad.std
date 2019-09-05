@@ -1,0 +1,10 @@
+linGrad            { type="group"; optional;
+   i               { type="int";  min=0; }
+   iSpin           { type="int";  min=0; max=1; }
+   ik              { type="int";  min=0; }
+   lambdaMin       { type="real"; max=0.0; }
+   lambdaMax       { type="real"; min=0.0; }
+   nSteps          { type="int";  min=1; }
+   noRhoStorage    { type="flag"; optional; }
+   noWavesStorage  { type="flag"; optional; }
+}

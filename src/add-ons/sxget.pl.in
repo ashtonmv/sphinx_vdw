@@ -1,0 +1,651 @@
+#!@PERL@ -w
+
+#AUTHOR: C.Freysoldt, freysoldt@mpie.de
+
+# TODO: 
+# - file validator statements a la 
+#   !log grep -q 'S/PHI/nX exited normally.' $log
+# - read command file once and store in hash
+
+use strict;
+use diagnostics;
+
+# exit codes
+my %exitcode = (
+      unknownCommand => 10,
+      autoUnzip      => 11,
+      fileNotFound   => 12,
+      emptyInputFile => 13,
+      failedCommand  => 14,
+      lineMisfit     => 15,
+      missingOption  => 16
+);
+
+my $zcat="@ZCAT@";
+
+my $commandFile;
+if ( exists($ENV{'SXGET_RC'}))  {
+   $commandFile = $ENV{'SXGET_RC'};
+} else {
+   $commandFile = "$0";
+   $commandFile =~ s/\.pl$//;
+   $commandFile .= ".rc";
+   if (! -r $commandFile) {
+      # hack for uninstalled out-of-place compiled version
+      my $makefile = $commandFile;
+      $makefile =~ s/sxget\.rc/Makefile/;
+      if (-r $makefile) {
+         my $srcdir;
+         $srcdir = `grep '^ *abs_srcdir *=' $makefile`;
+         $srcdir =~ s/ *abs_srcdir *= *//;
+         chomp $srcdir;
+         my $sxgetrc = "$srcdir/sxget.rc";
+         $commandFile = $sxgetrc if -r $sxgetrc;
+      }
+   }
+}
+
+my $sxgetalias = "sxget"; # replace $sxgetalias by $0 in sxget.rc
+my $letters = "0-9a-zA-Z_-"; # allowed characters for command names
+
+my %builtinCommands = (
+      help     => \&getHelp,
+      author   => \&showAuthor,
+      commands => \&getCommandList,
+      complete => \&complete,
+      extend   => \&helpExtend,
+      apropos  => \&apropos,
+      config   => \&printCommandFile,
+      );
+
+my %options;
+my @arguments;
+my @directories;
+
+while (@ARGV != 0)  {
+   $_ = shift;
+   if (/^-/)  {
+      if ($_ eq "-d")  {
+         $_ = shift;
+         chomp; s/^\s*//;
+         push @directories, (split);
+      } elsif ($_ eq "-D")  {
+         $_ = shift;
+         $_ = `echo $_`;
+         chomp;
+         push @directories, (split);
+         while (@ARGV > 0)  {
+            $_ = shift;
+            if (-d) { 
+               push @directories, $_; 
+            } else {
+               unshift @ARGV, $_;
+               last;
+            }
+         }
+      } elsif (!/^--/)  {
+         $options{$_} = (shift);
+      } else {
+         $options{$_} = 0; # flag options
+      }
+   } else {
+      push @arguments, $_;
+   }
+}
+
+
+if (@arguments == 0)  {
+   print STDERR <<ENDINFO;
+
+$sxgetalias:    extensible grepping tool for data.
+
+in order to get general help, type
+
+        $sxgetalias help
+
+ENDINFO
+   exit;
+}
+
+# handle built-in commands (must be first argument)
+if (exists $builtinCommands{$arguments[$[]})  {
+   my $option = shift @arguments;
+   my $routine = $builtinCommands{$option};
+   &$routine (@arguments);
+   exit;
+}
+
+# no directory given -> current directory only
+push @directories, undef if (@directories == 0);
+
+# filename container: each filename is stored in case it's needed again
+my %files;
+
+# handle multiple directories
+for my $dir (@directories)  {
+
+   $options{"-d"} = $dir if defined $dir;
+   undef %files; # clean up file names
+
+   my %output;
+   my $nLines = 0;
+
+# handle configured commands
+   for my $item (@arguments)  {
+      my $command = getCommand ($item);
+      print STDERR "$item command: $command\n" 
+         if (exists $options{"--verbose"});
+      my @outlines = `$command`;
+      if ($? != 0)  {
+         print STDERR "$item command failed (exit code: ".($?>>8).").\n";
+         exit $exitcode{failedCommand};
+      }
+      my $i = 0;
+      foreach (@outlines)  {
+         chomp;
+         s/^\s+//;
+         s/\s+$//;
+         push @{$output{++$i}}, $_ if /[^\s]/; # ignore empty lines
+      }
+      if ($nLines == 0)  {
+         $nLines = $i;
+      } elsif ($nLines != $i) {
+         print STDERR "Commands produce varying number of lines:\n";
+         $, = "\t";
+         $nLines = $i if ($i > $nLines);
+         for (1 .. $nLines)  {
+            print STDERR @{$output{$_}};
+            print STDERR "\n";
+         }
+         print STDERR "Commands produce varying number of lines.\n";
+         exit $exitcode{lineMisfit};
+      }
+   }
+      
+#set list element separator for output 
+   $, = "\t";
+   for (1 .. $nLines)  {
+      print @{$output{$_}};
+      print "\n";
+   }
+}
+
+# ---------------- subroutines
+
+sub getCommand  {
+   my $name = shift;
+   my $autoZip = ($name =~ m/^Z(.*)/);
+   if ($autoZip)  {
+      system "grep -q '$name\[^$letters\]' $commandFile";
+      if ($autoZip = ($? != 0))  {
+         $name = $1;
+         print STDERR "Z$name: Trying automatic unzip...\n"
+            if (!exists $options{"--quiet"});
+      }
+   }
+   my (@reqFiles, @cmdOptions, $command);
+   if ($name =~ m/^{([ $letters]*):(.*)}$/)  {
+# inline extraction commands
+      @reqFiles = split (' ',$1);
+      $command = $2;
+   } else {
+# extraction commands from commandFile
+      my @lines = qx{grep '^$name\[^$letters\]' $commandFile};
+      foreach (@lines)  {
+         chomp;
+         s/^$name\s*//;
+# aliases start with '='
+         if (/^=\s*(.*)$/) {return getCommand ($autoZip ? "Z$1" : $1); }
+# ignore descriptions
+         next if (/^"/);
+         if (/^!(.*)$/)  {
+            $_ = $1;
+            push @reqFiles, (split);
+         } elsif (/^\?(.*)$/)  {
+            $_ = $1;
+            push @cmdOptions, (split);
+         } else {
+            $command .= " $_";
+         }
+      }
+   }
+   if (! defined $command ) {
+      print STDERR "Unknown command '$name'\n";
+      exit $exitcode{unknownCommand};
+   }
+# replace sxgetalias by $0 (including options)
+   my $selfcall = $0;
+   foreach (keys %options)  {
+      $selfcall .= " $_" if /^--/;
+   }
+   $command =~ s/$sxgetalias/$selfcall/g;
+   if ($autoZip)  {
+      if (@reqFiles != 1)  {
+         print STDERR "auto-unzip failed: more than one input file\n";
+         exit $exitcode{autoUnzip};
+      }
+      my $file = shift @reqFiles;
+      $command =~ s/\$$file/-/;
+      $command = "zcat \$z$file | $command";
+      push @reqFiles, "z$file";
+   }
+# substitute required file variables by proper names
+   foreach my $file (@reqFiles)  {
+      my $fileName = getValidFile ($file);
+# substitute \$$file by actual fileName
+      $command =~ s/\$$file/$fileName/g;
+   }
+# substitute required option variables by proper names
+   foreach my $optName (@cmdOptions)  {
+      if (! exists $options{"-$optName"})  {
+         print STDERR "command $name requires option -$optName\n";
+         exit $exitcode{missingOption};
+      }
+# substitute \$$file by actual fileName
+      my $optVal = $options{"-$optName"};
+      $command =~ s/\$$optName/$optVal/g;
+   }
+# substitute zcat by proper executable
+   $command =~ s/\bzcat\b/$zcat/g;
+# substitute $PERL by current executable
+   $command =~ s/\$PERL/$^X/g;
+   return $command;
+}
+
+sub getFileName  {
+   my $file = shift;
+   if (exists $files{$file})  {
+      return $files{$file}; # get stored filename
+   }
+   my $fileName;
+   if (exists $options{"-$file"})  {
+# command line has priority
+      $fileName = $options{"-$file"};
+   } else {
+# get standard file name from sxget.rc
+      $_ = `grep "^\\\$$file" $commandFile`;
+      if (m/./)  {
+         s/^\$$file[ =]*//;
+         chomp;
+      } elsif ($file =~ m/^z(.*)/)  {
+         my $unzipped = $1;
+         print STDERR "autodefined $file-file: attach .gz to $unzipped-file\n"
+            unless exists $options{"--quiet"};
+         $_ = `grep "^\\\$$unzipped" $commandFile`;
+         if (m/./)  {
+            s/^\$$unzipped[ =]*//;
+            chomp;
+            $_ .= ".gz";
+         }
+      }
+      undef $_ if (! m/./);
+      $fileName = $_;
+   }
+# prepend dir (-d option) unless fileName starts with / or ./
+   if (   defined $fileName 
+       && exists $options{"-d"}
+       && !($fileName =~ m{^\.?/}) )  {
+      $fileName = $options{"-d"}."/$fileName";
+      $fileName =~ s{//}{/};
+   }
+   $files{$file} = $fileName; # store filename
+   return $fileName;
+}
+
+sub getValidFile {
+   my $file = shift;
+   my $printUsedFile =(!exists $options{"--quiet"} && !exists $files{$file});  
+   my $fileName = getFileName ($file);
+# check that we got something that exists
+   if (!defined $fileName || !-e $fileName)  {
+      print STDERR "$file-file '$fileName' does not exist.\n";
+      print STDERR "Use -$file option to give a valid file\n";
+      exit $exitcode{fileNotFound};
+   }
+# check that the file is not empty
+   if (-z $fileName)  {
+      print STDERR "$file-file '$fileName' is empty.\n";
+      print STDERR "It's probably not what you thought it should be...\n";
+      exit $exitcode{emptyInputFile};
+   }
+   print STDERR "$file-file: '$fileName'\n" if $printUsedFile;
+   return $fileName;
+}
+
+sub printCommandFile { print STDERR <<ENDCONFIG; }
+The commands are defined in
+
+   $commandFile
+
+New commands have to be added to this file. Run 
+
+   $sxgetalias extend | more
+
+for details how to do this.
+ENDCONFIG
+   
+
+sub showAuthor { print STDERR <<ENDAUTHOR ; }
+
+*************************************************************
+* This nice little tool was written by Christoph Freysoldt. *
+* Mail to freysoldt\@mpie.de if you like.                   *
+*                                                           *
+* You may reuse or modify this script for different         *
+* purposes, but not remove this message.                    *
+*************************************************************
+
+ENDAUTHOR
+
+# do not write to STDERR so it can be piped to 'more'
+sub getHelp  {
+   if (@_ == 0)  {
+      print <<ENDUSAGE;
+
+USAGE:
+   $sxgetalias help                 this help message
+   $sxgetalias commands             available commands
+   $sxgetalias complete             print the complete command line for the tcsh
+   $sxgetalias help <commands>      get help about <commands> (a list of words)
+   $sxgetalias apropos <keywords>   get commands that are related to <keywords>
+   $sxgetalias extend               how to add new commands
+   $sxgetalias extend | less        readable version of how to add new commands
+   $sxgetalias config               print location of configuration file
+   $sxgetalias help options         help about built-in options
+   
+   $sxgetalias <command> [<command>, ...]   get data specified by <command>
+
+   Each command requires one or more files (use '$sxgetalias help <command>' 
+   to see which).  The standard files can be overloaded by the option
+   given in brackets after the file. E.g.
+      
+      --- command 'energy':
+      requires: energy.dat (-energy)
+
+   tells you that the command 'energy' needs 'energy.dat', which can
+   be replaced by any file if you use the '-energy' option, e.g.
+
+      $sxgetalias energy -energy energy-lcao.dat
+
+   would use energy-lcao.dat instead.
+
+   There must be space between the option and the filename.
+
+   Using Z<command> requests automatic unzipping of zipped files. This
+   is an experimental feature and works only for simple single text file
+   extractions.
+
+ENDUSAGE
+      return;
+   }
+   if (@_[$[] =~ /^options$/)  {print <<ENDOPTIONS; return;}
+Built-in options:
+   --quiet     suppress all diagnostic output except errors
+   -d <dir>    set path to files. All files are assumed to be in
+               <dir>/ afterwards. If a single file should be taken from
+               a different path, use an absolute path (starting with '/')
+               or prepend './' in order to use a relative path from the
+               current directory. All other relative pathes are relative to
+               <dir>/. Be careful, the shell may expand relative pathes
+               already, so you may need to protect them by single quotes '.
+   -D <dirs>   similar to -d, but <dirs> may be more than one directory. Also
+               wildcards can be used.
+   --verbose   print extraction commands
+
+   The filenames listed as "required files" for each command can be overloaded
+   using the option given in brackets after that filename.
+
+   Some commands have additional options.
+
+ENDOPTIONS
+   my @commands = (@_);
+   
+COMMANDS: foreach my $name (@commands)  {
+      my @lines = qx{grep '^$name *[="\\!?]' $commandFile};
+      my (@reqFiles, @helpMessage, @cmdOptions);
+      foreach (@lines)  {
+         chomp;
+         s/^$name\s*//;
+# aliases start with '='
+         if (/^=\s*(.*)$/) { 
+            print "\n'$name' is alias for '$1'\n";
+            getHelp ($1); 
+            next COMMANDS; 
+         }
+         if (/^!(.*)$/)  {
+            $_ = $1;
+            push @reqFiles, (split);
+            next;
+         }
+         if (/^\?(.*)$/)  {
+            $_ = $1;
+            push @cmdOptions, (split);
+            next;
+         }
+         s/^"//;
+         push @helpMessage, "   $_\n";
+      }
+      print "\n--- command '$name':\n";
+      if (@reqFiles != 0)  {
+         print "requires: ";
+         foreach (@reqFiles)  {
+            my $fileName = getFileName ($_);
+            print "$fileName (-$_) ";
+         }
+         print "\n";
+         undef @reqFiles;
+      }
+      if (@cmdOptions != 0)  {
+         print "required options: ";
+         foreach (@cmdOptions)  {
+            print "-$_ ";
+         }
+         print "\n";
+         undef @cmdOptions;
+      }
+      print @helpMessage;
+      undef @helpMessage;
+   }
+}
+
+sub getCommandList  {
+   my @list = qx{grep '^\[$letters\]* *["=]' $commandFile | sed -e's/["=].*\$//'};
+   my %uniqueList;
+   foreach (@list)  {
+      chomp;
+      s/\s+$//;
+      $uniqueList{$_} = 0;
+   }
+   @list = sort {my ($one,$two) = ($a, $b);
+                 $one=~tr/A-Z/a-z/;
+                 $two=~tr/A-Z/a-z/; 
+                 $one cmp $two; }
+           (keys %uniqueList);
+   print "@list\n";
+}
+
+sub apropos  {
+# greps words in help messages and prints the corresponding help
+   my @words = @_;
+   my %commands;
+   foreach my $word (@words)  {
+      my @where = qx{grep '^\[$letters\]* *"' $commandFile | grep \'$word\' | sed -e's/".*\$//'};
+      foreach (@where)  {
+         chomp;
+         $commands{$_} = 0;
+      }
+   }
+   if (%commands)  {
+      getHelp (sort keys %commands);
+   } else {
+      $, = ", ";
+      print "There's nothing about ";
+      print @words;
+      print "\n";
+   }
+}
+
+sub complete {
+# TODO: suppress abbreviation aliases (v=volume)
+   my $commands = `$0 commands`; chomp $commands;
+   my $completion = "complete $sxgetalias ";
+   
+# built-in flag options
+   $completion .= "'c/--/(quiet verbose)/' ";
+   
+# built in -d option requires directory
+   $completion .= "'n/-d/d/' ";
+
+# help is about options and configured commands
+   $completion .= "'n/help/(options $commands)/' ";
+
+# non-flag options
+   my @optionList = `grep '^\\\$' $commandFile | sed -e's/\\\$// ; s/ .*// ;'`;
+   my $options = "d"; # built-in
+   for (@optionList)  { chomp; $options .= " $_"; }
+   $completion .= "'c/-/($options)/' ";
+
+# after non-flag options there is a file
+   $completion .= "'n/-*/f/' ";
+
+# the rest may be built-in or configured commands
+   $completion .= "'p/*/(";
+   for my $builtin (keys %builtinCommands)  {
+      $completion .= "$builtin ";
+   }
+   $completion .= "$commands)/'";
+   print "$completion\n";
+}
+
+# do not write to STDERR so it can be piped to 'more'
+sub helpExtend  {
+   my @builtin=sort keys %builtinCommands;
+   $"=",";
+   print <<ENDEXTEND;
+
+                              EXTENDING $sxgetalias
+                  ==========================================
+
+The commands are stored in a data file. The current data file is
+
+$commandFile
+
+New commands are added in this file. Each line concerned with your command
+starts by this command (no spaces in front). Commands have to be words
+(letters a-z, A-Z, and _).
+
+In the following we assume that you want to add the command 'lala'. Each new
+line that is added to the data file will be prepended here by a star *, so 
+you know what is to be typed in.
+
+------------ DESCRIPTION ------------
+
+First you'd like to specify what this command has as output. This is done
+in lines starting with double quote "
+
+*lala " This is a nice new command.
+*lala " It counts the number of non-empty lines in the log file
+
+-------------- FILES ----------------
+
+Then you must list the required files. They are given in a separate line
+after an exclamation mark '!'. In our case it is the log file, so
+
+*lala ! log
+
+If you have more than one file, then one after another. The second thing is
+that you want to set a default value for that file. So you go to the 
+beginning of the data file and enter the default after the filename which
+is preceeded by the dollar \$ sign.
+
+*\$log sphinx.log
+
+unless there is some defined log file already there. If you do not like
+that default, use a different name. If one variable is given more than once,
+the whole script probably crashes (I mean, adding commands is nothing you
+do twice a day, so a little effort can be expected from your side).
+
+In defining defaults, there is no 'lala' in front of the line, because this 
+may be used by all commands. This is also why it is in the beginning of the
+file, so you find them all immediately.
+
+----------- OPTIONS ------------------------
+
+Options are a way to request user-input for the command which is not
+available in files. In contrast to files, there are no default values.
+Otherwise, they work similar to files.
+
+Options are specified with a question mark '?' instead of a '!'. The
+content of options is not interpreted by sxget. In particular, options
+need not (and should not) specify files.
+
+It is absolutely crucial that you provide a proper description for
+the meaning of options in your command description, since there is no
+way of letting sxget guess what they mean.
+
+----------- CODE ---------------------------
+
+Now there is only the actual command left.
+If it is a multiline command, semicolons ';' go in between the statements
+always. Otherwise, like for the " and ! lines it may span several lines, that
+are concatenated into one command in the end. A space is put where a line
+break was, so don't try to break in the middle of the word.
+The command lines do not have any special sign. In our case it is simply
+
+*lala grep -c . \$log
+
+As you can see, the log file is addressed by log preceeded by the dollar sign.
+So, once again: 
+  declaration of defaults: \$-sign
+  require files          : no \$-sign
+  use in command         : \$-sign
+
+To use values for the non-file ('?'-type) options in the commands, the
+option name must be preceeded by a dollar sign, too. Example:
+*text "Print a message
+*text ? msg
+*text echo "\$msg"
+
+------------- ALIASES ----------------
+
+Now, there's only one thing left: the declaration of aliases. In our case we
+would like 'LALA' to do the same as lala. This is easily achieved by a 
+equal = sign:
+
+*LALA = lala
+
+That's it. Have fun with testing your own commands.
+
+------------- EXPLICIT COMMANDS ----------
+
+This is for people who like the capabilities of $sxgetalias so much that they
+want to use it even for their spontaneous extraction commands that should
+not make it into the commands file. They are given instead on the command 
+line as
+
+'{<file list>:<code>}'
+
+and correspond to
+
+*lala ! <file list>
+*lala <code>
+
+----------- DOs and DON'Ts ----------
+
+If you want to call the script itself, use '$sxgetalias'. It is
+immediately expanded to the full program name, and it also inserts all
+the '--' options (like --verbose) to the subcalls. You might want to specify
+the '--quiet' option, so you avoid double output for diagnostic messages.
+
+It is recommended to call perl by \$PERL. This is expanded into the perl
+executable used for this script (currently '$^X'). It could
+improve transferability.
+
+Here is only a small list of commands used by the main script, so don't
+define these:
+reserved commands: @builtin
+reserved options: -d -D
+
+ENDEXTEND
+  exit 0;
+}

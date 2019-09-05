@@ -1,0 +1,19 @@
+bandStructure     { type="group"; optional;
+   maxSteps       { type="int"; min=1; optional; }
+   maxStepsCCG    { type="int"; min=1; optional; }
+   dEnergy        { type="real"; min=0; optional; }
+   dEps           { type="real"; min=0; optional; }
+   printSteps     { type="int"; min=0; optional; }
+   verbose        { type="flag"; optional; }
+   noRhoStorage   { type="flag"; optional; }
+   noWavesStorage { type="flag"; optional; }
+   printResidue   { type="flag"; optional; }
+   dPsi           { type="real"; min=0; optional; }
+   autoSteps      { type="flag"; optional; }
+   nSloppy        { type="int"; min=0; optional; }
+   propagateWaves { type="flag"; optional; }
+   subspaceDiag   { type="group"; optional;
+      maxSize     { type="int"; min = 5; }
+      overlap     { type="int"; min = 3; }
+   }
+}

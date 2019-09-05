@@ -1,0 +1,53 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxArrayList.h \
+                  SxExportGraph.h \
+                  SxGPath.h \
+                  SxGPath.hpp \
+                  SxGPathList.h \
+                  SxGPathList.hpp \
+                  SxGProps.h \
+                  SxGQAnd.h \
+                  SxGQExpr.h \
+                  SxGQExprBase.h \
+                  SxGQExprList.h \
+                  SxGQOr.h \
+                  SxGQPattern.h \
+                  SxGQRelations.h \
+                  SxGQRelations.hpp \
+                  SxGQuery.h \
+                  SxGraph.h \
+                  SxGraph.hpp \
+                  SxGraphStorage.h \
+                  SxHashedArray.h \
+                  SxN.h \
+                  SxN.hpp \
+                  SxSet.h
+
+lib_LTLIBRARIES       = libsxgraph.la
+libsxgraph_la_SOURCES  = $(AUX_SRC)
+libsxgraph_la_SOURCES += SxExportGraph.cpp \
+   SxGProps.cpp \
+   SxGQAnd.cpp \
+   SxGQExpr.cpp \
+   SxGQExprList.cpp \
+   SxGQOr.cpp \
+   SxGQPattern.cpp \
+   SxGQuery.cpp
+
+libsxgraph_la_LIBADD   = $(SXIMPORTLIBS)
+libsxgraph_la_LIBADD  += 
+libsxgraph_la_LIBADD  += $(SXIMPORTOBJS)
+libsxgraph_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxgraph_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

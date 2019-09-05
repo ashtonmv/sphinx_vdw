@@ -1,0 +1,15 @@
+#!/bin/sh
+
+cd work
+mkdir -p ../std
+
+files=`ls *.h`
+for f in $files; do
+   echo $f
+   cpp -D_STD_MODE -include ../definitions -P  $f | tr '\n' ' ' > ../std/$f
+   indent ../std/$f
+done
+
+cd ..
+
+rm std/*.h~

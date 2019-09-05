@@ -1,0 +1,83 @@
+# ---------------------------------------------------------------------------
+#
+#      The ab-initio based multiscale library
+#
+#                  S / P H I / n X
+#
+#      Copyright:  Max-Planck-Institute for Iron Research
+#                  40237 Duesseldorf, Germany
+#
+#      Contact:    https://sxlib.mpie.de
+#      Authors:    see sphinx/AUTHORS
+#      License:    see sphinx/LICENSE
+#
+# ---------------------------------------------------------------------------
+# SXACCELERATE_SRC/system/make.am.filelist
+# ----------------------------------------------------------------------------
+#
+# Requires:
+#    NAME   -  e.g. "libsxutil.a"
+#    MODE   -  "libOnly"  or  "withWrappers"
+
+
+# --- avoid automatic definition of -DPACKAGE* as they are redefined
+#     by automake in SxConfig.h anyway
+#     that's why we overwrite DEFS explicitly.
+DEFS = -DLDFLAGS="\"$(AM_LDFLAGS) $(LDFLAGS)\""
+
+scriptsdir = $(prefix)/scripts
+scripts_SCRIPTS =
+
+# --- setup proper export/import behavior for shared libs
+AM_CPPFLAGS =
+if COND_BUILD_WIN32
+   AM_CPPFLAGS += -D_EXPORT_$(NAME)
+endif
+
+# --- define dynamic files to be deleted at "make clean"
+tmp_filelists = .files .files.cur MAKE.log
+
+# --- clean up files
+CLEANFILES  = $(tmp_filelists)
+CLEANFILES += $(abs_builddir)/*.tab.cpp
+CLEANFILES += $(abs_builddir)/*.tab.hpp
+CLEANFILES += $(abs_builddir)/*.yy.cpp
+CLEANFILES += $(abs_builddir)/*-x.cpp
+CLEANFILES += $(abs_builddir)/*.log
+CLEANFILES += $(bin_SCRIPTS) 
+
+c: clean
+
+ca: clean distclean
+
+filelist: filelist_unix
+
+filelist_unix:
+	@echo "Updating UNIX Makefiles..."
+	@a=$(UNIX_DEPDIRS) && b=$(UNIX_NUMLIBS) \
+     && $(SXACCELERATE_SRC)/system/sxmkmakeinc.sh   \
+         $(srcdir) $(NAME) ./Make-inc.am $(MODE) "$$a" "$$b"
+
+msfilelist:
+	@echo "Updating MSVC Project files in "`pwd`"..."
+	@a=$(MSVC_DEPDIRS) && b=$(MSVC_NUMLIBS) \
+     && cd $(srcdir) && $(SXACCELERATE)/bin/sxmsvcproj   \
+         --name $(NAME) \
+         --depth $(top_builddir) \
+         --srctop $(top_srcdir) \
+         --sxaccltop $(top_srcdir)/../sxaccelerate --mode $(MODE) \
+         --deps "$$a,$$b"
+
+# --- print dependencies (used to generate MSVC solution files)
+getguid=$(top_srcdir)/system/sxmkguid.sh $(subdir) $(abs_srcdir)
+sln:
+	@echo "Project (\"{`$(getguid) $(NAME) slnFolder`}\") = \"$(NAME)\", \"$(subdir)\\$(NAME).vcproj\", \"{`$(getguid) $(NAME) slnProj`}\"" >> $(OUT)
+	@echo "   ProjectSection(ProjectDependencies) = postProject" >> $(OUT)
+	@for d in $(DEP_DIRS); do  \
+      echo "      {`$(getguid) $$d slnDepDir`} = {`$(getguid) $$d slnDepDir`}" >> $(OUT); \
+    done
+	@echo "   EndProjectSection" >> $(OUT)
+	@echo "EndProject" >> $(OUT)
+
+include $(srcdir)/Make-inc.am
+include $(top_srcdir)/system/make.am.components

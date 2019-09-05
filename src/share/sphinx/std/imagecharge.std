@@ -1,0 +1,61 @@
+set validation;
+skipUnexpectedGroups;
+topLevelDefs;
+
+structure { type = "group"; optional;
+   cell         { type="matrix"; dims=[3,3]; optional;}
+}
+   slab         { type="group"; 
+     fromZ      { type="real"; }
+     toZ        { type="real"; }
+     broadening { type="real"; optional; }
+     epsilon    { type="real"; }
+     oldBroadening { type="flag"; optional; }
+   }
+
+   Qslab { type="group"; optional;
+     fromZ { type="real"; }
+     toZ   { type="real"; }
+     Q     { type="real"; }
+   }
+
+   charge       { type="group"; 
+     posZ       { type="real"; }
+     beta       { type="real"; optional; }
+     betaZ      { type="real"; optional; }
+     betaPara   { type="real"; optional; }
+     Q          { type="real"; }
+   }
+
+isolated { type="group"; optional;
+   fromZ { type = "real"; /*min = 0;*/ }
+   toZ    { type = "real"; }
+}
+
+periodic { type="group"; optional;
+   cut    { type="real"; optional; }
+   zField { type="real"; optional; }
+   electrodeZ { type="real"; optional; }
+   dropV { type="real"; optional; }
+}
+
+background { type="group"; optional;
+   Qslab { type="group"; optional;
+     fromZ { type="real"; }
+     toZ   { type="real"; }
+     Q     { type="real"; }
+   }
+   cut   { type="real"; optional; }
+   dropV { type="real"; optional; }
+
+   /*
+   charge       { type="group"; optional;
+     posZ       { type="real"; }
+     beta       { type="real"; optional; }
+     betaZ      { type="real"; optional; }
+     betaPara   { type="real"; optional; }
+     Q          { type="real"; }
+   }
+   */
+}
+

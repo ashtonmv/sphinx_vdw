@@ -1,0 +1,15 @@
+All S/PHI/nX classes are compiled with a rather high compiler warning
+level. ANSI and POSIX standards are requested by S/PHI/nX default 
+compiler switches.
+Some operating systems (like Windows) provide some necessary or useful
+functions which disobey ANSI/POSIX. Hence, if compiled with the
+corresponding compiler flags these (useful) functions are no longer 
+available. Hence, we have to following options:
+  1. reduce the compiler warning level throughout the code
+  2. do not offer some useful features on those platforms
+  3. keep the high compiler warning level and compile the wrappers separately.
+
+The 1st choice is unacceptable. The 2nd choice is implemented via
+configure switches. In order to implement the last item this SxCommOS 
+binding file has been introduced. It is compiled without any compiler
+warning switches.

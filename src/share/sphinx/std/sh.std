@@ -1,0 +1,4 @@
+SH                 { type="group"; optional;
+   nSternSteps     { type="int";   min=0; }
+   dSternEnergy    { type="real";  min=0; }
+}               

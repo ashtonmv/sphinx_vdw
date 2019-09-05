@@ -1,0 +1,37 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = sxatomstructbase sxatomstructderiv 
+
+sxatomstructbase_SOURCES   = $(AUX_SRC)
+sxatomstructbase_SOURCES  += sxatomstructbase.cpp 
+sxatomstructbase_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxatomstructbase_LDADD     =  $(SXIMPORTLIBS)
+sxatomstructbase_LDADD    +=  @SX_BLAS_LIBS@
+sxatomstructbase_LDADD    +=  $(SXIMPORTOBJS)
+
+sxatomstructderiv_SOURCES   = $(AUX_SRC)
+sxatomstructderiv_SOURCES  += sxatomstructderiv.cpp 
+sxatomstructderiv_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxatomstructderiv_LDADD     =  $(SXIMPORTLIBS)
+sxatomstructderiv_LDADD    +=  @SX_BLAS_LIBS@
+sxatomstructderiv_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/geom -I$(top_srcdir)/geom
+AM_CPPFLAGS += -I$(top_builddir)/dirac -I$(top_srcdir)/dirac
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/ipc
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/io
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/io
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/fs
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/ipc
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/math
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/util
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/util
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

@@ -1,0 +1,20 @@
+format sxpublisher;
+
+/* SxDoc {
+h1. abc
+
+p1. asdsd
+
+} */
+document {
+   file = "sxdoc/manual.sxdoc";
+
+   macros {
+      sxcmdref {
+         dirs {
+            cli = "@abs_top_builddir@/apps";
+            src = "@abs_top_srcdir@/apps";
+         }
+      }
+   }
+}

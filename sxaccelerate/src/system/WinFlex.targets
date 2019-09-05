@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <PropertyPageSchema
+      Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml" />
+    <AvailableItemName
+      Include="WinFlex">
+      <Targets>_WinFlex</Targets>
+    </AvailableItemName>
+  </ItemGroup>
+  <UsingTask
+    TaskName="WinFlex"
+    TaskFactory="XamlTaskFactory"
+    AssemblyName="Microsoft.Build.Tasks.v4.0">
+    <Task>$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml</Task>
+  </UsingTask>
+  <Target
+    Name="_WinFlex"
+    BeforeTargets="$(WinFlexBeforeTargets)"
+    AfterTargets="$(WinFlexAfterTargets)"
+    Condition="'@(WinFlex)' != ''"
+    DependsOnTargets="$(WinFlexDependsOn);ComputeWinFlexOutput"
+    Outputs="%(WinFlex.Outputs)"
+    Inputs="%(WinFlex.Identity);%(WinFlex.AdditionalDependencies);$(MSBuildProjectFile)">
+    <ItemGroup
+      Condition="'@(SelectedFiles)' != ''">
+      <WinFlex
+        Remove="@(WinFlex)"
+        Condition="'%(Identity)' != '@(SelectedFiles)'" />
+    </ItemGroup>
+    <ItemGroup>
+      <WinFlex_tlog
+        Include="%(WinFlex.Outputs)"
+        Condition="'%(WinFlex.Outputs)' != '' and '%(WinFlex.ExcludedFromBuild)' != 'true'">
+        <Source>@(WinFlex, '|')</Source>
+      </WinFlex_tlog>
+    </ItemGroup>
+    <Message
+      Importance="High"
+      Text="%(WinFlex.ExecutionDescription)" />
+    <WriteLinesToFile
+      Condition="'@(WinFlex_tlog)' != '' and '%(WinFlex_tlog.ExcludedFromBuild)' != 'true'"
+      File="$(ProjectName).write.1.tlog"
+      Lines="^%(WinFlex_tlog.Source);@(WinFlex_tlog-&gt;'%(Fullpath)')" />
+    <WinFlex
+      Condition="'@(WinFlex)' != '' and '%(WinFlex.ExcludedFromBuild)' != 'true'"
+      CommandLineTemplate="%(WinFlex.CommandLineTemplate)"
+      AdditionalOptions="%(WinFlex.AdditionalOptions)"
+      Inputs="%(WinFlex.Identity)" />
+  </Target>
+  <PropertyGroup>
+    <ComputeLinkInputsTargets>
+            $(ComputeLinkInputsTargets);
+            ComputeWinFlexOutput;
+          </ComputeLinkInputsTargets>
+    <ComputeLibInputsTargets>
+            $(ComputeLibInputsTargets);
+            ComputeWinFlexOutput;
+          </ComputeLibInputsTargets>
+  </PropertyGroup>
+  <Target
+    Name="ComputeWinFlexOutput"
+    Condition="'@(WinFlex)' != ''">
+    <ItemGroup>
+      <WinFlexDirsToMake
+        Condition="'@(WinFlex)' != '' and '%(WinFlex.ExcludedFromBuild)' != 'true'"
+        Include="%(WinFlex.Outputs)" />
+      <Link
+        Include="%(WinFlexDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+      <Lib
+        Include="%(WinFlexDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+      <ImpLib
+        Include="%(WinFlexDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+    </ItemGroup>
+    <MakeDir
+      Directories="@(WinFlexDirsToMake-&gt;'%(RootDir)%(Directory)')" />
+  </Target>
+</Project>

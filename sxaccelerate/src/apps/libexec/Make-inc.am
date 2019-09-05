@@ -1,0 +1,52 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+libexec_PROGRAMS  = sxloghash sxmsvcproj sxprint sxtee sxtestproc 
+
+sxloghash_SOURCES   = $(AUX_SRC)
+sxloghash_SOURCES  += SxLogHash.cpp
+sxloghash_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxloghash_LDADD     =  $(SXIMPORTLIBS)
+sxloghash_LDADD    +=  
+sxloghash_LDADD    +=  $(SXIMPORTOBJS)
+
+sxmsvcproj_SOURCES   = $(AUX_SRC)
+sxmsvcproj_SOURCES  += SxMSVCProj.cpp
+sxmsvcproj_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxmsvcproj_LDADD     =  $(SXIMPORTLIBS)
+sxmsvcproj_LDADD    +=  
+sxmsvcproj_LDADD    +=  $(SXIMPORTOBJS)
+
+sxprint_SOURCES   = $(AUX_SRC)
+sxprint_SOURCES  += SxPrint.cpp
+sxprint_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxprint_LDADD     =  $(SXIMPORTLIBS)
+sxprint_LDADD    +=  
+sxprint_LDADD    +=  $(SXIMPORTOBJS)
+
+sxtee_SOURCES   = $(AUX_SRC)
+sxtee_SOURCES  += SxTee.cpp
+sxtee_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxtee_LDADD     =  $(SXIMPORTLIBS)
+sxtee_LDADD    +=  
+sxtee_LDADD    +=  $(SXIMPORTOBJS)
+
+sxtestproc_SOURCES   = $(AUX_SRC)
+sxtestproc_SOURCES  += SxTestProc.cpp
+sxtestproc_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxtestproc_LDADD     =  $(SXIMPORTLIBS)
+sxtestproc_LDADD    +=  
+sxtestproc_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/io -I$(top_srcdir)/io
+AM_CPPFLAGS += -I$(top_builddir)/ipc -I$(top_srcdir)/ipc
+AM_CPPFLAGS += -I$(top_builddir)/fs -I$(top_srcdir)/fs
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

@@ -1,0 +1,9 @@
+set validation;
+topLevelDefs;
+
+// see also: src/SFHIngX/std/sfhingx.std
+
+vol       { type="group"; minItem=1;
+   xtraF  { type="vector"; nItem=1; minDim=1;}
+}
+   

@@ -1,0 +1,36 @@
+QN           { type="group"; optional; 
+   maxSteps  { type="int"; min=0; optional; }
+   dX        { type="real"; min=0.; optional; }
+   dF        { type="real"; min=0.; optional; }
+   dXavg     { type="real"; min=0.; optional; }
+   dFavg     { type="real"; min=0.; optional; }
+   dEnergy   { type="real"; min=0.; optional; }
+   maxStepLength { type="real"; min=0.; optional; }
+   saveRelaxHist { type="flag"; optional; }
+   thirdOrderCor { type="flag"; optional; }
+   secondaryStructure { type="group"; optional;
+      periodicity {type="string";}
+      nTurns {type="int";}
+      motif {type="enum";val="helix,FES,apSheet,pSheet";}
+   }
+   hessian { type="group"; optional;
+      file { type="string"; }
+   }
+   ric { type="group"; optional; xor="hessian,ric";
+      maxDist { type="real"; optional; min=1; }
+      typifyThreshold { type="real"; optional; min=0.001; }
+      rmsThreshold    { type="real"; optional; min=1; }
+      planeCutLimit   { type="real"; optional; min=0.5; }
+      withAngles      { type="flag"; optional; }
+      Schlegel        { type="flag"; optional; xor="Schlegel,Fischer,bondConstant"; }
+      Fischer         { type="flag"; optional; xor="Schlegel,Fischer,bondConstant"; }
+      bondConstant  { type="real"; optional; min=0.; }
+      angleConstant { type="real"; optional; min=0.; }
+   }
+   driftFilter   { type="flag"; optional; }
+   
+   bornOppenheimer { type="group"; optional;
+      include <std/elmin.std>;
+   }
+   
+}

@@ -1,0 +1,265 @@
+// ---------------------------------------------------------------------------
+//
+//           The general purpose cross platform C/C++ framework
+//
+//                       S x A c c e l e r a t e
+//
+//           Home:       https://www.sxlib.de
+//           License:    Apache 2
+//           Authors:    see src/AUTHORS
+//
+// ---------------------------------------------------------------------------
+// Compile with bison option -pSxParser_ ...
+// --------------------------------------------------------------------------
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <iostream>
+#include <SxSymbolTable.h>
+#include <SxParser.h>
+
+
+int dimension = 0;
+
+void printStack ()
+{
+   sxprintf ("SxParser_symbolStack\n");
+   for (int i=0; i < SxParser_symbolStack.getSize(); i++)  {
+      //cout << i << ": " << SxParser_symbolStack(i) << endl;
+      sxprintf ("%d: ", i); SxParser_symbolStack(i).print();
+   }
+   sxprintf ("\n");
+}
+
+%}
+// --- types
+%union {
+   char     *str;
+   double    val;
+   SxSymbol *sym;
+};
+%type <sym> expr
+// --- tokens
+%token <sym> NUM
+%token <sym> STR
+%token <sym> VEC
+%token <sym> VAR FUNC STRFUNC
+%token <sym> LIST
+// --- order
+%right '='
+%right ','
+%left  '-' '+'
+%left  '*' '/'
+%left  NEG
+%right '^'
+
+%%
+input:   /* empty string */
+       | input stmt
+;
+
+stmt:    expr ';'          { //cout << "result = " << *$1 << endl; 
+                             if (SxParser_symbolStack.getSize())  {
+                                SxString name = SxParser_symbolStack(0).getName ();
+                                SxSymbolTable *group = SxSymbolTable::getGlobalPtr ();
+                                if (!group->get (name, true, false) 
+                                    && !SxParser_globalVars.contains (name))  {
+            // if you find a symbol on the stack that does not exist in the
+            // current group this probably means that you tried to set a
+            // flag, but the parser identified the identifier with a
+            // variable in an outer group. So here's the fallback:
+            // create a local flag
+                                   SxSymbol* sym = group->append (name);
+                                   sym->setDefined (false);
+                                   sym->val = -1;
+                                   sym->initialized = false;
+                                }
+                                SxParser_symbolStack.removeFirst();
+                             } 
+                           }
+;                         
+                          
+expr:    NUM               { //cout << "NUM " << *$1 << endl;
+                             //printStack ();
+                             SxSymbol a ( *$1 );
+                             SxParser_symbolStack.removeFirst ();       // $1
+                             SxParser_symbolStack.prepend (a);
+                             $$ = &SxParser_symbolStack.first(); 
+                             //printStack ();
+                           }
+       | STR               { //cout << "STR " << *$1 << endl;
+                             //printStack ();
+                             SxSymbol a ( *$1 );
+                             SxParser_symbolStack.removeFirst ();       // $1
+                             SxParser_symbolStack.prepend (a);
+                             $$ = &SxParser_symbolStack.first(); 
+                           }
+       | VAR               { //cout << "VAR: " << $1->name << endl;
+                             SxSymbol a ( *$1 );
+                             SxParser_symbolStack.prepend ( a );
+                             $$ = &SxParser_symbolStack.first(); 
+                             //printStack(); 
+                           }
+       | VAR  '=' expr     { //cout << "ASSIGN: " << $1->name << " = " << *$3 << endl;
+                             //printStack ();
+                             SxString name ($1->name);
+                             SxSymbol a ( *$3 );
+                             a = a.flatten ();
+                             SxParser_symbolStack.removeFirst();        // $3;
+                             SxSymbolTable *tableLvl;
+                             tableLvl = (SxParser_globalVars.contains(name))
+                                      ?  SxSymbolTable::getGlobalPtr()->topLevel() : SxSymbolTable::getGlobalPtr();
+                             // --- don't overwrite global variables
+                             if (!tableLvl->get(name, false, false))  {
+                                SxSymbol *sym = tableLvl->append (name);
+                                *sym = a;
+                                sym->name = $1->name;
+                                SxParser_symbolStack.prepend ( *sym );
+                             }  else  {
+                                // --- normal case
+                                if (a.name != "" && !a.initialized) {
+                                   SxSymbolTable::getGlobalPtr()->topLevel()->print ();
+                                   SxString msg;
+                                   msg += "Undeclared variable '"
+                                        + a.name + "'";
+                                   SxParser_error (msg.ascii());
+                                }
+
+                                *$1 = a;
+                                $1->name = name;
+                                $1->initialized = true;
+                                SxParser_symbolStack.prepend ( *$1 );
+                             }
+                             $$ = &SxParser_symbolStack.first(); 
+                           }
+       | '[' expr ']'      { //cout << '[' << *$2 << ']' << endl;
+                             //printStack ();
+                             SxSymbol a ( *$2 );
+                             SxParser_symbolStack.removeFirst();
+                             if (a.type == LIST)
+                                SxParser_symbolStack.first() = a;
+                             else
+                                (*SxParser_symbolStack.first().valList)(0) = a;
+                             $$ = &SxParser_symbolStack.first(); 
+                             dimension--; 
+                           }
+       | expr ',' expr     { //cout << *$1 << " , " << *$3 << endl;
+                             SxSymbol sym, a (*$1), b (*$3);
+                             a = a.flatten(); b = b.flatten();
+                             if ( $3->type != LIST)  {
+                                sym = SxSymbol ( "", 0.);
+                                sym.type = LIST;
+                                sym.append ( a );
+                                sym.append ( b );
+                             }  else  {
+                                if ( $1->type != LIST )  {
+                                   sym = SxSymbol ( b );
+                                   sym.prepend    ( a );
+                                }  else  {
+                                   sym = SxSymbol ( "", 0.);
+                                   sym.type = LIST;
+                                   sym.append ( a );
+                                   // --- tensors not allowed
+                                   if (b.getRank() > 1)  {
+                                      SxList<SxSymbol>::Iterator it;
+                                      for (it  = b.valList->begin(); 
+                                           it != b.valList->end(); it++)  
+                                      {
+                                         sym.append ( *it );
+                                      }
+                                    }  else  {
+                                       sym.append ( b );
+                                    }
+                                }
+                             }
+                             SxParser_symbolStack.removeFirst ();
+                             SxParser_symbolStack.removeFirst ();
+                             SxParser_symbolStack.prepend (sym.flatten());
+                             $$ = &SxParser_symbolStack.first(); 
+                             //printStack();
+                           }
+                          
+       | expr '+' expr     { //cout << *$1 << "+" << *$3 << endl;
+                             //printStack ();
+                             SxSymbol a (*$1), b (*$3);
+                             SxParser_symbolStack.removeFirst ();       // $1
+                             SxParser_symbolStack.removeFirst ();       // $3
+                             SxParser_symbolStack.prepend (a + b );
+                             $$ = &SxParser_symbolStack.first(); 
+                           }
+       |      '-' expr     { //cout << "-" << *$2 << endl;
+                             //printStack ();
+                             SxSymbol a (*$2);
+                             SxParser_symbolStack.removeFirst ();       // $2
+                             SxParser_symbolStack.prepend (-a );
+                             $$ = &SxParser_symbolStack.first(); 
+                           }
+       |      '+' expr     { //cout << "+" << *$2 << endl;
+                             //printStack ();
+                             SxSymbol a (*$2);
+                             SxParser_symbolStack.removeFirst ();       // $2
+                             SxParser_symbolStack.prepend (a );
+                             $$ = &SxParser_symbolStack.first(); 
+                           }
+       | expr '-' expr     { //cout << *$1 << "-" << *$3 << endl;
+                             //printStack ();
+                             SxSymbol a (*$1), b (*$3);
+                             SxParser_symbolStack.removeFirst ();       // $1
+                             SxParser_symbolStack.removeFirst ();       // $3
+                             SxParser_symbolStack.prepend (a - b );
+                             $$ = &SxParser_symbolStack.first(); 
+                           }
+       | expr '*' expr     { //cout << *$1 << "*" << *$3 << endl;
+                             //printStack ();
+                             SxSymbol a (*$1), b (*$3);
+                             SxParser_symbolStack.removeFirst ();       // $1
+                             SxParser_symbolStack.removeFirst ();       // $3
+                             SxParser_symbolStack.prepend (a * b );
+                             $$ = &SxParser_symbolStack.first(); 
+                             //printStack ();
+                           }
+       | expr '/' expr     { //cout << *$1 << "/" << *$3 << endl;
+                             //printStack ();
+                             SxSymbol a (*$1), b (*$3);
+                             SxParser_symbolStack.removeFirst ();       // $1
+                             SxParser_symbolStack.removeFirst ();       // $3
+                             SxParser_symbolStack.prepend (a / b );
+                             $$ = &SxParser_symbolStack.first(); 
+                           }
+       | expr '^' expr     { //cout << *$1 << "^" << *$3 << endl;
+                             //printStack ();
+                             SxSymbol a (*$1), b (*$3);
+                             SxParser_symbolStack.removeFirst ();       // $1
+                             SxParser_symbolStack.removeFirst ();       // $3
+                             SxParser_symbolStack.prepend (a ^ b );
+                             $$ = &SxParser_symbolStack.first(); 
+                           }
+       | '(' expr ')'      { //cout << '(' << *$2 << ')' << endl;
+                             //printStack ();
+                             SxSymbol res (*$2);
+                             SxParser_symbolStack.removeFirst ();       // $2
+                             SxParser_symbolStack.prepend (res);
+                             $$ = &SxParser_symbolStack.first(); 
+                           }
+       | FUNC '(' expr ')' { //cout<<"Function: "<<*$1<<'('<<*$3<<")\n";
+                             //printStack ();
+                             SxSymbol a ("func", (*($1->func))((*$3).val) );
+                             SxParser_symbolStack.removeFirst ();       // $1
+                             SxParser_symbolStack.removeFirst ();       // $3
+                             SxParser_symbolStack.prepend (a);
+                             $$ = &SxParser_symbolStack.first(); 
+                           }
+       | STRFUNC '(' expr ')' { //cout<<"StringFunction: "<<*$1<<'('<<*$3<<")\n";
+                             //printStack ();
+                             SxSymbol a ("strfunc", (*($1->strfunc))((*$3).str) );
+                             SxParser_symbolStack.removeFirst ();       // $1
+                             SxParser_symbolStack.removeFirst ();       // $3
+                             SxParser_symbolStack.prepend (a);
+                             $$ = &SxParser_symbolStack.first(); 
+                           }
+;
+
+
+%%

@@ -1,0 +1,22 @@
+# ---------------------------------------------------------------------------
+#
+#      The ab-initio based multiscale library
+#
+#                  S / P H I / n X
+#
+#      Copyright:  Max-Planck-Institute for Iron Research
+#                  40237 Duesseldorf, Germany
+#
+#      Contact:    https://sxlib.mpie.de
+#      Authors:    see sphinx/AUTHORS
+#      License:    see sphinx/LICENSE
+#
+# ---------------------------------------------------------------------------
+# SXDIR/src/system/make.am.apps
+# ----------------------------------------------------------------------------
+
+AM_CPPFLAGS  += @CXX_PEDANTIC@
+# done here, since stuff in config header is always from sxbase
+AM_CPPFLAGS  += -DSXDATE=`date +%s`
+AM_CPPFLAGS  += -DSXPACKAGE='"@PACKAGE_NAME@"'
+AM_CPPFLAGS  += -DSXRELEASE='"@PACKAGE_VERSION@"'

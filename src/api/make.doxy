@@ -1,0 +1,379 @@
+/**\page    page_make        Make Environment
+
+   Before compiling SPHInX make sure that you have installed the necessary
+   external program packages as described in \ref page_req.
+
+\section make_intro        General comments on this page
+
+   In this page you will be confronted with some basic commands and features
+   of the shell. In order to avoid confusions this basic knowledge is briefly
+   explained here.
+   
+\subsection make_shell     Choosing the shell
+
+   In the following examples we assume that the user's shell is a 
+   \b csh or \b tcsh.
+   The (t)csh sets environment variables like
+\verbatim
+   setenv A_USER_VARIABLE 12345
+\endverbatim
+
+   If your shell is a \b bash instead the same line would read
+\verbatim
+   export A_USER_VARIABLE=12345
+\endverbatim
+   Note, that here the '=' has to be used! The \b bash users should replace
+   the following \tt setenv statements with the proper \tt export commands.
+
+
+\subsection make_pwd       Using the UNIX command pwd
+
+   Sometimes we use the \b pwd command which returns the absolute work path.
+   We use the output directly as input for other UNIX commands (piping), e.g.
+\verbatim
+   configure --prefix=`cd ../..; pwd`
+\endverbatim
+   Please note, that pwd is placed in back ticks ` and not in single quotes 
+   '!
+
+\subsection make_gnu       Using GNU tools
+
+   GNU = (G)NU is (n)ot (U)nix. Programs published under the GNU public 
+   license are free of charge. They are very common in both UNIX and Windows.
+   On some systems both commercial and their GNU counterparts might be
+   installed. To avoid name conflicts the GNU programs are then used to be 
+   called with a prefix "g", e.g., "gtar" instead of "tar". "gtar" refers to
+   the GNU program whereas "tar" to the commercial once. On other systems,
+   where only the GNU tools are installed the prefix "g" is not required and
+   hence, on such environments the "tar" command would simply be "tar".
+   Therefore, in the following sections programs like "make" and "tar" are
+   labeled as "(g)make" or "(g)tar". Please choose the proper form matching
+   your computer environment.
+
+\section    make_compiler   Building the GNU C/C++ Compiler
+
+   If you don't have a preferred C/C++ compiler the free GNU C/C++ compiler
+   is always a good choice. The GNU compiler supports the ANSI standard
+   and builds an highly efficient code. The performance of the GNU compiler
+   compares well with commercial counterparts. In fact, the entire S/PHI/nX
+   package has been developed using the GNU C/C++ compiler.
+
+   The compilation is simple:
+   -# Download the sources from http://gcc.gnu.org, e.g.,
+      gcc-<version>.tar.bz2
+   -# Unpack them using (g)tar:
+\verbatim
+   (g)tar xvfj gcc-<version>.tar.bz2
+\endverbatim
+   -# Rename the extracted directory
+\verbatim
+   mv gcc-<version> gcc-<version>-src
+\endverbatim
+   -# Create a target directory
+\verbatim
+   mkdir gcc-<version>
+   cd gcc-<version>
+\endverbatim
+   -# Configure the compiler, build it, and clean up the folder
+\verbatim
+   ../gcc-<version>-src/configure --prefix=`pwd`
+   (g)make bootstrap install clean
+\endverbatim
+   -# It might be useful to add the path gcc-<version> to your search path.
+      Depending on your shell edit your private $HOME/.(t)cshrc or 
+      $HOME/.bashrc on (t)csh or bash, respectively.
+      \b Alternatively, you can also set the environment variables CC and CXX
+\verbatim
+   setenv CC  /home/johndoe/gcc-<version>/bin/gcc
+   setenv CXX /home/johndoe/gcc-<version>/bin/g++
+\endverbatim
+   Bash users type instead
+\verbatim
+   export CC=/home/johndoe/gcc-<version>/bin/gcc
+   export CXX=/home/johndoe/gcc-<version>/bin/g++
+\endverbatim
+      
+   
+\section    make_external   Optional packages
+
+   SPHInX needs to be linked against 
+     - a BLAS/LAPACK library
+     - a FFT library
+     - <a href="http://www.unidata.ucar.edu/packages/netcdf">netCDF</a>.
+
+   The performance of SPHInX strongly depends on the efficiency
+   of these libraries. If vendor libraries are available they should be
+   taken. Otherwise the cross platform libraries 
+   
+     -# <a href="http://www.fftw.org">FFTW</a>
+     -# <a href="http://www.netlib.org/atlas">ATLAS</a> 
+        with \b full LAPACK support
+     -# <a href="http://www.netlib.org/CLAPACK">CLAPACK</a> to extend ATLAS
+
+   can be used. Note, that the default configuration of ATLAS comes \b without
+   full LAPACK support, but SPHInX requires a complete LAPACK interface. 
+   So, if ATLAS is already installed on the target system but without 
+   full LAPACK interface the library has to be recompiled.
+
+   Even if both FFTW and ATLAS (with full LAPACK support) are installed already
+   it is recommended to rebuild them. The installation programs of the
+   various libraries recognize the hardware configuration and adopt
+   their optimization parameters accordingly. Hence, better performance can
+   be accomplished.
+
+   The generation of all numeric libraries takes on a Pentium 4 with 1.6 GHz
+   approx. 25 minutes. Only a few user interactions are needed.
+
+\subsection make_setup     Setup
+   Before you start check what processor (CPU) is installed on the target
+   system. This information is required later.
+\verbatim
+   cd numlibs/packages
+   (g)make setup
+\endverbatim
+   This inflates the archives and overwrites some of the default configuration
+   files in order to make the installation a bit easier.
+
+
+\subsection   make_fftw     FFTW (2-3 minutes)
+   Building the FFTW library is rather simple:
+\verbatim
+   cd fftw-<VERSION_NUMER>
+   ./configure --prefix=`cd ../..; pwd`
+   (g)make all install
+   cd ..
+\endverbatim
+   Note, that you use the "`" instead of the "'" character when piping pwd.
+
+
+\subsection make_clapack CLAPACK (for ATLAS with full LAPACK support) (7 minutes)
+
+   You should be back to the folder 'numlibs/packages'. Enter the CLAPACK
+   directory:
+\verbatim
+   cd CLAPACK
+\endverbatim
+   The 'make.inc' file is preconfigured for Linux Pentium III PCs already.
+   Now fine tune it for your needs. Use your favorite editor, e.g.,
+\verbatim
+   vi make.inc
+\endverbatim
+   In case you have got an 64bit platform you must choose the 64bit compiler
+   options. If you encounter problems with compiling CLAPACK please also read
+   the file README.install located in the same directory. 
+   Continue with
+\verbatim
+   (g)make
+   cd ..
+\endverbatim
+
+\subsection  make_atlas     ATLAS (15 minutes)
+
+   You should now be back to the directory 'numlibs/packages'. Continue to
+   build the ATLAS library. 
+   In the ATLAS README file it is recommended to set the environment 
+   variables MALLOC_TRIM_THRESHOLD_ and MALLOC_MMAP_MAX_ to make ATLAS 
+   slightly faster also in case of small vector sizes.
+   If you use a (t)csh type
+\verbatim
+   cd ATLAS
+   setenv MALLOC_TRIM_THRESHOLD_ -1
+   setenv MALLOC_MMAP_MAX_ 0
+   (g)make
+\endverbatim
+   Users of the bash type
+\verbatim
+   cd ATLAS
+   export MALLOC_TRIM_THRESHOLD_=-1
+   export MALLOC_MMAP_MAX_=0
+   (g)make
+\endverbatim
+   instead.
+   
+   Follow the instructions of the configuration sequence. On 64bit platforms
+   you will be asked whether you want to build 32bit or 64bit libraries.
+   Please choose 64bit in this case.  
+   The search for a local BLAS library takes a while and can be skipped by
+   hitting <CTRL>-C.
+   Continue as suggested by the configuration sequence, e.g. 
+\verbatim
+   make install arch=Linux_P4SSE2
+\endverbatim
+
+   On some systems the ATLAS installation stops with an error message
+   "unable to get timings in tolerance". In this case please increase the
+   threshold values in ATLAS/include/ARCH/atlas_?sysinfo.h. Increase the
+   value of ATL_nkflop in all files by a factor of 10.
+   More information can be found at 
+   <a href="http://math-atlas.sourceforge.net/errata.html#tol">ATLAS-Errata</a>. 
+
+\subsection  make_atlas_lapack  Extending ATLAS with full LAPACK support
+
+   Instructions on how to make ATLAS support LAPACK can be found in
+   'doc/LibReadme.txt'. However, we have created a small shell script which
+   does the job automatically according to the previous installation steps:
+\verbatim
+   ./extendATLAS
+   cd ..
+\endverbatim
+
+
+\subsection  make_lib_netcdf     netCDF  (2 minutes)
+
+   SPHInX's binary files (*.sxb) are based on the netCDF library. If this
+   library is not installed on the target system it should be compiled now.
+   Change to the source directory of netCDF
+\verbatim
+   cd netcdf-<NETCDF_VERSION_NUMBER>
+   cd src
+\endverbatim
+
+   If a Fortran90/95 compiler is present simply compile the library with
+\verbatim
+   ./configure --prefix=`cd ../../..; pwd`
+   (g)make all install
+\endverbatim
+
+   Otherwise, if no Fortran90/95 compiler is available, simply empty the
+   FC environment variable:
+\verbatim
+   setenv FC "" && ./configure --prefix=`cd ../../..; pwd`
+   (g)make all install
+\endverbatim
+   Note, that you use the "`" instead of the "'" character when piping pwd.
+
+   By the way, for working with SPHInX the Fortran90/95 interface of the
+   netCDF library is not required.
+
+   If you encounter problems in building the netCDF library please try
+   explicitly "gmake". Please also read the file INSTALL.html.
+
+   Change back to the packages folder
+\verbatim
+   cd ../..
+\endverbatim
+   before proceeding.
+
+
+\subsection  make_lib_install    Installation
+
+   The last step is to copy the generated libraries to the folder 'numlibs'.
+   Simply call in the directory 'numlibs/packages':
+\verbatim
+   (g)make install
+\endverbatim
+
+   Eventually a list of the installed libraries is printed. It should contain
+
+      - libatlas.a
+      - libcblas.a
+      - libcblaswr.a
+      - libF77.a
+      - libf77blas.a
+      - libfftw3.a
+      - libfftw3.la
+      - libI77.a
+      - liblapack.a
+      - libnetcdf.a
+      - libnetcdf_c++.a
+
+\subsection make_clean    Cleaning up
+
+   Once the numeric libraries are installed successfully the source trees
+   can be removed. Therefore in "numlibs/packages" the command
+\verbatim
+   (g)make cleanall
+\endverbatim
+   can be executed.
+
+
+   Note, that unless it is particulary noted it is not necessary to rebuild 
+   the numeric libraries when updating SPHInX in the future.
+   However, the libraries are now optimized for the current hardware setup. If
+   either the computer's hardware changes or the package has to be installed
+   on another machine the libraries \b have \b to \b be \b recompiled to
+   keep optimal performance.
+
+
+\subsection make_32bit  Building 32bit libraries on 64bit platforms
+
+   If your target platform is a 32bit environment you can skip this section.
+
+   On 64bit platforms it is sometimes useful to build 32bit executables.
+   In order to do so beside the 64bit libraries also 32bit libraries have
+   to be available on the system. In this section it is described how to
+   build the above mentioned libraries as 32bit libraries. 
+
+   The previously generated libraries were automatically compiled as 64bit
+   (except ATLAS and CLAPACK where you have specified it explicitly).
+
+   On 64bit platforms it is common to keep two lib/ paths, the normal 
+   lib/ folder keeping the 32bit lilbraries as well as a lib64/ folder for 
+   the 64bit counterparts.  
+   You should still be in the directory 'numlibs/packages'. The first step is
+   to rename the lib/ folder to lib64/
+
+\verbatim
+   cd ..
+   mv lib lib64
+   cd ..
+\endverbatim
+
+   In order to prepare the compilation of all 32bit libraries the environment
+   variables CFLAGS and CXXFLAGS have to be modified to cause the C and C++
+   compilers to produce 32bit code. Please check the documentation of your
+   C and C++ compilers for the corresponding options. If you use the GNU C/C++
+   compiler it is "-m32". Set the environment variables accordingly, e.g., 
+
+\verbatim
+   setenv CFLAGS -m32
+   setenv CXXFLAGS -m32
+   setenv CFLAGS_32_64 -m32
+\endverbatim
+
+   bash users use "export" instead:
+
+\verbatim
+   export CFLAGS=-m32
+   export CXXFLAGS=-m32
+   export CFLAGS_32_64=-m32
+\endverbatim
+
+   Now the libraries can be compiled again following the instructions given
+   above:
+
+   -# Unpack the archives,
+      see \ref make_setup.
+   -# FFTW:
+      The configure environment of the FFTW library takes the environment
+      variables CFLAGS and CXXFLAGS into account. You can follow the 
+      instructions given in \ref make_fftw in order to build the 32bit FFTW.
+   -# CLAPACK:
+      When editing the file "make.inc" choose the 32bit compiler options this
+      time. Proceed as described in \ref make_clapack.
+   -# ATLAS:
+      On 64bit platforms the ATLAS asks whether you want to build 32bit or
+      64bit libraries. This time please choose 32bit. Proceed as in 
+      \ref make_atlas.
+   -# ATLAS with full LAPACK support:
+      Proceed exactly as explained in \ref make_atlas_lapack.
+   -# netCDF:
+      As the FFTW the configure tool of the netCDF takes the environment
+      variables CFLAGS and CXXFLAGS into account, too. You can follow the 
+      instructions given in \ref make_lib_netcdf to build the 32bit netCDF.
+   -# Installing the 32bit libraries:
+      Please follow the explanations given in \ref make_lib_install.
+   -# Clean up the build folder by following \ref make_clean.
+
+   After this installation procedure you should find the 32bit libraries
+   under ../lib/ and their 64bit counterparts under ../lib64/.
+
+   In order to avoid implications with further compilation it is recommended
+   to delete the environment variables CFLAGS and CXXFLAGS now. The simplest
+   solution is to close that xterm window in which you have set both variables.
+   Alternatively you can use "unsetenv" or "unset" in tcsh or bash,
+   respectively.
+   
+
+\author Sixten Boeck
+*/

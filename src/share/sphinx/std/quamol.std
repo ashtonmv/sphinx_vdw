@@ -1,0 +1,127 @@
+// ---------------------------------------------------------------------------
+//
+//      The ab-initio based multiscale library
+//
+//                  S / P H I / n X
+//
+//      Copyright:  Max-Planck-Institute for Iron Research
+//                  40237 Duesseldorf, Germany
+//
+//      Contact:    https://sxlib.mpie.de
+//      Authors:    see sphinx/AUTHORS
+//      License:    see sphinx/LICENSE
+//
+// ---------------------------------------------------------------------------
+// Rather strict input file format definitions:
+//    * variables may be defined only in top level node
+//    * k-Points for bandstructures (path through the Brillouin zone) are
+//      expected in cartesion coordinates
+//    * k-Points used in the Monkhorst-Pack folding are expected in 
+//      relative coordinates
+//    * energy-cutoff limited 
+// --------------------------------------------------------------------------
+set validation;
+
+
+deprecateFormat;
+topLevelDefs;
+
+// Declare global "skipUnexpectedGroups". See also footer of this file.
+skipUnexpectedGroups;
+
+Quamol                    { type="group";
+   
+   potFile                { type="string"; optional;}
+      
+   basis                  { type="group";  
+      species                { type="group"; 
+         radBasis            { type="group";
+            fromPotential    { type="group";     xor="fromPotential,fromFile,generate";
+               file          { type="string";   }
+               is             { type="int";   min=0;}
+            }    
+            fromFile         { type="group";   xor="fromPotential,fromFile,generate";
+               file          { type="string";   }
+               is            { type="int";   min=0;}
+            }
+            generate         { type="group";   xor="fromPotential,fromFile,generate";
+               rMin          { type="real"; min=1e-10;}
+               rMax          { type="real"; min=1e-10;}
+               nPoints       { type="int";  min=0;}
+            }  
+         }    
+         orbital             { type="group"; 
+            fromPotential    { type="group";     xor="fromPotential,fromFile,generateGaussian,gaussianBasis,fromWaves";
+               file          { type="string";}
+               l             { type="int";   min=0;}
+               iot           { type="int";   min=0;}
+               is            { type="int";   min=0;}
+               scale         { type="real";  min=1.0; optional;}
+            }
+            fromFile         { type="group";   xor="fromPotential,fromFile,generateGaussian,gaussianBasis,fromWaves";
+               file          { type="string";   }
+               l             { type="int";   min=0;}
+               iot           { type="int";   min=0;}
+               is            { type="int";   min=0;}
+               scale         { type="real";  min=1.0; optional;}
+               rCut          { type="real";  min=0.0; optional;}
+               Siesta        { type="flag"; optional;}
+            }
+            fromWaves        { type="group";   xor="fromPotential,fromFile,generateGaussian,gaussianBasis,fromWaves";
+               file          { type="string";   }
+               l             { type="int";   min=0;}
+               iState        { type="int";   min=0;}
+               is            { type="int";   min=0;}
+            }
+            generateGaussian { type="group";   xor="fromPotential,fromFile,generateGaussian,gaussianBasis,fromWaves";
+               l             { type="int";    min=0;}
+               beta          { type="real";   min=0;}
+            }
+            gaussianBasis    { type="group";  xor="fromPotential,fromFile,generateGaussian,gaussianBasis,fromWaves";
+               l             { type="int";    min=0;}
+               exponents     { type="vector";}
+               coefficients  { type="vector";}
+            }
+            fixed            { type="flag"; optional;}
+         }
+      }
+   }
+
+   spillage               { type="group"; optional;
+      sigma               { type="real"; min=0.0; optional;}
+   }
+
+   localization           { type="group"; optional;
+      kappa               { type="real"; min=0.0; optional;}
+      rStart              { type="real"; min=0.0; optional;}
+      adaptive            { type="flag"; optional;}
+   }
+
+   kineticEnergy          { type="group"; optional;
+      zeta                { type="real"; min=0.0; optional;}
+      adaptive            { type="flag"; optional;}
+   }   
+   
+   subSpace               { type="group"; 
+      waveFile            { type="string";}
+      fermi               { type="group"; optional; xor="fermi,window,bands,nStates";
+         nElectrons       { type="real"; min=0.0; optional;}
+         ekt              { type="real"; min=0.0; optional;}
+      }
+      window              { type="group"; optional; xor="fermi,window,bands,nStates";
+         lowEnergy        { type="real"; }
+         highEnergy       { type="real"; }
+         ekt              { type="real"; min=0.0; optional;}
+      }
+      nStates             { type="int"; min=0; optional; xor="fermi,window,bands,nStates";}
+      bands               { type="vector"; optional; xor="fermi,window,bands,nStates";}
+   }
+
+   main                   { type="group";
+      dF                  { type="real"; min=0.0; optional;}
+      dRes                { type="real"; min=0.0; optional;}
+      dRelLineMin         { type="real"; min=0.0; optional;}
+      maxSteps            { type="int";  min=0;   optional;}
+      print               { type="flag"; optional;}
+   }
+}

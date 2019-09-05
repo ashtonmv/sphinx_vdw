@@ -1,0 +1,21 @@
+potential      = <potentials/c-pbe-t15spd.cpi>;
+name           = "Carbon";
+element        = "C";
+valenceCharge  = 4;
+lMax           = d;
+lLoc           = d;
+lcaoOrbitals   = [s,p];
+atomicRhoOcc   = [2,2,0];
+rGauss         = 1;
+reciprocalMass = .1;
+dampingMass    = .7;
+ionicMass      = 12.;
+
+
+/* --- fhi98PP input file:
+6.00 1 2 6 0.00 : z nc nv
+    1  0   2.00      : n  l   f 
+    2  0   2.00 
+    2  1   2.00 
+2 t
+*/

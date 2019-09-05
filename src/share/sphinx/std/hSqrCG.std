@@ -1,0 +1,28 @@
+hSqrCG     { type="group"; optional;
+   maxSteps       { type="int"; min=1; }
+   maxStepsCCG    { type="int"; min=1; }
+   pStep	         { type="int"; optional;}   
+   dEnergy        { type="real"; min=0; }
+   dEps           { type="real"; min=0; optional; }
+   ekt            { type="real"; min=0; optional; }
+   printSteps     { type="int"; min=0; }
+   verbose        { type="flag"; optional; }
+   noRhoStorage   { type="flag"; optional; }
+   noWavesStorage { type="flag"; optional; }
+   printResidue   { type="flag"; optional; }
+   dPsi           { type="real"; min=0; optional; }
+   autoSteps      { type="flag"; optional; }
+   sacrifyStates  { type="int"; min=0; optional; }
+   propagateWaves { type="flag"; optional; }
+   connectedSpins { type="flag"; optional; }
+   noPreconditioning { type="flag"; optional; }   
+   dontUseDegeneracy { type="flag"; optional; }   
+   hSqr           { type="flag"; optional; }   
+   holes          { type="flag"; optional; }
+   noSubspaceDiag { type="flag"; optional; }
+   tuning         { type="real"; optional; }
+   subspaceDiag   { type="group"; optional;
+      maxSize     { type="int"; min = 5; }
+      overlap     { type="int"; min = 3; }
+   }
+}

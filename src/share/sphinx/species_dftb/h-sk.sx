@@ -1,0 +1,9 @@
+name           = "Hydrogen";
+element        = "H";
+skElementName  = "h"; // --- used to identify the SK files for every pair of species in the structure: 
+valenceCharge  = 1;   //     (SK files names = "skElementName"(species_i) + "..."(species_j) + ".sx")
+lMax           = s;
+atomicRhoOcc   = [1];
+reciprocalMass = .5;
+dampingMass    = .7;
+ionicMass      = 1.;

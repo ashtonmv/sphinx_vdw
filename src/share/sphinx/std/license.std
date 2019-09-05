@@ -1,0 +1,11 @@
+set validation;
+topLevelDefs;
+
+license        { type="group"; optional; 
+   user        { type="string"; }
+   host        { type="string"; }
+   serial      { type="string"; }
+   key         { type="string"; }
+   expires     { type="string"; }
+}
+

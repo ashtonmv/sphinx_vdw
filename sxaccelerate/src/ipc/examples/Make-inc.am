@@ -1,0 +1,50 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = sxdaemon sxlogbufthread sxprocess sxprocstdin sxthreadpool 
+
+sxdaemon_SOURCES   = $(AUX_SRC)
+sxdaemon_SOURCES  += sxdaemon.cpp
+sxdaemon_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxdaemon_LDADD     =  $(SXIMPORTLIBS)
+sxdaemon_LDADD    +=  
+sxdaemon_LDADD    +=  $(SXIMPORTOBJS)
+
+sxlogbufthread_SOURCES   = $(AUX_SRC)
+sxlogbufthread_SOURCES  += sxlogbufthread.cpp
+sxlogbufthread_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxlogbufthread_LDADD     =  $(SXIMPORTLIBS)
+sxlogbufthread_LDADD    +=  
+sxlogbufthread_LDADD    +=  $(SXIMPORTOBJS)
+
+sxprocess_SOURCES   = $(AUX_SRC)
+sxprocess_SOURCES  += sxprocess.cpp
+sxprocess_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxprocess_LDADD     =  $(SXIMPORTLIBS)
+sxprocess_LDADD    +=  
+sxprocess_LDADD    +=  $(SXIMPORTOBJS)
+
+sxprocstdin_SOURCES   = $(AUX_SRC)
+sxprocstdin_SOURCES  += sxprocstdin.cpp
+sxprocstdin_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxprocstdin_LDADD     =  $(SXIMPORTLIBS)
+sxprocstdin_LDADD    +=  
+sxprocstdin_LDADD    +=  $(SXIMPORTOBJS)
+
+sxthreadpool_SOURCES   = $(AUX_SRC)
+sxthreadpool_SOURCES  += sxthreadpool.cpp
+sxthreadpool_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxthreadpool_LDADD     =  $(SXIMPORTLIBS)
+sxthreadpool_LDADD    +=  
+sxthreadpool_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/ipc -I$(top_srcdir)/ipc
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

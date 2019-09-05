@@ -1,0 +1,32 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxBasis.h SxBinIO.h SxDirac.h SxDirac.hpp SxDiracLib.h SxHDF5.h SxOverlap.h SxProjMatrix.h SxProjMatrix.hpp
+
+
+lib_LTLIBRARIES       = libsxdirac.la
+libsxdirac_la_SOURCES  = $(AUX_SRC)
+libsxdirac_la_SOURCES += SxBasis.cpp SxBinIO.cpp SxDirac.cpp SxHDF5.cpp SxOverlap.cpp 
+libsxdirac_la_LIBADD   = $(SXIMPORTLIBS)
+libsxdirac_la_LIBADD  += @SX_NETCDF_LIBS@
+libsxdirac_la_LIBADD  += $(SXIMPORTOBJS)
+libsxdirac_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxdirac_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/io
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/io
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/ipc
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/math
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/fs
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/util
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/util
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/nonstd
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/mpi
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/mpi
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

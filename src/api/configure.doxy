@@ -1,0 +1,263 @@
+/**\page    page_configure        Make Environment
+
+   Before compiling SPHInX make sure that you have installed the necessary
+   external program packages as described in \ref page_req.
+
+
+
+\section    make_configure   Generating the Make Environment
+   The first step in the compilation sequence of SPHInX is to generate 
+   the Makefiles and various configuration files. This can get done by calling
+   the configure shell script in the 'sphinx/src' directory.
+   Call 
+   \verbatim
+      configure --help
+   \endverbatim
+   for a detailed description of the fine tuning arguments.
+
+   In general, options (FEATUREs) that influence the compilation of the 
+   package (numerical libraries, parallelization modes etc.) can be controlled
+   with
+   \verbatim
+      --enable-FEATURE 
+   \endverbatim
+   or
+   \verbatim
+      --disable-FEATURE 
+   \endverbatim
+   switches. The set of subdirectories (PACKAGEs) which are to be 
+   compiled can be specified with 
+   \verbatim
+      --with-PACKAGE
+   \endverbatim
+   or
+   \verbatim
+      --without-PACKAGE
+   \endverbatim
+   A list of possible FEATUREs and PACKAGEs is listed when invoking configure
+   with the --help option.
+
+
+\section    make_modes       The Two Compilation Modes
+
+   The SPHInX package can be compiled in two different compilation modes:
+     -# the slow DEBUG mode
+     -# the fast RELEASE mode
+
+   Both modes are compiled with different compiler flags (for changing
+   these flags see \ref make_tuning).
+
+\subsection make_debug       The DEBUG mode (configure --enable-debug)
+   
+   The DEBUG is the default mode. The package will be compiled with all
+   SPHInX Debug Macros being enabled (see \ref page_debug). Furthermore
+   the line information of the source code is added to the executable
+   (C/C++ option -g). All optimization options are switched off.
+   This mode allows the developer to find most of the standard programming
+   flaws (boundary checks, memory checks, type and rank checks, uninitialized
+   vectors and so on).
+   On the other hand executables compiled in the DEBUG mode are used to be
+   rather slow. 
+
+\subsection make_release     The RELEASE mode (configure --disable-debug)
+
+   Once the package is debugged and is ready to use, it should be recompiled
+   in the RELEASE mode. In that mode the SPHInX Debug Macros are switched
+   off and the compiler optimization options are fully enabled. As a result
+   the executables are much faster. But no consistency checks are performed
+   any more. Note, that object files or libraries compiled in the DEBUG mode
+   cannot be mixed with those compiled in the RELEASE mode. Because of that 
+   a change of the compilation mode invokes a 'make cleanall' command.
+
+
+\subsection make_switching   Switching the Compilation Mode
+
+   Object files (*.o) which are compiled in different compilation modes must
+   never linked together. That's why the SPHInX Make Environment uses
+   a simple caching scheme to invoke a "make cleanall" whenever the compilation
+   mode has changed. Thus, whenever the mode is changed the entire package will
+   be recompiled automatically.
+   The compilation mode can be canged via the configure script located in the
+   src/ subdirectory, e.g.
+   \verbatim
+      cd src
+      configure --enable-debug
+      (g)make
+   \endverbatim
+   
+
+\subsection make_tuning      Fine Tuning of the Compilation Modes
+
+   If the compiler flags should be fine adjusted this can be done \b carefully
+   in the \e configure.in file located in the system/ subdirectory. In this
+   script a rather long \em case block can be found (section:
+   \em set \em compiler \em flags) which cotains the possible compiler flags
+   for each supported C/C++ compiler. For each compiler the following variables
+   have to be set:
+      - DEBUG   Mode: CXX_DEBUG
+      - RELEASE Mode: CXX_REL
+      - PROFILE Mode: CXX_PRO
+
+   After changing the configure script has to be updated by calling (g)make
+   inside the system/ subfolder. After that the package can be recompiled,
+   e.g.
+   \verbatim
+      cd system
+      vi configure.in
+      (g)make
+      cd ..
+      (g)make cleanall
+      configure <options>
+      (g)make
+   \endverbatim
+
+\section    make_shlibs      The Shared Libraries  (configure --enable-shared)
+   SPHInX actually is set of shared libraries rather than a stand-alone 
+   DFT program. These libraries are organized as follows:
+
+    -# [ \b util/ ]:    Utilities: Numerics, String manipulations, 
+                        Exception handling 
+    -# [ \b io/ ]:      File Input/Output: ASCII and binary file readers,
+                        writers, converters
+    -# [ \b comm/ ]:    TCP/IP: Network communication
+    -# [ \b base/ ]:    DFT, structure relaxation
+    -# [ \b add-ons/ ]: Executables: SPHInX and its add-ons
+
+   Shared objects can be recompiled seperately from the executables (as long as
+   the interface functions are not modified). Thus, minor changes in one of the
+   libraries requires a recompilation only inside the corresponding subfolder.
+   However, the makefiles in all subfolders recognize the changes automatically.
+   For example, a make invoked in the exeuctbales folder examples/ or add-ons
+   would recompile only needed libraries.
+
+\section    make_tests    Writing Test Suites (configure --with-tests)
+
+   Sometimes it is useful to check the behavior of some SPHInX functions
+   in a separate small executable. Since both compilation and linkage require
+   a large set of flags it might appear inconvenient to do so manually.
+   The subfolder src/tests offers an ready-to-use environment to create
+   exactly those test programs. Its makefile recognizes any new *.cpp source
+   files and adds them to the make project. After compilation and linking the
+   wrapper shell script will also be created. 
+
+\section    make_examples  Compiling examples (configure --with-examples)
+
+   The same folder contains some examples which are to demonstrate several
+   aspects of the SPHInX API. Please also read \ref intro_hello.
+   In contrast to the add-ons none of these executables will become part of
+   the SPHInX Binary Distribution.
+
+\subsection make_ex_inp      Create standard input files for examples
+
+   If an example program requires certain input files (*.sx files) they can
+   be extracted automatically out of the *.cpp source code. A simple shell
+   script (system/sxextract.sh) creates those input files. In the source code
+   the file name can be specified with the '//=' prefix.
+   Every line of the input file must start with the prefix '//+'.
+
+   The text block
+   \verbatim
+   //= myInputFile.sx
+   //+ format sphinx;
+   //+ include <parameters.sx>;
+   \endverbatim
+   creates an file "myInputFile.sx" which contains 
+   \verbatim
+      format sphinx;
+      include <parameters.sx>;
+   \endverbatim
+   Note, that whenever (g)make is called the input files will be updated.
+
+   Further examples how input files can be extracted can be found in 
+   \ref dft.cpp and \ref rho.cpp.
+
+
+\section    make_addons      The SPHInX Add-ons (configure --with-addons)
+
+   The SPHInX add-ons are executables which are using the SPHInX libraries.
+   They are used to be tools for setting up DFT calculations, controlling
+   running SPHInX jobs, and last but not least performing the analysis of the
+   SPHInX results. Note, that the SPHInX main executable itself is nothing 
+   but an add-on, too.
+   All add-ons consist of an add-on class and a main entrance point. The main()
+   function should only read user parameters from the command line and/or some
+   input file(s). These data should be passed to the add-on class. Inside the
+   main() function no further calculations should be performed.
+   Add-ons are compiled in two steps:
+   -# Compilation of the add-on class \em without the main() function. 
+      The resulting object is added to the libSPHInX.so library.
+   -# Compilation of the main() function \em without the add-on class.
+      Linking with the libSPHInX.so.
+
+   In oder to support the two-step sequence the add-on class has to be separated
+   from the main() function by applying the preprocessor variable STANDALONE:
+   \verbatim
+      #include <SxMyAddOn.h>
+      #include <SxCLI.h>
+      #ifndef STANDALONE
+      SxMyAddOn::SxMyAdon (...)
+      {
+         ...
+      }
+
+      void SxMyAddOn::foo (...)
+      {
+         ...
+      }
+      ...
+      #else  /* STANDALONE */
+
+
+      int main (int argc, char **argv)
+      {
+         // --- Initialize SPHInX
+         initSFHIngXUT ();
+         initSFHIngXMath ();
+
+         // --- Parse command line
+         SxCLI cli (argc, argv);
+         SxString inFile  = cli.option ("-i|--input",  "file", 
+                                        "Read from specified input file");
+         SxString outFile = cli.option ("-o|--output", "file", 
+                                        "Write to specified output file");
+         ...
+         cli.finalize ();
+
+         SxMyAddOn myAddOn (...);
+         myAddOn.foo ();
+         ...
+         return 0;
+      }
+      #endif /* STANDALONE */
+   \endverbatim
+
+   As the makefile in the examples/ subfolder new *.cpp files will be added
+   to the add-on project automatically.
+
+\section    make_doc        The SPHInX API Documentation (configure --with-doc)
+
+   The top level makefile generates the SPHInX API documentation in these
+   file formats:
+      - HTML (src/doc/html/index.html)
+      - PDF (src/doc/latex/refman.pdf)
+      - MAN pages (src/doc/man3)
+
+   In order to use the man pages please modify your MANPATH variable in your
+   .bashrc or .(t)cshrc
+
+   .bashrc:   
+   \verbatim
+      export MANPATH=$(MANPATH):<YOUR_SPHINX_PATH>/src/doc/man
+   \endverbatim
+
+   .(t)cshrc:
+   \verbatim
+      setenv MANPATH $(MANPATH):<YOUR_SPHINX_PATH>/src/doc/man
+   \endverbatim
+
+   Please replace <YOUR_SPHINX_PATH> with the proper path.
+
+
+\author Sixten Boeck
+*/
+

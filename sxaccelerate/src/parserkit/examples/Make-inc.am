@@ -1,0 +1,30 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+libexec_PROGRAMS  = sxdemo 
+
+sxdemo_SOURCES   = $(AUX_SRC)
+sxdemo_SOURCES  += sxdemo.cpp
+sxdemo_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+sxdemo_LDADD     =  $(SXIMPORTLIBS)
+sxdemo_LDADD    +=  
+sxdemo_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/parserkit -I$(top_srcdir)/parserkit
+AM_CPPFLAGS += -I$(top_builddir)/graph -I$(top_srcdir)/graph
+AM_CPPFLAGS += -I$(top_builddir)/fs -I$(top_srcdir)/fs
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(top_builddir)/../../parserkit/examples/01_hello/libsxdemo1.la -I$(top_srcdir)/../../parserkit/examples/01_hello/libsxdemo1.la
+AM_CPPFLAGS += -I$(top_builddir)/../../parserkit/examples/02_stateful_scanner/libsxdemo2.la -I$(top_srcdir)/../../parserkit/examples/02_stateful_scanner/libsxdemo2.la
+AM_CPPFLAGS += -I$(top_builddir)/../../parserkit/examples/03_unicode/libsxdemo3.la -I$(top_srcdir)/../../parserkit/examples/03_unicode/libsxdemo3.la
+AM_CPPFLAGS += -I$(top_builddir)/../../parserkit/examples/04_include_files/libsxdemo4.la -I$(top_srcdir)/../../parserkit/examples/04_include_files/libsxdemo4.la
+AM_CPPFLAGS += -I$(top_builddir)/../../parserkit/examples/05_parser_stack/libsxdemo5.la -I$(top_srcdir)/../../parserkit/examples/05_parser_stack/libsxdemo5.la
+AM_CPPFLAGS += -I$(top_builddir)/../../parserkit/examples/06_schema/libsxdemo6.la -I$(top_srcdir)/../../parserkit/examples/06_schema/libsxdemo6.la
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

@@ -1,0 +1,131 @@
+// ---------------------------------------------------------------------------
+//
+//      The ab-initio based multiscale library
+//
+//                  S / P H I / n X
+//
+//      Copyright:  Max-Planck-Institute for Iron Research
+//                  40237 Duesseldorf, Germany
+//
+//      Contact:    https://sxlib.mpie.de
+//      Authors:    see sphinx/AUTHORS
+//      License:    see sphinx/LICENSE
+//
+// ---------------------------------------------------------------------------
+
+set validation;
+topLevelDefs;
+
+// --- units
+energyUnit     { type="string"; not="kBoltzmann"; optional; }
+lengthUnit     { type="string"; not="eMassByhBarSqr"; optional; }
+eMassByhBarSqr { type="real"; not="lengthUnit"; optional; min=0; } 
+kBoltzmann     { type="real"; not="energyUnit"; optional; min=0; }
+eps0           { type="real"; min=0; optional; }
+
+temperature    { type="real"; optional; }
+siteConcentration { type="real"; min=0; optional; }
+
+chemicalPotentials { type="group";
+   species { type="group";
+      element { type="string"; }
+      value   { type="real"; }
+      mobile  { type="flag"; optional; }
+   }
+}
+
+band { type="group"; optional;
+   name       { type="string"; optional; }
+   energy     { type="real"; }
+   mass       { type="real"; }
+   degeneracy { type="int"; min=1; optional; }
+}
+
+defect { type="group"; optional;
+   name           { type="string"; optional; }
+   state { type="group";
+      energy         { type="real"; }
+      charge         { type="real"; optional; }
+   }
+   configurations { type="int"; min=1; optional; }
+   species        { type="group"; optional;
+      element { type="string"; optional; }
+      nAtoms  { type="int"; }
+   }
+   diffusionBarrier   { type="real"; optional; }
+   diffusionPrefactor { type="real"; optional; }
+   diffusionCharge    { type="real"; optional; }
+}
+
+reaction { type="group"; optional;
+   educt { type = "group"; 
+      name { type="string"; } 
+   }
+   product { type="group"; 
+      name { type="string"; } 
+   }
+   prefactor { type = "real"; }
+   barrierEnergy { type = "real"; }
+   transitionCharge { type="real"; }
+//   reactionRadius { type="flag"; 
+//                    not="prefactor,barrier,transitionCharge"; }
+}
+
+main { type="main"; optional;
+   equilibrate { type="group";
+      species { type="group"; 
+         element       { type="string"; }
+         concentration { type="real"; not="mu"; optional; }
+         mu            { type="real"; not="concentration"; optional; }
+      }
+      fermiRange { type="vector"; optional; }
+   }
+   profile { type="group";
+      part { type="group";
+         species { type="group"; 
+            element       { type="string"; }
+            concentration { type="real"; not="mu"; optional; }
+            mu            { type="real"; not="concentration"; optional; }
+         }
+         range { type="vector"; }
+      }
+      pinFermi { type="real"; optional; not="voltage"; }
+      voltage  { type="real"; optional; not="pinFermi"; }
+      nPoints { type="int"; min = 2; }
+      length  { type="real"; }
+      maxPotLoop { type = "int"; min = 100; }
+   }
+   diffusion { type = "group"; optional;
+      time { type="real"; min = 0; }
+      dumpTime { type="real"; min = 0; optional;}
+      file { type="string"; optional; }
+   }
+
+   chargeVsPot { type="group"; optional;
+      species { type="group"; 
+         element       { type="string"; }
+         concentration { type="real"; not="mu"; optional; }
+         mu            { type="real"; not="concentration"; optional; }
+      }
+      range { type="vector"; }
+   }
+
+   pinningCurve { type="group"; optional;
+      species { type="group"; 
+         element       { type="string"; }
+         concentration { type="real"; not="mu"; optional; }
+         mu            { type="real"; not="concentration"; optional; }
+      }
+      pinFermi   { type="real"; }
+      alignFile  { type="string"; optional; }
+      startFermi { type="real"; optional; }
+      plot { type="group";
+         charge  { type="flag";  not="element,name"; optional; }
+         element { type="string"; not="charge,name"; optional; }
+         name    { type="string"; not="charge,element"; optional; } 
+      }
+   }
+}
+
+
+   

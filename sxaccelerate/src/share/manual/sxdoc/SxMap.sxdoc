@@ -1,0 +1,337 @@
+h2. @SxMap<K,V>@
+
+p1. The @SxMap@ container provides a way to store key-value pairs in a
+    dynamically increasing way. The data types of keys and values can be
+    any type as long as they provide default constructor, copy constructor
+    and '==' operator.
+
+p1. In the following the common functionality of @SxMap<K,V>@ is demonstrated
+    by means of simple data types, such as @int@ or @SxString@. Therefore,
+    include the header files
+
+{{{cpp(sxmap)
+#include <SxMap.h>
+#include <SxString.h>
+}}}
+
+p1. and declare an @SxMap@ object that stores countries and their capitals
+    as key-value pairs:
+
+{{{cpp(sxmap.fixture)
+SxMap<SxString, SxString> map;
+map("Albania") = "Tirana";
+map("Belgium") = "Brussels";
+map("China")   = "Beijing";
+map("Denmark") = "Copenhagen";
+}}}
+
+h3. Initialize using @std::initializer\_list@
+
+p1. Similarly, a map object could be populated by providing @std::initializer\_list@ of @SxPair@ in
+    the constructor as shown below:
+
+{{{cpp(sxmap.initList)
+SxMap<SxString, SxString> initMap = { {"Albania", "Tirana"},
+                                      {"Belgium", "Brussels"},
+                                      {"China"  , "Beijing"},
+                                      {"Denmark", "Copenhagen"} };
+auto it = initMap.begin ();
+while (it != initMap.end ()) {
+   cout << it.getKey () << "=" << it.getValue () << endl;
+   it++;
+}
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxmap.initList)
+Albania=Tirana
+Belgium=Brussels
+China=Beijing
+Denmark=Copenhagen
+}}}
+
+h3. Adding/updating elements, @operator ()@
+
+p1. The () operator can be used to add new key-value pair or update the value
+    for a given key. By using @map@ object from above:
+
+{{{cpp(sxmap.fixture.update)
+map("China") = "Shanghai";
+auto uIt = map.begin ();
+while (uIt != map.end ()) {
+   cout << uIt.getKey () << "=" << uIt.getValue () << endl;
+   uIt++;
+}
+}}}
+
+p1. After updating element with key "China",
+
+{{{expect(stdout,sxmap.fixture.update)
+Albania=Tirana
+Belgium=Brussels
+China=Shanghai
+Denmark=Copenhagen
+}}}
+
+
+h3. Check for existence, @hasKey()@ and @hasValue()@
+
+p1. In order to check whether a key exists in the @SxMap@ object, @containsKey@
+    or @hasKey@ can be used. Similarly, to check for value, @containsValue@ or
+    @hasValue@ can be used. Consider a map that stores each student's ID number
+    and names.
+
+{{{cpp(sxmap.fixture.containFixture)
+   SxMap<int,SxString> idMap;
+   idMap(345) = "name1";
+   idMap(732) = "name2";
+   idMap(223) = "name3";
+   idMap(335) = "name4";
+}}}
+
+p1. Now using this @SxMap@ object,
+
+{{{cpp(sxmap.fixture.containFixture.hasKV)
+   if (idMap.hasKey (223)) {
+      cout << "ID:223 maps to " << idMap(223) << endl; 
+   }
+   else {
+      cout << "ID 223 does not exist" << endl;
+   }
+   if(idMap.hasValue ("name5")) {
+      cout << "name5 exists" << endl;
+   }
+   else {
+      cout << "name5 does not exist" << endl;
+   }
+}}}
+
+p1. Which yields,
+
+{{{expect(stdout,sxmap.fixture.containFixture.hasKV)
+ID:223 maps to name3
+name5 does not exist
+}}}
+
+h3. Remove element using, @removeKey()@/@removeValue()@
+
+p1. The individual elements of the @SxMap@ object can be removed by either
+    providing the key or the value corresponding to the element.
+    The @removeKey@ function removes an element based on the given key and
+    @removeValue@ function removes the element based on the provided value.
+    By using the @map@ object from above:
+
+{{{cpp(sxmap.fixture.rmKV)
+map.removeKey ("Belgium");
+map.removeValue ("Copenhagen");
+for (auto it = map.begin (); it != map.end (); ++it) {
+   cout << it.getKey () << "=" << it.getValue () << endl;
+}
+}}}
+
+p1. After removing elements corresponding to key "Belgium" and
+    value "Copenhagen" we have:
+
+{{{expect(stdout,sxmap.fixture.rmKV)
+Albania=Tirana
+China=Beijing
+}}}
+
+h3. Remove element using iterator, @removeItem()@
+
+p1. The @removeItem@ function can be used to safely remove an element
+    from @SxMap@ object by providing the @Iterator@ pointing to the element.
+    The element is removed and a valid @Iterator@ pointing to next element
+    of @SxMap@ is returned. The next element is decided based on the direction
+    of provided iterator. If iterator's direction is forward, then after a call
+    to @removeItem@ the iterator would be pointing to the next element in
+    the @SxMap@. Otherwise, if the iterator's direction is backward, then the
+    next element is the previous element in the @SxMap@.
+    By using the @map@ object from above
+
+{{{cpp(sxmap.fixture.itm)
+for (auto rmItr = map.begin (); rmItr != map.end (); ++rmItr) {
+   if(rmItr.getKey () == "Albania") {
+      map.removeItem (&rmItr);
+      break;
+   }
+}
+for (auto rmItr = map.begin (); rmItr != map.end (); ++rmItr) {
+   cout << rmItr.getKey () << "=" << rmItr.getValue () << endl;
+}
+}}}
+
+p1. After removing the item with key "Albania":
+
+{{{expect(stdout,sxmap.fixture.itm)
+Belgium=Brussels
+China=Beijing
+Denmark=Copenhagen
+}}}
+
+h3. Iterators
+
+p1. The @SxMap<T>@ container class supports iterators. Considering
+    the example @idMap@ object from above:
+
+{{{cpp(sxmap.fixture.containFixture.iterators)
+for (auto cIt = idMap.begin (); cIt != idMap.end (); cIt++) {
+   cout << cIt.getKey () << " => " << cIt.getValue () << endl;
+}
+}}}
+
+p1. Which results in,
+
+{{{expect(stdout,sxmap.fixture.containFixture.iterators)
+345 => name1
+732 => name2
+223 => name3
+335 => name4
+}}}
+
+h4. Accessing Iterators, @begin()@ / @end()@ and @fromLast()@ / @toFirst()@
+
+p1. The @begin()@ function returns iterator pointing to the first element(key,value) of @SxMap@ object. It is used in conjunction with @end()@ function, which returns an iterator pointing to the location one past the last valid element in the map. 
+
+
+.begin() := returns iterator pointing to first valid element in the map.
+.end()   := returns iterator pointing to one past the last valid element.
+
+.fromLast() := returns iterator pointing to the last valid element in the map.
+.toFirst()  := returns iterator pointing to one before the first valid element.
+
+
+p1. By using the @map@ object from above:
+
+{{{cpp(sxmap.fixture.beginIt)
+for (auto beginIt = map.begin ();beginIt != map.end (); ++beginIt) {
+   cout << beginIt.getKey () << "=" << beginIt.getValue () << endl;
+}
+}}} 
+
+p1. Which yields,
+
+{{{expect(stdout,sxmap.fixture.beginIt)
+Albania=Tirana
+Belgium=Brussels
+China=Beijing
+Denmark=Copenhagen
+}}}
+
+p1. The @fromLast()@ function returns the iterator pointing to the
+    last valid element and @toFirst()@ returns the iterator pointing to
+    the location before the first valid element.
+
+{{{cpp(sxmap.fixture.fromLastIt)
+for(auto beginIt = map.fromLast ();beginIt != map.toFirst (); --beginIt) {
+   cout << beginIt.getKey () << "=" << beginIt.getValue () << endl;
+}
+}}}
+
+p1. Which results in,
+
+{{{expect(stdout,sxmap.fixture.fromLastIt)
+Denmark=Copenhagen
+China=Beijing
+Belgium=Brussels
+Albania=Tirana
+}}}
+
+h4. Setting iterator direction, @isForward()@ / @forward()@ / @backward()@ / @reverse()@
+
+p1. An iterator can have either forward or backward direction. The iterator
+    returned by @begin()@ function is by default an forward iterator and the
+    iterator returned by @fromLast@ is a backward iterator. The direction can
+    be checked by calling @isForward@ function. The @isForward@ returns true
+    if the iterator has forward direction and false otherwise. 
+
+{{{cpp(sxmap.fixture.isForward)
+auto beginIt = map.begin ();
+if (beginIt.isForward () == true)
+   cout << "The beginIt is a forward iterator" << endl;
+auto lastIt = map.fromLast ();
+if (lastIt.isForward () == false)
+   cout << "The lastIt is a backward iterator" << endl;
+}}}
+
+p1. The above code results in the following output:
+
+{{{expect(stdout,sxmap.fixture.isForward)
+The beginIt is a forward iterator
+The lastIt is a backward iterator
+}}}
+
+p1. The @forward@ function returns a copy of the iterator with it's
+    direction set to forward and @backward@ function returns a copy of
+    the calling iterator with it's direction set to backward. 
+
+{{{cpp(sxmap.fixture.forwardBackwardIt)
+auto beginIt = map.begin ();
+if (beginIt.isForward () == true)
+   cout << "beginIt's direction is forward" << endl;
+beginIt = beginIt.backward ();
+if (beginIt.isForward () == false)
+   cout << "beginIt's direction is backward" << endl;
+beginIt = beginIt.forward ();
+if (beginIt.isForward () == true)
+   cout << "beginIt's direction is forward" << endl;
+}}}
+
+p1. The above code yields the following output:
+
+{{{expect(stdout,sxmap.fixture.forwardBackwardIt)
+beginIt's direction is forward
+beginIt's direction is backward
+beginIt's direction is forward
+}}}
+
+p1. Similarly, @reverse@ function returns a copy of the calling iterator
+    with it's direction reversed.
+
+{{{cpp(sxmap.fixture.reverseIt)
+auto lastIt = map.fromLast ();
+if (lastIt.isForward () == false)
+   cout << "The lastIt's direction is backward" << endl;
+lastIt = lastIt.forward ();
+if (lastIt.isForward () == true)
+   cout << "The lastIt's direction is forward" << endl;
+lastIt = lastIt.backward ();
+if (lastIt.isForward () == false)
+   cout << "The lastIt's direction is backward" << endl;
+}}}
+
+p1. Which yields,
+
+{{{expect(stdout,sxmap.fixture.reverseIt)
+The lastIt's direction is backward
+The lastIt's direction is forward
+The lastIt's direction is backward
+}}}
+
+h4. Access Iterator to specific element, @begin()@
+
+p1. The @begin@ function also allows to get an iterator pointing to a
+    specific element. It requires the specific key and iterator direction as
+    parameters. The default value of the @direction@ is forward.
+
+{{{cpp(sxmap.fixture.beginParam)
+auto it = map.begin ("China", sx::Backward);
+if (it.isValid ()) {
+if (it.getKey () == "China")
+   cout << "The returned iterator points to key: 'China'" << endl;
+if (it.isForward () == false)
+   cout << "The returned iterator's direction is backward" << endl;
+}
+else {
+   cout << "The specified key not found" << endl;
+}
+}}}
+
+p1. Which results in:
+
+{{{expect(stdout,sxmap.fixture.beginParam)
+The returned iterator points to key: 'China'
+The returned iterator's direction is backward
+}}}
+

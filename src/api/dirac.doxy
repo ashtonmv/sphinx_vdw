@@ -1,0 +1,185 @@
+/** \page       page_dirac     Dirac Notation in SPHInX
+
+\section        dirac_intro    Introduction
+
+   In this package we have tried to support the Dirac notation style at the
+   source code level. This is based on the overloaded C++ operator '|' which
+   allows to reformulate Dirac expressions like
+   \f[
+      c = \langle A | B \rangle
+   \f]
+   to
+\code
+SxDiracVec<?> A = ...;
+SxDiracVec<?> B = ...;
+c = ( A | B );
+\endcode
+   Note, that the bra ('<') and ket ('>') brackets have be replaced with
+   round parentheses ('(' and ')'). Unfortunately, up to now it was not 
+   possible to deal properly with expressions like
+   \f[
+      A = H | B \rangle
+   \f]
+   Here an unbalanced parenthesis would occur which cannot compile. The solution
+   is either to skip the parenthesis
+   \code
+A = H | B;
+   \endcode
+   or to put the "wrong" left '<' bracket
+   \code
+A = ( H | B );
+   \endcode
+   However, this style of writing is still intuitive and readers of the
+   source will most probably easily understand the meaning of such code
+   fragments.
+
+\section        dirac_samples  Using SPHInX Dirac Vectors
+
+   In the Dirac notation the vectors cannot be represented as objects of the
+   SxVector class. Additional information (like the quantum numbers of the
+   vector) are required. SxDiracVec<?> objects are exactly SxVector objects
+   which also keep these additional data. This special object is defined in
+   the header file "SxDirac.h".
+   The overloaded '|' operator can be found in SxProjector.h. So, every
+   class which shall support Dirac's notation style has to include these
+   two headers:
+   \code
+      #include <SxDirac.h>
+      #include <SxProjector.h>
+   \endcode
+   If these headers are not included spurious compiler error messages will
+   occur!
+
+\section        dirac_layers   The three Dirac Layers
+
+   The Dirac notation style is based on three layers of classes. To understand
+   these classes a deeper understanding of C++ is required. However, in order
+   to extend the functionality standard "cut-and-paste" without further
+   knowledge of the classes is possible as well.
+   The three basic layers are
+   - \ref dirac_basis
+     (definition of basis-sets, operator's like \f$\nabla\f$, \f$\nabla^2\f$,
+      projectors to other basis-sets)
+   - \ref dirac_vectors
+     (numerical representation of the vectors)
+   - \ref dirac_proj
+     (glues previous two layers together)
+
+\subsection     dirac_basis    (i) The Basis-set Classes
+
+   All basis-sets (like SxRBasis   \f$|\mathbf{R}\rangle\f$,
+                        SxGBasis   \f$|\mathbf{G}\rangle\f$
+                        SxGkBasis  \f$|\mathbf{G+k}\rangle\f$
+                        SxRadBasis \f$|r\rangle\f$ etc.) are derived from an
+   abstract SxBasis class. This class contains empty placeholders for the
+   possible projectors between the basis-sets. If a new basis-set should be
+   implemented, the first step is to add empty projectors to the new basis-set
+   in SxBasis.
+   In the derived basis-set classes those empty placeholders are overloeaded
+   and replaced with the actual numerical expressions. They have to be 
+   registered in the corresponding header files with the C++ macro
+   REGISTER_PROJECTOR.
+   For example, in order to project a vector from the \f$|R\rangle\f$
+   basis to the \f$|\mathbf{G}\rangle\f$ basis in SxRBasis the corresponding
+   Fourier transformation function SxRBasis::toGSpace has been defined, i.e.,
+   \f[
+      \langle G | \Psi \rangle 
+          = 
+      \sum_R \langle G | R \rangle \langle R | \Psi \rangle
+   \f]
+   It also needs to be registered as projector in its header file like
+   \code
+      REGISTER_PROJECTOR (SxRBasis, SxGBasis, toGSpace);
+   \endcode
+   In addition \b every basis set needs an identity projector like
+   \f[
+      \langle R | \Psi \rangle 
+          = 
+      \sum_R' \langle R | R' \rangle \langle R' | \Psi \rangle
+   \f]
+   It will be registered, e.g., 
+   \code
+      REGISTER_PROJECTOR (SxRBasis, SxRBasis, identity);
+   \endcode
+
+   The basis-set layer has been designed in such a way that only those
+   projectors have to be defined which really are needed in the Hamiltonian.
+
+\subsection     dirac_vectors  (ii) The Dirac Vectors
+
+	The second ingredients to the Dirac notation style are the Dirac vectors.
+   Depending on the basis-set a vector is labeled with different quantum 
+   numbers. For example plane-waves depend on the Bloch state \em i,
+   the spin \f$\sigma\f$ and the k-point \b k, whereas an atomic orbital 
+   is usually specified with the species \em is, the atom \em ia, the 
+   main quantum number \em n, the angluar momentum \em l, and the magnetic
+   projection \em m. Classes in this layer have to overload the proper
+   C++ function 'operator()' and to keep track of the representing basis-set
+   object, e.g. the Bloch waves (SxPW) can translate
+   \f[
+      \Psi_{i,\sigma,k} \Leftrightarrow \mathrm{psi(i,sigma,k)}
+   \f]
+   and an atomic orbital SxAtomicOrbitals has to be able to translate
+   \f[
+      \mu_{i_s, i_a, n, l, m} \Leftrightarrow \mathrm{mu(is,ia,n,l,m)}
+   \f]
+   It is also possible to introduce "hybrid wavefunctions" which are represented
+   internally in one basis-set but they pretend to be given in another one.
+   An example is the class SxMuPW. Internally, it keeps atomic orbitals
+   in a radial basis \f$\langle r | \mu_{i_s,i_a,n,l,m} \rangle \f$. But 
+   externally, it also can be used as Bloch-like waves by performing the
+   projection
+   \f[
+      \langle G | \Psi_{i,\sigma,k} \rangle
+         =
+      \sum_r  \langle G | r \rangle \langle  r | \mu_{i_s,i_a,n,l,m} \rangle
+   \f]
+   This projection is done "on-the-demand" whenever the C++ ()-function
+   (i,sigma,k) is called. 
+   \code
+SxMuPW orbitals (...);
+muI = orbitals (i, iSpin, ik);
+   \endcode
+   
+   So, the SxMuPW class can be used exactly in the same way as a SxPW object
+   is used. It is applied in the tight-binding initialization 
+   (SxHamSolver::tightBinding) to be used in the SxPWHamiltonian. Thus, no
+   change of the SxPWHamiltonian was necessary.
+
+\subsection     dirac_proj     (iii) The Dirac Projectors
+
+   The two previous layers cannot be used alone. The Dirac projectors 
+   can glue them together and create the actual code. The header file
+   SxProjector.h cotains the possible '|' operators between wavefunctions
+   and basis-set as well as between two basis-sets. Each projector
+   is only a few code lines long and new implementations can be done with
+   cut-and-paste.
+   
+\section        dirac_types    The two projection types
+
+   Projections between to basis-sets can be done via the '|' operator. 
+   In principle, all SxDiracVec<?> objects can be projected between basis-sets.
+   So even the charge density (SxRho) could be projected between \b G and \b R
+   space with the '|' operator. But the original Dirac notation exists only
+   for wavefunctions. In order not to confuse the developer another projection
+   method exists. It simply defines member functions like 'toR' or 'toG' in
+   the headers SxDirac.hh and SxDirac.hpp. This allows expressions like
+   \code
+      rhoR = rhoG.toR ();
+   \endcode
+   instead of the non-sense expressions
+   \code
+      rhoR = ( R | rhoG );
+   \endcode
+   which also would work.
+
+\section        dirac_classes  The Dirac Backbone
+
+   The Dirac Notation in SPHInX is based on two sets of classes. The first
+   family are classes derived from the general basis-set class SxPsiSet. On
+   the other hand there is the general Hamiltonian SxHamiltonian with all
+   its children.
+   The involved classes are organized in the group \ref group_dirac.
+
+\author Sixten Boeck
+*/

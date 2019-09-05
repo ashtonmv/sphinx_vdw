@@ -1,0 +1,107 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxAlg.h \
+                  SxAllocCache.h \
+                  SxArray.h \
+                  SxAutoLoop.h \
+                  SxBitArray.h \
+                  SxCBoundPtr.h \
+                  SxCLI.h \
+                  SxCList.h \
+                  SxChar.h \
+                  SxChar.hpp \
+                  SxConfig.h \
+                  SxContainer.h \
+                  SxCrashHandler.h \
+                  SxCrashListener.h \
+                  SxError.h \
+                  SxException.h \
+                  SxFunction.h \
+                  SxFunctor.h \
+                  SxHashFunction.h \
+                  SxHashTable.h \
+                  SxHashTable.hpp \
+                  SxIterator.h \
+                  SxList.h \
+                  SxLog.h \
+                  SxLogBuf.h \
+                  SxMacroLib.h \
+                  SxMap.h \
+                  SxMap.hpp \
+                  SxMemConsumer.h \
+                  SxMemMonitor.h \
+                  SxMetadata.h \
+                  SxMultiMap.h \
+                  SxMultiMap.hpp \
+                  SxNArray.h \
+                  SxPair.h \
+                  SxPtr.h \
+                  SxPtr.hpp \
+                  SxRange.h \
+                  SxRedirect.h \
+                  SxRegex.h \
+                  SxSearch.h \
+                  SxSed.h \
+                  SxSelection.h \
+                  SxSelection.hpp \
+                  SxSigSlots.h \
+                  SxSignals.h \
+                  SxSlot.h \
+                  SxSort.h \
+                  SxSortedList.h \
+                  SxSparseUtil.h \
+                  SxStack.h \
+                  SxString.h \
+                  SxString.hpp \
+                  SxTemplate.h \
+                  SxTime.h \
+                  SxTimer.h \
+                  SxTree.h \
+                  SxTree.hpp \
+                  SxTypeDefs.h \
+                  SxUnicodeTbl.h \
+                  SxUniqueList.h \
+                  SxUniqueList.hpp \
+                  SxUtil.h \
+                  SxVariant.h \
+                  SxVariant.hpp \
+                  SxWinConfig.h
+
+lib_LTLIBRARIES       = libsxutil.la
+libsxutil_la_SOURCES  = $(AUX_SRC)
+libsxutil_la_SOURCES += SxAllocCache.cpp \
+   SxBitArray.cpp \
+   SxChar.cpp \
+   SxCLI.cpp \
+   SxCrashHandler.cpp \
+   SxError.cpp \
+   SxException.cpp \
+   SxLog.cpp \
+   SxLogBuf.cpp \
+   SxMemConsumer.cpp \
+   SxMemMonitor.cpp \
+   SxMetadata.cpp \
+   SxRedirect.cpp \
+   SxRegex.cpp \
+   SxSed.cpp \
+   SxString.cpp \
+   SxTemplate.cpp \
+   SxTimer.cpp \
+   SxUtil.cpp \
+   SxVariant.cpp
+
+libsxutil_la_LIBADD   = $(SXIMPORTLIBS)
+libsxutil_la_LIBADD  += 
+libsxutil_la_LIBADD  += $(SXIMPORTOBJS)
+libsxutil_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxutil_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

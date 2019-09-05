@@ -1,0 +1,43 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = test-eventdata test-events test-pipes test-sxprocess 
+
+test_eventdata_SOURCES   = $(AUX_SRC)
+test_eventdata_SOURCES  += test-eventdata.cpp
+test_eventdata_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+test_eventdata_LDADD     =  $(SXIMPORTLIBS)
+test_eventdata_LDADD    +=  
+test_eventdata_LDADD    +=  $(SXIMPORTOBJS)
+
+test_events_SOURCES   = $(AUX_SRC)
+test_events_SOURCES  += test-events.cpp
+test_events_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+test_events_LDADD     =  $(SXIMPORTLIBS)
+test_events_LDADD    +=  
+test_events_LDADD    +=  $(SXIMPORTOBJS)
+
+test_pipes_SOURCES   = $(AUX_SRC)
+test_pipes_SOURCES  += test-pipes.cpp
+test_pipes_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+test_pipes_LDADD     =  $(SXIMPORTLIBS)
+test_pipes_LDADD    +=  
+test_pipes_LDADD    +=  $(SXIMPORTOBJS)
+
+test_sxprocess_SOURCES   = $(AUX_SRC)
+test_sxprocess_SOURCES  += test-sxprocess.cpp
+test_sxprocess_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+test_sxprocess_LDADD     =  $(SXIMPORTLIBS)
+test_sxprocess_LDADD    +=  
+test_sxprocess_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/ipc -I$(top_srcdir)/ipc
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

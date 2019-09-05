@@ -1,0 +1,66 @@
+#!@PERL@
+
+sub fileNotFound();
+
+my $format = 'gcc';
+my $file;
+my ($dir) = `pwd` =~ /\/([^\/]+)$/; chomp ($dir);
+
+my %counter;
+
+open (FP, "<MAKE.log") || fileNotFound ();
+if ($format eq 'gcc')  {
+   while (<FP>)  {
+
+      # update directory
+      if (m/Entering directory `.*\/([^\/]+)'/)  {
+         $dir = $1;
+      }
+
+      # SxFileName.cpp:125: warning: unused parameter 'abc_'
+      if (/^(.+):\d+.*:\s*warning/)  {
+         $file = $1;
+         # strip line numbers
+         if ($file =~ /:/) { $file = $`; }
+         # strip unnecessary paths
+         if ($file =~ /([^\/]+)\/([^\/]+)$/) { $file = "$1/$2";      }
+         else                                { $file = "$dir/$file"; }
+
+         if (!(exists($counter{$file})))  { $counter{$file} = 0; }
+         $counter{$file}++;
+      }
+   }  
+} else {
+   die "Compiler format not supported.";
+}
+close (FP);
+
+# --- print statistics
+my $SEP="+--------------------------------------"
+       ."---------------------------------------";
+my @files = sort {
+   if ($counter{$a} == $counter{$b})  {
+      return $a cmp $b;
+   } else {
+      return $counter{$a} <=> $counter{$b};
+   }
+} keys %counter;
+if ($#files >= 0)  {
+   print "\n";
+   print "$SEP\n";
+   print "|  Compiler Warnings:\n";
+   print "$SEP\n";
+   foreach $k (@files) {
+      next if ($k =~ /-main.cpp/);
+      printf ("%-50s %d\n", $k.":", $counter{$k});
+   }
+}
+
+
+exit;
+
+sub fileNotFound ()
+{
+   print "MAKE.log not found. Warning statistics not available.\n";
+   exit 0;
+}

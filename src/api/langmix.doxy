@@ -1,0 +1,149 @@
+/**\page    page_langmix     Calling FORTRAN routines from SPHInX
+
+\section   langmix_intro     Overview
+   Many libraries in the field of scientific computing have been written
+   in FORTRAN. Since SPHInX has been coded entirely in C++ it is not
+   straightforward to access those FORTRAN libraries.
+   The SPHInX Fortran Mixer is an environment which simplifies mixing
+   FORTRAN libraries with SPHInX. The developer simply copies FORTRAN
+   files into a certain directory and recompiles the package. That's it!
+
+\section   langmix_misuse    Concept/Misuage
+   SPHInX is and always will be a pure C++ package. Functionality which
+   is based on such Fortran routines will never be accepted as new SPHInX
+   features! So don't abuse the mixing environment. It's for test purposes
+   only.
+
+\section   langmix_req       Requirements
+   In order to use FORTRAN routines a Fortran 90/95 compiler is needed.
+   The following compilers are supported:
+   - f95   (NAG Fortran 90/95 Compiler)
+   - ifc   (Intel Fortran 90/95 Compiler)
+   - pgf90 (Portland Group Fortran 90 Compiler)
+
+   Furthermore the FORTRAN routines
+   - have to use only "conventional" Fortran commands
+   - must not have either CPP preparser statements
+   - nor any higher Fortran90/95 statements like 
+      - modules
+      - interfaces
+      - operator overloading
+   - avoid parameter lists with derived datatypes
+
+   No problems will occur with the "typical" Fortran programs, written
+   in FOTRAN77 with additional allocate/deallocate statements, but probably
+   95% of the scientific programs are written in such a way...
+   
+
+\section   langmix_make      Compiling SPHInX with Fortran support
+   In order to access Fortran in the SPHInX package the Fortran support
+   has to be enable. A detailed description on how to compile the SPHInX
+   package can be found in \ref page_make.
+
+\section   langmix_src       Calling a Fortran routine from SPHInX
+   The handling of the SPHInX Fortran Mixer shall be demostrated by means
+   of a simple example. In order to be able to compile SPHInX programs
+   that require Fortran even on systems without Fortran the presents of
+   a compiler has to be checked:
+
+   \code
+   #include <SPHInXF.h>     // include the Fortran headers
+   #include <SPHInX.h>
+   #ifndef WITH_FORTRAN
+      FORTRAN_MISSING;
+   #else
+      // --- add here the calling routine
+      int main ()
+      {
+          // --- initialize SPHInX
+          initSFHIngXUT ();
+          initSFHIngXMath ();
+
+          // --- call an external Fortran routine
+          FCALL(someFortranRoutine) ();
+
+          return 0;
+      }
+   #endif /* WITH_FORTRAN */
+   \endcode
+
+   The FCALL macro has to be called in order to create the proper function
+   call needed on the current platform. Depending on the compiler the 
+   fortran function symbols can be modified, e.g. leading or trailing
+   underscores, uppercase/lowercase symbols etc. The FCALL macro translates
+   the function symbol to the correct spelling.
+
+\subsection langmix_arguments   Providing arguments
+   Arguments between C/C++ and FORTRAN can be exchanged by value or by
+   reference. Again, this depends on the FORTRAN compiler. In order to make
+   the function or subroutine calls independent on the FORTRAN compiler
+   the argument list on the caller's side (SPHInX) have to be kept
+   variable. This is accomplished by preparser macros:
+   - FCALL(<function/subroutine name>)
+   - FINT(<scalar integer value>)
+   - FFLOAT(<scalar float value>)
+   - FDOUBLE(<scalar double value>)
+   - FCOMPLEX8(<scalar complex value, single precision>)
+   - FCOMPLEX16(<scalar complex value, double precision>)
+   - FINTVEC(<integer vector/array>)
+   - FFLOATVEC(<float vector/array>)
+   - FDOUBLEVEC(<double vector/array>)
+   - FCOMPLEX8VEC(<complex vector/array, single precision>)
+   - FCOMPLEX16VEC(<complex vector/array, double precision>)
+
+   With these macros interfaces to all kind of FORTRAN functions and
+   SUBROUTINES can be generated.
+
+   Let's assume a FORTRAN function \b fortsqrt should be called. As an
+   input value it takes an double value and returns it's square root, also
+   of type double. 
+   -# Copy the FORTRAN source file to <SFHINGXROOT>/src/fortran>.
+      Note that the extension of the source file must be either *.f or *.f90
+   -# Create the prototype definition.
+      Add the corresponding prototype definition to the file include/SFHIngXF.h
+      To do so the function name \b fortsqrt as well as the argument has to
+      be translated with the predifined macros, e.g.
+      \code
+         double FCALL(fortsql) (FDOUBLE(arg)) FBODY;
+      \endcode
+      Don't forget to finalize the line with the "FBODY" macro.
+   -# Calling the FORTRAN routine.
+      In order to call the FORTRAN interface properly the same macros
+      as already used in the prototype definition have to be applied, e.g.
+      \code
+      double arg    = 16.;
+      double result = FCALL(fortsqrt) (FDOUBLE(arg));
+      \endcode
+   -# Compile the package with FORTRAN support being enabled (\ref page_make)
+
+
+\section langmix_problems       Problems/Complications
+   The multi-language mixing does not allow to mix all FORTAN functionality
+   with SPHInX. Known problems/drawbacks might be related to
+   - \ref langmix_const
+   - \ref langmix_stdout
+   - \ref langmix_higherf95
+
+\subsection langmix_const       Providing constants to FORTRAN routines
+   Depending on the Fortran compiler scalar arguments are provided either
+   by reference or value. A call-by-reference is similar to a C/C++ parameter
+   supply with pointers. Since it is not possible to create the address of
+   a scalar calls like
+   \code
+      FCALL(someFortranRoutine) (FDOUBLE(16.));
+   \endcode
+   is not possible/allowed. Instead a temporatry variable has to be defined:
+   \code
+      double arg = 16.;
+      FCALL(someFortranRoutine) (FDOUBLE(arg));
+   \endcode
+   
+\subsection langmix_stdout      Printing in FORTRAN routines
+   to be continued
+
+\subsection langmix_higherf95   Using higher Fortran 90/95 statements
+   to be continued
+
+
+\author Sixten Boeck
+*/

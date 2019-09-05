@@ -1,0 +1,27 @@
+// --------------------------------------------------------------------------
+// SFHIngX  - rhombohedral lattice 
+//             
+//
+// Christoph Freysoldt
+// 04/19/2005
+//
+// --------------------------------------------------------------------------
+// Argument:
+//    aLat                lattice parameter a [Bohr]
+//    alpha               lattice parameter alpha [degree]
+//    
+// --------------------------------------------------------------------------
+
+needs aLat;
+needs alpha;
+
+global _a, _c;
+// conventional cell is hexagonal, with a = 2_a ; c = 3_a
+_a   = sqrt( (1 -     cos(0.0174532925199433 * alpha))/ 2); // = a/2 
+_c   = sqrt( (1 + 2 * cos(0.0174532925199433 * alpha))/ 3); // = c/3
+
+// --- definition of the primitive unit cell
+cell = aLat * [ [ _a,  -1/sqrt(3) * _a, _c],
+                [  0,   2/sqrt(3) * _a, _c],
+                [-_a,  -1/sqrt(3) * _a, _c]];
+

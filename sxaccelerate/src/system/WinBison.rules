@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VisualStudioToolFile
+	Name="WinBison"
+	Version="8.00"
+	>
+	<Rules>
+		<CustomBuildRule
+			Name="WinBison"
+			CommandLine="$(MSYSDIR)\usr\bin\bison -y -p$(InputName)_ -d $(InputName).ypp -o $(IntDir)\$(InputName).tab.cpp"
+			Outputs="$(IntDir)\$(InputName).tab.hpp; $(IntDir)\$(InputName).tab.cpp"
+			FileExtensions="*.ypp"
+			>
+			<Properties>
+			</Properties>
+		</CustomBuildRule>
+	</Rules>
+</VisualStudioToolFile>

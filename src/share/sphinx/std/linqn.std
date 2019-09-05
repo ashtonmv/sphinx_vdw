@@ -1,0 +1,15 @@
+linQN            { type="group"; optional; 
+   maxSteps      { type="int"; min=1; optional; }
+   dX            { type="real"; min=0.; optional; }
+   dF            { type="real"; min=0.; optional; }
+   dEnergy       { type="real"; min=0.; optional; }
+   nProjectors   { type="int"; min=1; optional; }
+   diag          { type="real"; min=0.; optional; }
+   maxStepLength { type="real"; min=0.; optional; }
+   driftFilter   { type="flag"; optional; }
+   
+   bornOppenheimer { type="group";optional;
+      include <std/elmin.std>;
+   }
+   
+}

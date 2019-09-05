@@ -1,0 +1,42 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = 
+
+bin_PROGRAMS     = test-sxmap test-sxstring test-sxtypedefs test-sxuniquelist 
+
+test_sxmap_SOURCES   = $(AUX_SRC)
+test_sxmap_SOURCES  += test-sxmap.cpp 
+test_sxmap_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+test_sxmap_LDADD     =  $(SXIMPORTLIBS)
+test_sxmap_LDADD    +=  
+test_sxmap_LDADD    +=  $(SXIMPORTOBJS)
+
+test_sxstring_SOURCES   = $(AUX_SRC)
+test_sxstring_SOURCES  += test-sxstring.cpp 
+test_sxstring_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+test_sxstring_LDADD     =  $(SXIMPORTLIBS)
+test_sxstring_LDADD    +=  
+test_sxstring_LDADD    +=  $(SXIMPORTOBJS)
+
+test_sxtypedefs_SOURCES   = $(AUX_SRC)
+test_sxtypedefs_SOURCES  += test-sxtypedefs.cpp 
+test_sxtypedefs_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+test_sxtypedefs_LDADD     =  $(SXIMPORTLIBS)
+test_sxtypedefs_LDADD    +=  
+test_sxtypedefs_LDADD    +=  $(SXIMPORTOBJS)
+
+test_sxuniquelist_SOURCES   = $(AUX_SRC)
+test_sxuniquelist_SOURCES  += test-sxuniquelist.cpp 
+test_sxuniquelist_CPPFLAGS  = $(AM_CPPFLAGS) -DSXLIBTOOL="\"@SXLIBTOOL@\""
+test_sxuniquelist_LDADD     =  $(SXIMPORTLIBS)
+test_sxuniquelist_LDADD    +=  
+test_sxuniquelist_LDADD    +=  $(SXIMPORTOBJS)
+
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

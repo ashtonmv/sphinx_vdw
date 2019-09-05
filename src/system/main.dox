@@ -1,0 +1,16 @@
+/** \mainpage The S/PHI/nX - API
+
+This is the application programming interface (API) documentation of the
+S/PHI/nX physics library. It heavily relies on the SxAccelerate framework,
+which is documented separately. Links to the SxAccelerate documentation are
+provided.
+
+This API documentation servers as a quick, browsable reference guide to
+developers of the S/PHI/nX code or additional tools/add-ons. It is not
+necessary to study the API in order to use the code. The API documentation
+does not replace a proper introduction into pogramming with S/PHI/nX, and it
+is far from being exhaustive. If you are interested in starting new projects
+based on S/PHI/nX or SxAccelerate or in joining an existing project, please
+contact the developers for advice (see http://sxlib.mpie.de).
+
+*/

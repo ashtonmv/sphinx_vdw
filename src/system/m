@@ -1,0 +1,30 @@
+#!/bin/sh
+# 
+# S/PHI/nX make
+#
+# Copy this file to your private $HOME/bin/m and make sure that
+# it is found in $PATH
+#
+
+# --- do we have a sxmake in this folder (e.g. we are in src/)
+if test -x system/sxmake; then
+   system/sxmake $*
+   exit $?
+fi
+
+# --- do we have a sxmake in the parent folder (e.g. we are in src/util)
+if test -x ../system/sxmake; then
+   ../system/sxmake $*
+   exit $?
+fi
+
+# --- fall back to GNU make
+gmake=`which gmake`
+if test x"$gmake" = x; then
+   $gmake $*
+   exit $?
+fi
+
+# --- fall back to make
+make $*
+exit $?

@@ -1,0 +1,14 @@
+/** \brief documenting enumeration types
+  
+*/
+enum Enumerations {
+     /** \brief long-style - Left string alignment  */
+     Left, 
+
+     /** \brief long-style - centered string alignment */
+     Center, 
+
+     Right, /**< \brief short style - Right string alignment */
+
+     None   /**< \brief short style - No alignment */
+};

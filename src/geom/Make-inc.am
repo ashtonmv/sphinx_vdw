@@ -1,0 +1,33 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxAims.h SxArtifactFilter.h SxAtomInfo.h SxAtomicStructure.h SxAtomicStructure.hpp SxCell.h SxElemDB.h SxEquivalence.h SxForceSym.h SxGeom.h SxGrid.h SxLinEquation.h SxNeighbors.h SxPDBFast.h SxPoscar.h SxPotential.h SxRotation.h SxSpeciesData.h SxSpeciesRef.h SxSymFinder.h SxSymGroup.h SxSymOp.h SxSymType.h SxXYZ.h
+
+
+lib_LTLIBRARIES       = libsxgeom.la
+libsxgeom_la_SOURCES  = $(AUX_SRC)
+libsxgeom_la_SOURCES += SxAims.cpp SxArtifactFilter.cpp SxAtomicStructure.cpp SxAtomInfo.cpp SxCell.cpp SxElemDB.cpp SxEquivalence.cpp SxForceSym.cpp SxGrid.cpp SxLinEquation.cpp SxNeighbors.cpp SxPDBFast.cpp SxPoscar.cpp SxPotential.cpp SxRotation.cpp SxSpeciesData.cpp SxSpeciesRef.cpp SxSymFinder.cpp SxSymGroup.cpp SxSymType.cpp SxXYZ.cpp 
+libsxgeom_la_LIBADD   = $(SXIMPORTLIBS)
+libsxgeom_la_LIBADD  += @SX_BLAS_LIBS@
+libsxgeom_la_LIBADD  += $(SXIMPORTOBJS)
+libsxgeom_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxgeom_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/dirac -I$(top_srcdir)/dirac
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/ipc
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/io
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/io
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/fs
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/math
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/util
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/util
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/nonstd
+AM_CPPFLAGS += -I@SXACCELERATE_SRC@/mpi
+AM_CPPFLAGS += -I@SXACCELERATE_BUILD@/mpi
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

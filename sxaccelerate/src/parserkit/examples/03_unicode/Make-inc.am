@@ -1,0 +1,28 @@
+# This file has been generated automatically.
+# Do not edit it. Instead invoke
+#    (g)make filelist
+# From the source folder
+
+
+include_HEADERS = SxDemo3.h \
+                  SxDemo3Parser.h
+
+lib_LTLIBRARIES       = libsxdemo3.la
+libsxdemo3_la_SOURCES  = $(AUX_SRC)
+libsxdemo3_la_SOURCES += SxDemo3Parser.cpp
+
+libsxdemo3_la_LIBADD   = $(SXIMPORTLIBS)
+libsxdemo3_la_LIBADD  += 
+libsxdemo3_la_LIBADD  += $(SXIMPORTOBJS)
+libsxdemo3_la_LDFLAGS  = -version-info $(VERSION)
+if COND_BUILD_WIN32
+   libsxdemo3_la_LDFLAGS += -no-undefined
+endif
+
+AM_CPPFLAGS += -I$(top_builddir)/parserkit -I$(top_srcdir)/parserkit
+AM_CPPFLAGS += -I$(top_builddir)/graph -I$(top_srcdir)/graph
+AM_CPPFLAGS += -I$(top_builddir)/fs -I$(top_srcdir)/fs
+AM_CPPFLAGS += -I$(top_builddir)/util -I$(top_srcdir)/util
+AM_CPPFLAGS += -I$(top_builddir)/nonstd -I$(top_srcdir)/nonstd
+AM_CPPFLAGS += -I$(abs_builddir) -I$(srcdir)
+

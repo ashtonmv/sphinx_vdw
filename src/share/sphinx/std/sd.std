@@ -1,0 +1,15 @@
+SD                 { type="group"; optional;
+   hContrib        { type="int";  min=0; max=255; optional; }
+   deltaT          { type="real"; min=0; }
+   maxSteps        { type="int"; min=1; }
+   dEnergy         { type="real"; min=0; }
+   dEnergyLow      { type="real"; min=0; optional; }
+   dPsi            { type="real"; min=0; }
+   printSteps      { type="int"; min=1; }
+   keepRhoFixed    { type="flag"; optional; }
+   keepOccFixed    { type="flag"; optional; }
+   keepSpinFixed   { type="flag"; optional; not="keepOccFixed"; }
+   spinMoment      { type="real"; optional; not="keepOccFixed"; }
+   noRhoStorage    { type="flag"; optional; }
+   noWavesStorage  { type="flag"; optional; }
+}               

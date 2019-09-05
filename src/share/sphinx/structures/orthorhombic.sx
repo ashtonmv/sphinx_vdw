@@ -1,0 +1,42 @@
+
+// --------------------------------------------------------------------------
+// SPHInX  -  orthorhombic lattice
+//                     
+//
+// Mira Todorova, m.todorova@mpie.de
+// 31/07/2009
+//
+// Reference: J. Phys. C: Solid State Phys. 6, 2133 (1973) 
+//
+// --------------------------------------------------------------------------
+// Arguments:
+//    aLat                lattice parameter a [Bohr]
+//    cLat                lattice parameter c [Bohr]
+// --------------------------------------------------------------------------
+
+requires aLat;
+requires bLat;
+requires cLat;
+
+// --- definition of the primitive unit cell
+global a1, a2, a3;
+a1   = [aLat,    0,    0];
+a2   = [   0, bLat,    0];
+a3   = [   0,    0, cLat];
+cell = [a1, a2, a3];
+
+
+// --- reciprocal space units
+global kx, ky, kz;
+kx = 2*pi/aLat;
+ky = 2*pi/bLat;
+kz = 2*pi/cLat;
+
+// --- high symmetry k-points
+G      = [ kx* 0  , ky* 0  , kz* 0  ];
+Sigma  = [ kx* 1/4, ky* 0  , kz* 0  ];
+X      = [ kx* 1/2, ky* 0  , kz* 0  ];
+Delta  = [ kx* 0  , ky* 1/4, kz* 0  ];
+Y      = [ kx* 0  , ky* 1/2, kz* 0  ];
+Lambda = [ kx* 0  , ky* 0  , kz* 1/4];
+Z      = [ kx* 0  , ky* 0  , kz* 1/2];

@@ -1,0 +1,128 @@
+# ----------------------------------------------------------------------------
+#
+#           The general purpose cross platform C/C++ framework
+#
+#                       S x A c c e l e r a t e
+#
+#           Home:       https://www.sxlib.de
+#           License:    Apache 2
+#           Authors:    see src/AUTHORS
+#
+# ----------------------------------------------------------------------------
+# SXBASE/system/make.am.components
+# ----------------------------------------------------------------------------
+
+# --- numlibs
+FFT      =
+BLAS     =
+REGEX    =
+PTHREADS =
+NETCDF   =
+SHORTCUT =
+
+# --- S/PHI/nX
+#SXNONSTD  = $(top_builddir)/nonstd/libsxnonstd.la
+SXUTIL      = $(top_builddir)/util/libsxutil.la
+SXGRAPH     = $(top_builddir)/graph/libsxgraph.la
+SXMATH      =
+if COND_BUILD_SXMATH
+   SXMATH  += $(top_builddir)/math/libsxmath.la
+endif
+SXFS        = $(top_builddir)/fs/libsxfs.la
+SXIPC       = $(top_builddir)/ipc/libsxipc.la
+SXPARSERKIT = $(top_builddir)/parserkit/libsxparserkit.la
+SXJSON      = $(top_builddir)/json/libsxjson.la
+SXIO        = $(top_builddir)/io/libsxio.la
+# ---
+SXMPI     = $(top_builddir)/mpi/libsxmpi.la
+# ---
+if COND_BUILD_WIN32
+  SXNONSTD = $(top_builddir)/nonstd/libsxnonstd.la
+endif
+
+AM_CPPFLAGS += -I@NUMLIBS@/include
+
+SXIMPORTLIBS    =
+SXIMPORTLIBS   += $(EXT_LIBS) $(SX_DEPLIBS)
+SXIMPORTLIBS   += @LIBS@
+if COND_BUILD_WIN32
+   AM_CPPFLAGS += @WIN32FLAGS@
+endif
+
+# --- save linkage for external usage
+#scripts_SCRIPTS += $(top_srcdir)/system/sphinx.$(NAME).opts
+#CLEANFILES  += $(top_srcdir)/system/sphinx.$(NAME).opts
+#$(top_srcdir)/system/sphinx.$(NAME).opts:
+#	@test -f $@ -o x"$(MODE)" = x"withBin" \
+#    || echo `echo $(NAME) | tr "[:lower:]" "[:upper:]"`"=\"lib$(NAME).la $(UNIX_NUMLIBS)\"" \
+#    > $@
+
+
+# --- prepare dependencies for UNIX makefiles
+UNIX_DEPDIRS = `$(MAKE) @MAKE_SILENT_ARGS@ unixdepdirs | tail -1`
+UNIX_NUMLIBS = `$(MAKE) @MAKE_SILENT_ARGS@ unixnumlibs | tail -1`
+
+unixdepdirs_:
+	@echo $(SX_DEPLIBS)
+
+unixdepdirs:
+	@$(MAKE) @MAKE_SILENT_ARGS@\
+            SXNONSTD=nonstd \
+            SXUTIL=util \
+            SXGRAPH=graph \
+            SXMATH=math \
+            SXFS=fs \
+            SXIPC=ipc \
+            SXPARSERKIT=parserkit \
+            SXJSON=json \
+            SXIO=io \
+            SXMPI=mpi \
+            unixdepdirs_
+
+unixnumlibs_:
+	@echo $(NUM_DEPLIBS)
+
+unixnumlibs:
+	@$(MAKE) @MAKE_SILENT_ARGS@\
+            FFT="\@SX_FFT_LIBS\@" \
+            BLAS="\@SX_BLAS_LIBS\@" \
+            REGEX="" \
+            PTHREADS="" \
+            NETCDF="\@SX_NETCDF_LIBS\@" \
+            SHORTCUT="\@SX_SHORTCUT_LIBS\@" \
+            unixnumlibs_
+
+
+# --- prepare dependencies for MSVC
+MSVC_DEPDIRS = `$(MAKE) @MAKE_SILENT_ARGS@ msvcdepdirs | tail -1`
+MSVC_NUMLIBS = `$(MAKE) @MAKE_SILENT_ARGS@ msvcnumlibs | tail -1`
+
+msvcdepdirs_:
+	@echo $(SX_DEPLIBS)
+
+msvcdepdirs:
+	@$(MAKE) @MAKE_SILENT_ARGS@\
+            SXNONSTD=_SolutionDir_/sxaccelerate/src/nonstd!_OutDir_/sxnonstd.lib \
+            SXUTIL=_SolutionDir_/sxaccelerate/src/util!_OutDir_/sxutil.lib \
+            SXGRAPH=_SolutionDir_/sxaccelerate/src/graph!_OutDir_/sxgraph.lib \
+            SXMATH=_SolutionDir_/sxaccelerate/src/math!_OutDir_/sxmath.lib \
+            SXFS=_SolutionDir_/sxaccelerate/src/fs!_OutDir_/sxfs.lib \
+            SXIPC=_SolutionDir_/sxaccelerate/src/ipc!_OutDir_/sxipc.lib \
+            SXPARSERKIT=_SolutionDir_/sxaccelerate/src/parserkit!_OutDir_/sxparserkit.lib \
+            SXJSON=_SolutionDir_/sxaccelerate/src/json!_OutDir_/sxjson.lib \
+            SXIO=_SolutionDir_/sxaccelerate/src/io!_OutDir_/sxio.lib \
+            SXMPI=_SolutionDir_/sxaccelerate/src/mpi!_OutDir_/sxmpi.lib \
+            msvcdepdirs_
+
+msvcnumlibs_:
+	@echo $(NUM_DEPLIBS)
+
+msvcnumlibs:
+	@$(MAKE) @MAKE_SILENT_ARGS@\
+            FFT="" \
+            BLAS="mkl_rt.lib\;mkl_sequential_dll.lib\;mkl_core_dll.lib"\
+            REGEX="libpcre2-8-0.lib" \
+            PTHREADS= \
+            NETCDF=netcdf.lib \
+            SHORTCUT= \
+            msvcnumlibs_
