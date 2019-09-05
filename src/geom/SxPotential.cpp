@@ -27,47 +27,47 @@ SxPotential::~SxPotential ()
    // empty
 }
 
-SxAtomicStructure 
+SxAtomicStructure
 SxPotential::getForces (const SxAtomicStructure &tau,
                         const SxArray<const SxSymbolTable *> &cmds)
 {
    SxAtomicStructure f;
    for (int i=0; i < cmds.getSize(); i++)
          f = getForces (tau, cmds(i));
-   
+
 //   // --- extremely ugly, to be cleaned up
-//   if (applyVDWCorrection) {
-//      SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
-//      SxAtomicStructure help;
-//      SxAtomicStructure fVDW;
-//      help.copy(tau);
-//      //TODO (urgent): switch to SxAtomicStructure 
-//      for (int i = 0; i < tau.nTlAtoms; i++) 
-//         tauArray(i) = help.ref(i);
-//      VDWCorrection.update (tauArray);
-//      tauArray = VDWCorrection.getForces();
-//      fVDW.copy(tau);
-//      for (int i = 0; i < tau.nTlAtoms; i++) 
-//         fVDW.ref(i) = (tauArray(i));
-//      fVDW.nSpecies = f.nSpecies = tau.nSpecies;
-//      fVDW.nAtoms = f.nAtoms = tau.nAtoms;
-//      
-//     f = f + fVDW;
-//   } 
+  if (applyVDWCorrection) {
+     SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
+     SxAtomicStructure help;
+     SxAtomicStructure fVDW;
+     help.copy(tau);
+     //TODO (urgent): switch to SxAtomicStructure
+     for (int i = 0; i < tau.nTlAtoms; i++)
+        tauArray(i) = help.ref(i);
+     VDWCorrection.update (tauArray);
+     tauArray = VDWCorrection.getForces();
+     fVDW.copy(tau);
+     for (int i = 0; i < tau.nTlAtoms; i++)
+        fVDW.ref(i) = (tauArray(i));
+     fVDW.nSpecies = f.nSpecies = tau.nSpecies;
+     fVDW.nAtoms = f.nAtoms = tau.nAtoms;
+
+    f = f + fVDW;
+  }
    return f;
 }
 
 double SxPotential::getPotentialEnergy ()
 {
    double ePot = getEnergy ();
-//   if (applyVDWCorrection) {
-//      ePot = ePot + VDWCorrection.getTotalEnergy ();
-//      /*
-//      cout << VDWCorrection.potentialType << endl;
-//      cout << VDWCorrection.getTotalEnergy () << endl;
-//      SX_EXIT;
-//      */
-//   }
+  if (applyVDWCorrection) {
+     ePot = ePot + VDWCorrection.getTotalEnergy ();
+     /*
+     cout << VDWCorrection.potentialType << endl;
+     cout << VDWCorrection.getTotalEnergy () << endl;
+     SX_EXIT;
+     */
+  }
    return ePot;
 }
 
@@ -81,25 +81,25 @@ SxAtomicStructure SxPotential::getSymForces (const SxAtomicStructure  &tau,
    SxAtomicStructure f = getForces (tau, table);
 
 //   // --- extremely ugly, to be cleaned up
-//   if (applyVDWCorrection) {
-//      SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
-//      SxAtomicStructure help;
-//      SxAtomicStructure fVDW;
-//      help.copy(tau);
-//      //TODO (urgent): switch to SxAtomicStructure 
-//      for (int i = 0; i < tau.nTlAtoms; i++) 
-//         tauArray(i) = help.ref(i);
-//    
-//      VDWCorrection.update (tauArray);
-//      tauArray = VDWCorrection.getForces();
-//      fVDW.copy(tau);
-//      for (int i = 0; i < tau.nTlAtoms; i++) 
-//         fVDW.ref(i) = (tauArray(i));
-//      fVDW.nSpecies = f.nSpecies = tau.nSpecies;
-//      fVDW.nAtoms = f.nAtoms = tau.nAtoms;
-//      f = f + fVDW;
-//   }
-   
+  if (applyVDWCorrection) {
+     SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
+     SxAtomicStructure help;
+     SxAtomicStructure fVDW;
+     help.copy(tau);
+     //TODO (urgent): switch to SxAtomicStructure
+     for (int i = 0; i < tau.nTlAtoms; i++)
+        tauArray(i) = help.ref(i);
+
+     VDWCorrection.update (tauArray);
+     tauArray = VDWCorrection.getForces();
+     fVDW.copy(tau);
+     for (int i = 0; i < tau.nTlAtoms; i++)
+        fVDW.ref(i) = (tauArray(i));
+     fVDW.nSpecies = f.nSpecies = tau.nSpecies;
+     fVDW.nAtoms = f.nAtoms = tau.nAtoms;
+     f = f + fVDW;
+  }
+
    // symmetrize forces according to existing symmetry elements
 
    if (forceSymmetrizer.getNSymmetries () == 0)
@@ -108,7 +108,7 @@ SxAtomicStructure SxPotential::getSymForces (const SxAtomicStructure  &tau,
 }
 
 
-SxAtomicStructure 
+SxAtomicStructure
 SxPotential::getSymForces (const SxAtomicStructure &tau,
                            const SxArray<const SxSymbolTable *> &cmds)
 {
@@ -124,7 +124,7 @@ SxPotential::getSymForces (const SxAtomicStructure &tau,
 }
 
 
-SxArray<const SxSymbolTable *> 
+SxArray<const SxSymbolTable *>
 SxPotential::getMinimCmds (const SxSymbolTable *table) const
 {
    SX_CHECK (table);
@@ -183,8 +183,8 @@ bool SxPotential::isSymmetrizedStructure (const SxAtomicStructure &tau) const
 
 }
 
-//void SxPotential::setVDWCorrection (const SxVDW &vdw)
-//{
-//   VDWCorrection = vdw;
-//   applyVDWCorrection = true;
-//}
+void SxPotential::setVDWCorrection (const SxVDW &vdw)
+{
+  VDWCorrection = vdw;
+  applyVDWCorrection = true;
+}
