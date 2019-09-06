@@ -16,8 +16,6 @@
 #include <SxPotential.h>
 #include <SxGrid.h>
 
-bool ApplyVDWCorrection = table->getGroup("vdwCorrection")
-
 SxPotential::SxPotential ()
    : dEnergyLow(false), noNetForce(true)
 {
@@ -38,7 +36,8 @@ SxPotential::getForces (const SxAtomicStructure &tau,
          f = getForces (tau, cmds(i));
 
 //   // --- extremely ugly, to be cleaned up
-   if (applyVDWCorrection) {
+
+   if (table->getGroup("vdwCorrection")) {
       SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
       SxAtomicStructure help;
       SxAtomicStructure fVDW;
@@ -62,7 +61,7 @@ SxPotential::getForces (const SxAtomicStructure &tau,
 double SxPotential::getPotentialEnergy ()
 {
    double ePot = getEnergy ();
-   if (applyVDWCorrection) {
+   if (table->getGroup("vdwCorrection")) {
       ePot = ePot + VDWCorrection.getTotalEnergy ();
       /*
       cout << VDWCorrection.potentialType << endl;
@@ -83,7 +82,7 @@ SxAtomicStructure SxPotential::getSymForces (const SxAtomicStructure  &tau,
    SxAtomicStructure f = getForces (tau, table);
 
 //   // --- extremely ugly, to be cleaned up
-   if (applyVDWCorrection) {
+   if (table->getGroup("vdwCorrection")) {
       SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
       SxAtomicStructure help;
       SxAtomicStructure fVDW;
