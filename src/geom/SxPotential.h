@@ -17,7 +17,7 @@
 #define _SX_POTENTIAL_H_
 
 #include <SxAtomicStructure.h>
-//#include <SxVDW.h>
+#include <SxVDW.h>
 #include <SxSpeciesData.h>
 #include <SxSymbolTable.h>
 #include <SxForceSym.h>
