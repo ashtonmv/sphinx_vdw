@@ -37,7 +37,7 @@ SxPotential::getForces (const SxAtomicStructure &tau,
 
 //   // --- extremely ugly, to be cleaned up
 
-   if (table->getGroup("vdwCorrection")) {
+   if (true) {
       SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
       SxAtomicStructure help;
       SxAtomicStructure fVDW;
@@ -61,7 +61,7 @@ SxPotential::getForces (const SxAtomicStructure &tau,
 double SxPotential::getPotentialEnergy ()
 {
    double ePot = getEnergy ();
-   if (table->getGroup("vdwCorrection")) {
+   if (true) {
       ePot = ePot + VDWCorrection.getTotalEnergy ();
       /*
       cout << VDWCorrection.potentialType << endl;
@@ -82,7 +82,7 @@ SxAtomicStructure SxPotential::getSymForces (const SxAtomicStructure  &tau,
    SxAtomicStructure f = getForces (tau, table);
 
 //   // --- extremely ugly, to be cleaned up
-   if (table->getGroup("vdwCorrection")) {
+   if (true) {
       SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
       SxAtomicStructure help;
       SxAtomicStructure fVDW;
