@@ -41,6 +41,9 @@ SxPotential::getForces (const SxAtomicStructure &tau,
       SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
       SxAtomicStructure help;
       SxAtomicStructure fVDW;
+
+      SxVDW VDWCorrection;
+
       help.copy(tau);
       //TODO (urgent): switch to SxAtomicStructure
       for (int i = 0; i < tau.nTlAtoms; i++)
@@ -51,7 +54,7 @@ SxPotential::getForces (const SxAtomicStructure &tau,
       for (int i = 0; i < tau.nTlAtoms; i++)
          fVDW.ref(i) = (tauArray(i));
       fVDW.nSpecies = f.nSpecies = tau.nSpecies;
-      fVDW.nAtoms = f.nAtoms = tau.nAtoms;
+      fVDW.nTlAtoms = f.nTlAtoms = tau.nTlAtoms;
 
      f = f + fVDW;
    }
@@ -62,6 +65,8 @@ double SxPotential::getPotentialEnergy ()
 {
    double ePot = getEnergy ();
    if (true) {
+      SxVDW VDWCorrection;
+
       ePot = ePot + VDWCorrection.getTotalEnergy ();
       /*
       cout << VDWCorrection.potentialType << endl;
@@ -86,6 +91,7 @@ SxAtomicStructure SxPotential::getSymForces (const SxAtomicStructure  &tau,
       SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
       SxAtomicStructure help;
       SxAtomicStructure fVDW;
+      SxVDW VDWCorrection;
       help.copy(tau);
       //TODO (urgent): switch to SxAtomicStructure
       for (int i = 0; i < tau.nTlAtoms; i++)
@@ -97,7 +103,7 @@ SxAtomicStructure SxPotential::getSymForces (const SxAtomicStructure  &tau,
       for (int i = 0; i < tau.nTlAtoms; i++)
          fVDW.ref(i) = (tauArray(i));
       fVDW.nSpecies = f.nSpecies = tau.nSpecies;
-      fVDW.nAtoms = f.nAtoms = tau.nAtoms;
+      fVDW.nTlAtoms = f.nTlAtoms = tau.nTlAtoms;
       f = f + fVDW;
    }
 
@@ -184,8 +190,8 @@ bool SxPotential::isSymmetrizedStructure (const SxAtomicStructure &tau) const
 
 }
 
-void SxPotential::setVDWCorrection (const SxVDW &vdw)
-{
-  VDWCorrection = vdw;
-  applyVDWCorrection = true;
-}
+//void SxPotential::setVDWCorrection (const SxVDW &vdw)
+//{
+//  VDWCorrection = vdw;
+//  applyVDWCorrection = true;
+//}

@@ -51,6 +51,9 @@ class SX_EXPORT_GEOM SxAtomicStructure
       /// Number of atoms
       int nTlAtoms;
 
+      /// Number of unique species
+      int nSpecies;
+
       /// The periodic boundary conditions
       SxCell cell;
 

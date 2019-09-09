@@ -714,6 +714,7 @@ void SxAtomicStructure::set (const SxList<SxList<Coord> > &atoms)
    aInfo->nSpecies = int(atoms.getSize ());
    aInfo->nAtoms.resize (aInfo->nSpecies);
 
+   nSpecies = aInfo->nSpecies;
    nTlAtoms = 0;
    SxList<SxList<Coord> >::ConstIterator specIt = atoms.begin ();
    for (int is = 0; is < aInfo->nSpecies; ++is, ++specIt)
