@@ -116,6 +116,8 @@ class SX_EXPORT_GEOM SxElemDB
 		double getAtomicWeight (int idx) const; 
       double getGyrRatio (const SxString &chemName_) const;
 
+
+
       int getSize () const { return int(name.getSize()); }
 
       void set (int idx_, int atomNumber_, const SxString &chemSymbol_,
@@ -159,6 +161,12 @@ class SX_EXPORT_GEOM SxElemDB
       SxArray<double>  green;
       /** The blue color channel for the CPK model, 0 ... 1 */
       SxArray<double>  blue;
+      /** The polarizability in Bohr^3 */
+      SxArray<double>  polarizability;
+      /** The dispersion coefficient C6 in Hartree * Bohr^6 */
+      SxArray<double> C6;
+      /** The vdW radius in Bohr */
+      SxArray<double> vdwRadius;
 };
 
 #endif /* SX_ELEMENTS_H */

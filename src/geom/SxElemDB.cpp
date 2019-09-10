@@ -70,6 +70,9 @@ void SxElemDB::read (const SxSymbolTable *table)
       red.resize(nElem);
       green.resize(nElem);
       blue.resize(nElem);
+      polarizability.resize(nElem);
+      C6.resize(nElem);
+      vdwRadius.resize(nElem);
 
       SxList<double> color;
 //    while (elem && i < nElem)  {
@@ -92,6 +95,10 @@ void SxElemDB::read (const SxSymbolTable *table)
          green(i)          = (color(1)/255.);
          blue(i)           = (color(2)/255.);
          
+         polarizability(i) = (elem->get ("polarizability", true)->toReal()));
+         C6(i) = (elem->get ("C6", true)->toReal()));
+         vdwRadius(i) = (elem->get ("vdwRadius", true)->toReal()));
+
          elem = elem->nextSibling ("elem");
          ++i;
       }

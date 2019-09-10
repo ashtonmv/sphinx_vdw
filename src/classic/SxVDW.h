@@ -35,17 +35,22 @@ class SX_EXPORT_CLASSIC SxVDW
 	  SxArray<double>  energyContrib;
 
 	  SxArray<SxList<int> > neighbours;
-     SxArray<SxList<int> > sNeighbours;
+      SxArray<SxList<int> > sNeighbours;
 
 	  SxArray<SxList<int> >  borderType;
 	  SxArray<SxList<int> > supercellIds;
 	  SxArray<SxList<int> > sSupercellIds;
 	  
-     SxArray<SxList<int> > borderCrossers;
+      SxArray<SxList<int> > borderCrossers;
 	  SxArray<SxVector3<Double> > Forces;
 
 	  SxArray<SxList<double> > dist;
 	  SxArray<SxList<double> > expTerm;
+
+	  SxArray<double> polarizability;
+	  SxArray<double> C6;
+	  SxArray<double> vdwRadius;
+
 
 	  bool output;
 	  int nAtoms;
@@ -85,8 +90,8 @@ class SX_EXPORT_CLASSIC SxVDW
 	  double getDampingDerivative(double, double);
 	  double getDampingSecondDerivative(double, double);
 	  
-	  double getC6 (int, int); 
-	  double getRm (int, int); 
+	  double getC6ij (int, int); 
+	  double getRij (int, int); 
 	  double getParam (SxString, int, int);
 	  double getTotalEnergy ();
 

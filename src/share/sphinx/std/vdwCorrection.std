@@ -1,5 +1,5 @@
 vdwCorrection      { type="group"; optional;
-      potentialType { type="enum";  
-                  val = "WTYang_I,WTYang_II,Elstner_I,Elstner_II"; }
+      correctionType { type="enum";  
+                  val = "D2,WTYang_I,WTYang_II,Elstner_I,Elstner_II"; }
 }
 

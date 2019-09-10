@@ -15,6 +15,7 @@
 // Author: Lars Ismer, ismer@fhi-berlin.mpg.de
 
 #include <SxVDW.h>
+#include <SxElemDB.h>
 
 SxVDW::SxVDW () 
 { //SVN_HEAD;
@@ -27,6 +28,18 @@ SxVDW::SxVDW
 { 
    int i;
    SxAtomicStructure tau;
+   SxParser parser;
+
+   try {
+      SxParser::Table elemTable = parser.read ("species/elements.sx");
+      read(&*elemTable);
+	  SxElemDB elemDB(elemTable);
+
+   } catch (SxException e) {
+      cout << "WARNING: failed to load element database" << endl;
+   }
+
+
    tau.copy(t);
 
    nAtoms = tau.nTlAtoms;
@@ -39,12 +52,19 @@ SxVDW::SxVDW
       
 	coord                 = SxArray<SxVector3<Double> > (nAtoms);
 	species               = SxArray<SxString> (nAtoms);
+	polarizability        = SxArray<Double> (nAtoms);
+	C6                    = SxArray<Double> (nAtoms);
+	vdwRadius             = SxArray<Double> (nAtoms);
+
 
    //SxSpeciesData speciesData = SxSpeciesData(cmd -> topLevel ());
    
    for (i = 0; i < nAtoms; i++) {
       coord(i) = tau.ref (i);
       species(i) = speciesData.chemName(tau.getISpecies (i));
+	  polarizability(i) = elemDB -> getGroup(species(i)) -> getGroup("polarizability");
+	  C6(i) = elemDB -> getGroup(species(i)) -> getGroup("C6");
+	  vdwRadius(i) = elemDB -> getGroup(species(i)) -> getGroup("vdwRadius");
    }
       
 	energyContrib   = SxArray<double>             (nAtoms);
@@ -62,8 +82,8 @@ SxVDW::SxVDW
 
 	Forces = SxArray<SxVector3<Double> > (nAtoms);
 
-   potentialType = cmd -> getGroup ("vdwCorrection") 
-                       -> get("potentialType") -> toString ();
+    correctionType = cmd -> getGroup ("vdwCorrection") 
+                       -> get("correctionType") -> toString ();
       
 }
 
@@ -73,12 +93,12 @@ SxVDW::~SxVDW ()
 }
 
 void SxVDW::resize 
-(SxList<SxList<SxVector3<Double> > >  tau, SxList<SxString> speciesNameList, SxMatrix3<Double> aMat, SxString pt)
+(SxList<SxList<SxVector3<Double> > >  tau, SxList<SxString> speciesNameList, SxMatrix3<Double> aMat, SxString ct)
 {
 	int i, j;
 	int counter;
   	
-	potentialType = pt;
+	correctionType = ct;
 	nAtoms = 0;
 	for (i = 0; i < tau.getSize (); i++) {
 			nAtoms += (int)tau(i).getSize ();
@@ -112,7 +132,7 @@ void SxVDW::resize
 	Forces = SxArray<SxVector3<Double> > (nAtoms);
 
 }
-
+/*
 void SxVDW::updateHybridisation ()
 {
 	int i;
@@ -137,6 +157,7 @@ void SxVDW::updateHybridisation ()
 		}
 	}
 }
+*/
 
 void SxVDW::update (SxArray<SxVector3<Double > > newcoord) 
 {
@@ -152,7 +173,7 @@ void SxVDW::update (SxArray<SxVector3<Double > > newcoord)
 	//printNeighbours ();
 	updateHybridisation ();
 	//printSpecies ();
-	updateNeighbours (SxString ("vanDerWaalsCutoff"));
+	updateNeighbours (SxString ("vdwCutoff"));
 	//printNeighbours();
 	//updateSecondNeighbours();
 }
@@ -233,9 +254,10 @@ void SxVDW::updateBorderCrossers ()
 		if (sqrt(superCell(j).absSqr().sum ()) < 2.*maxDist) smallSuperCell = true;
 	}
 	
-	for (superCellId = 0; superCellId < 27; superCellId++) {
-		borderCrossers(superCellId).resize(0);
-	}
+	// This caused a crash.
+	// for (superCellId = 0; superCellId < 27; superCellId++) {
+	// 	borderCrossers(superCellId).resize(0);
+	// }
 	
 	for (i = 0; i < nAtoms; i++) {
 	if (smallSuperCell) {
@@ -343,49 +365,46 @@ void SxVDW::updateNeighbours (SxString modus)
 	}
 }
  
-double SxVDW::getDampingFunction (double R, double Rm) 
+double SxVDW::getDampingFunction (double R, double Rij) 
 {
 	double fd = 0.;
-	double cdamp = getParam("cdamp", 0, 0);
-	double beta = getParam("beta", 0, 0);
-   double dstar = getParam("dstar", 0, 0);
+	double s6 = getParam("s6", 0, 0);
+	double d = getParam("d", 0, 0);
+    double sR = getParam("sR", 0, 0);
+	double vdwCutoff = getParam("vdwCutoff", 0, 0);
 
-	if (potentialType == SxString("WTYang_I")) 
-		fd = ::pow ((1 - exp(-cdamp*::pow((R/Rm), 3.))), 2.);
-	if (potentialType == SxString("WTYang_II")) 
-		fd = (1/(1 + exp(-beta*(R/Rm - 1))));
-   if (potentialType.contains("Elstner"))
-      fd = ::pow((1 - exp(-dstar*::pow((R/Rm), 7.))), 4);
+
+	// Fermi damping with cutoff (set by default to~ 100 Bohr)
+
+	if (R < vdwCutoff) {
+		fd = s6 / (1 + exp(-d * (R / (sR * Rij) - 1)));
+	}
 
 	return fd;
 }
 
-double SxVDW::getDampingDerivative (double R, double Rm) 
+double SxVDW::getDampingDerivative (double R, double Rij) 
 {
-	double fd = 0.;
-	double e = 0.;
+	double fdprime = 0.;
 
-	double cdamp = getParam("cdamp", 0, 0);
-	double beta = getParam("beta", 0, 0);
-   double dstar = getParam("dstar", 0, 0);
-	
-	if (potentialType == SxString("WTYang_I")) {
-		e = exp(-cdamp*(::pow( (R/Rm), 3.)));
-		fd = 6.*cdamp*R*R/Rm/Rm/Rm*(1. - e)*e;
+	double s6 = getParam("cdamp", 0, 0);
+	double d = getParam("beta", 0, 0);
+    double sR = getParam("dstar", 0, 0);
+	double vdwCutoff = getParam("vdwCutoff", 0, 0);
+	double scale = 1.0 / (sR * Rij);
+	double x = R * scale;
+	double chi = exp(-d * (x - 1.0));
+
+	// Again fermi damping with a cutoff, vdwCutoff
+
+	if (R < vdwCutoff) {
+		fdprime = d * scale * chi / ::pow(1.0 + chi, 2);
 	}
-	
-	if (potentialType == SxString("WTYang_II")) {
-		e = exp(-beta*(R/Rm - 1.));
-		fd = beta/Rm*e/(1. + e)/(1. + e);
-	}
-	
-   if (potentialType.contains("Elstner")) {
-		e = exp(-dstar*(::pow( (R/Rm), 7.)));
-		fd = ::pow((1-e), 3.)*28.*dstar/::pow(Rm, 7.)*::pow(R, 6.)*e;
-	}
-	return fd;
+
+	return fdprime;
 }
 
+/*
 double SxVDW::getDampingSecondDerivative (double R, double Rm) {
 	double fd, e, ePrime, ePrimePrime, a;
 	double cdamp = getParam("cdamp", 0, 0);
@@ -416,18 +435,19 @@ double SxVDW::getDampingSecondDerivative (double R, double Rm) {
    
 	return fd;
 }
-	
+*/
+
 double SxVDW::getTotalEnergy () {
-	double R, Rm, fd, eVDW, C6;
+	double R, Rij, fd, eVDW, C6ij;
 	int i, j, neighj;
 	eVDW = 0.;
 	for (i = 0; i < nAtoms; i++) {
 		for (j = 0; j < neighbours(i).getSize (); j++) {
 			R = dist(i)(j);
 			neighj = neighbours(i)(j);
-			Rm = getRm (i, neighj);
-			C6 = getC6 (i, neighj);
-			fd = getDampingFunction (R, Rm);
+			Rij = getRij (i, neighj);
+			C6ij = getC6ij (i, neighj);
+			fd = getDampingFunction (R, Rij);
 			/*
 			cout << "R: " << R << endl;
 			cout << "Rm: " << Rm << endl;
@@ -435,7 +455,7 @@ double SxVDW::getTotalEnergy () {
 			cout << "fd: " << fd << endl;
 			cout << "eVDW: " << eVDW << endl;
 			*/
-			eVDW += -fd*C6/(::pow(R, 6.))/2.;
+			eVDW += -fd*C6ij/(::pow(R, 6.))/2.;
 		}
 	}
 	
@@ -449,7 +469,7 @@ SxVector3<Double>  SxVDW::getForceOnAtom (int i) {
 	
 	SxVector3<Double>  returnValue;
 	
-   double R, Rm, C6, fd, fdPrime, derivative;
+   double R, Rij, C6ij, fd, fdPrime, derivative;
 			 
 	int neighj;
 	
@@ -465,13 +485,13 @@ SxVector3<Double>  SxVDW::getForceOnAtom (int i) {
 	      neighj = neighbours(i)(j);	
 			//cout << "Bonding Partner: " << neighj << endl;;
 			R = dist(i)(j);
-			Rm = getRm(i, neighj);
-			C6 = getC6(i, neighj);
-			fdPrime = getDampingDerivative (R, Rm);
-			fd = getDampingFunction (R, Rm);
+			Rij = getRij(i, neighj);
+			C6ij = getC6ij(i, neighj);
+			fdPrime = getDampingDerivative (R, Rij);
+			fd = getDampingFunction (R, Rij);
 
 			derivative  
-				= fdPrime*C6/::pow(R, 6.) - 6.*fd*C6/::pow(R, 7.); 
+				= fdPrime*C6ij/::pow(R, 6.) - 6.*fd*C6ij/::pow(R, 7.); 
 
 			returnValue += derivative * (coord(i) - coord(neighj) 
 					       - getLatticeVec (supercellIds(i)(j)))
@@ -534,6 +554,8 @@ int SxVDW::getNeighborIndex (int atom1, int atom2) {
 
 	return neighbor;
 }
+
+/*
 SxMatrix3<Double> SxVDW::getInteraction (int atom1, int atom2, int neighborIndex) 
 {
 	SxMatrix3<Double> returnValue;
@@ -547,8 +569,8 @@ SxMatrix3<Double> SxVDW::getInteraction (int atom1, int atom2, int neighborIndex
 	double dg, g, fd, fdP, fdPP;
 	
 	double R = dist(atom1)(neighborIndex);
-	double Rm = getRm (atom1, atom2);
-	double C6 = getParam(SxString("C6"), atom1, atom2);
+	double Rij = getRij (atom1, atom2);
+	double C6ij = getC6ij (atom1, atom2);
 
 	
 	deltaCoord = coord1 - coord2 
@@ -574,9 +596,9 @@ SxMatrix3<Double> SxVDW::getInteraction (int atom1, int atom2, int neighborIndex
 	}
 
 
-	fd = getDampingFunction (R, Rm);
-	fdP = getDampingDerivative (R, Rm);
-	fdPP = getDampingSecondDerivative (R, Rm);
+	fd = getDampingFunction (R, Rij);
+	fdP = getDampingDerivative (R, Rij);
+	fdPP = getDampingSecondDerivative (R, Rij);
 
 	g = fdP*C6/::pow(R, 6.) - 6.*fd*C6/::pow(R, 7.);
 	dg = fdPP*C6/::pow(R, 6.) - 12.*fdP*C6/::pow(R, 7.) + 42.*fd*C6/::pow(R, 8.);
@@ -677,7 +699,7 @@ SxMatrix<Double>  SxVDW::getNumericalHessian (double dx) {
 	update(undevCoord);
 	return hessian;
 }
-
+*/
 SxArray<SxVector3<Double> > SxVDW::getNumericalForces (double dx) {
 	SxArray<SxVector3<Double> > forces     (nAtoms);
 	SxArray<SxVector3<Double> > dummy      (nAtoms); 
@@ -715,221 +737,23 @@ SxArray<SxVector3<Double> > SxVDW::getNumericalForces (double dx) {
 	
 }
 
-double SxVDW::getRm (int atom1, int atom2)
+double SxVDW::getRij (int atom1, int atom2)
 {
-	double Rm = 0.;
-   if (potentialType.contains ("WTYang")) {
-      if (species(atom1).contains(SxString("N"))) Rm += 2.93;
-      if (species(atom1).contains(SxString("H"))) Rm += 2.27;
-      if (species(atom1).contains(SxString("O"))) Rm += 2.87;
-      if (species(atom1).contains(SxString("C"))) Rm += 3.21;
-	
-      if (species(atom2).contains(SxString("N"))) Rm += 2.93;
-      if (species(atom2).contains(SxString("H"))) Rm += 2.27;
-      if (species(atom2).contains(SxString("O"))) Rm += 2.87;
-      if (species(atom2).contains(SxString("C"))) Rm += 3.21;
-   }
-   
-   if (potentialType.contains ("Elstner")) {
-       Rm = 3.8 * 1.8897;
-   }
+	double Rij = getR(atom1) + getR(atom2);
 
-	return Rm;
+	return Rij;
 }
 
-double SxVDW::getC6 (int atom1, int atom2) 
+double SxVDW::getC6ij (int atom1, int atom2) 
 {
-	double C6one = 0., None = 0., C6two = 0., Ntwo = 0., C6 = 0.;
-   double conv = 1./0.5976;
-   double conv2 = 6.7481;
-   double Pone = 0., Ptwo = 0.;
-      
-   if (potentialType.contains("WTYang")) {
-   //--- C6 coefficients from Q. Wu and W. Yang, JCP 116, 515 (2002), Table II
-      if (species(atom1).contains("C_sp2")) {
-         C6one = 27.32;
-         None = 2.02;
-      }
-
-      if (species(atom1).contains("C_sp3")) {
-         C6one = 22.05;
-         None = 2.02;
-      }
-	
-      if (species(atom1).contains("H")) {
-         C6one = 2.845;
-         None = 0.53;
-      }
-	
-      if (species(atom1).contains("O")) {
-         C6one = 13.07;
-         None = 2.65;
-      }
-
-      if (species(atom1).contains("N")) {
-         C6one = 19.48;
-         None = 2.52;
-      }
-	
-      if (species(atom2).contains("C_sp2")) {
-         C6two = 27.32;
-         Ntwo = 2.02;
-      }
-
-      if (species(atom2).contains("C_sp3")) {
-         C6two = 22.05;
-         Ntwo = 2.02;
-      }
-	
-      if (species(atom2).contains("H")) {
-         C6two = 2.845;
-         Ntwo = 0.53;
-      }
-	
-      if (species(atom2).contains("O")) {
-         C6two = 13.07;
-         Ntwo = 2.65;
-      }
-
-      if (species(atom2).contains("N")) {
-         C6two = 19.48;
-         Ntwo = 2.52;
-      }
-
-	C6 = 2 * 
-		::pow (C6one*C6one*C6two*C6two*None*Ntwo, 1./3.)/
-		(::pow (C6one*Ntwo*Ntwo, 1./3.) + (::pow (C6two*None*None, 1./3.)));
-   }
-
-   if (potentialType.contains("Elstner_I")) {
-   //--- C6 coefficients from M. Elstner et al., JCP 114, 5149 (2001), 
-   //    Table II (first row), effective number of electrons (None)
-   //    are calculated according to Eq. 6   
-      
-      
-      if (species(atom1).contains("C_sp2")) {
-         C6one = 18.56*conv;
-         Pone = 1.352*conv2;
-      }
-
-      if (species(atom1).contains("C_sp3")) {
-         C6one = 12.93*conv;
-         Pone = 1.061*conv2;
-      }
-	
-      if (species(atom1).contains("H")) {
-         C6one = 1.61*conv;
-         Pone = 0.387*conv2;
-      }
-	
-      if (species(atom1).contains("O")) {
-         C6one = 5.71*conv;
-         Pone = 0.569*conv2;
-      }
-
-      if (species(atom1).contains("N")) {
-         C6one = 13.16*conv;
-         Pone = 1.030*conv2;
-      }
-      
-      if (species(atom2).contains("C_sp2")) {
-         C6two = 18.56*conv;
-         Ptwo = 1.352*conv2;
-      }
-
-      if (species(atom2).contains("C_sp3")) {
-         C6two = 12.93*conv;
-         Ptwo = 1.061*conv2;
-      }
-	
-      if (species(atom2).contains("H")) {
-         C6two = 1.61*conv;
-         Ptwo = 0.387*conv2;
-      }
-	
-      if (species(atom2).contains("O")) {
-         C6two = 5.71*conv;
-         Ptwo = 0.569*conv2;
-      }
-
-      if (species(atom2).contains("N")) {
-         C6two = 13.16*conv;
-         Ptwo = 1.030*conv2;
-      }
-
-      //--- Slater-Kirkwood interpolation formula 
-      //    Note: Elstner paper (Eq. 7) is wrong here
-      //    Formula is correct in T. Halgren, JACS 114, 7827 (1992) 
-      C6 = (2.*C6one*C6two*Pone*Ptwo)
-         / (Ptwo*Ptwo*C6one + Pone*Pone*C6two);
-   }
-   if (potentialType.contains("Elstner_II")) {
-   //--- C6 coefficients from M. Elstner et al., JCP 114, 5149 (2001), 
-   //    Table II (second row), effective number of electrons (None)
-   //    are calculated according to Eq. 6   
-      
-      
-      if (species(atom1).contains("C_sp2")) {
-         C6one = 16.07*conv;
-         Pone = 1.352*conv2;
-      }
-
-      if (species(atom1).contains("C_sp3")) {
-         C6one = 12.37*conv;
-         Pone = 1.061*conv2;
-      }
-	
-      if (species(atom1).contains("H")) {
-         C6one = 1.53*conv;
-         Pone = 0.387*conv2;
-      }
-	
-      if (species(atom1).contains("O")) {
-         C6one = 4.15*conv;
-         Pone = 0.569*conv2;
-      }
-
-      if (species(atom1).contains("N")) {
-         C6one = 11.55*conv;
-         Pone = 1.030*conv2;
-      }
-      
-      if (species(atom2).contains("C_sp2")) {
-         C6two = 16.07*conv;
-         Ptwo = 1.352*conv2;
-      }
-
-      if (species(atom2).contains("C_sp3")) {
-         C6two = 12.37*conv;
-         Ptwo = 1.061*conv2;
-      }
-	
-      if (species(atom2).contains("H")) {
-         C6two = 1.53*conv;
-         Ptwo = 0.387*conv2;
-      }
-	
-      if (species(atom2).contains("O")) {
-         C6two = 4.15*conv;
-         Ptwo = 0.569*conv2;
-      }
-
-      if (species(atom2).contains("N")) {
-         C6two = 11.55*conv;
-         Ptwo = 1.030*conv2;
-      }
-   
-      //--- Slater-Kirkwood interpolation formula 
-      //    Note: Elstner paper (Eq. 7) is wrong here
-      //    Formula is correct in T. Halgren, JACS 114, 7827 (1992) 
-      C6 = (2.*C6one*C6two*Pone*Ptwo)
-         / (Ptwo*Ptwo*C6one + Pone*Pone*C6two);
-   }
- 
-   return C6;
+    // double C6ij = ::pow (C6(atom1) * C6(atom2), 0.5);
+	// double C6ij = ::pow (C6(atom1) * C6(atom2), 0.73);
+	double C6ij = (2 * C6(atom1)*C6(atom2) /
+		( C6(atom2) * polarizability(atom1) / polarizability(atom2)
+		+ C6(atom1) * polarizability(atom2) / polarizability(atom1) )
+	)
+    return C6ij;
 }	
-
-	
 
 
 double SxVDW::getParam (SxString name, int atom1, int atom2) 
@@ -939,16 +763,16 @@ double SxVDW::getParam (SxString name, int atom1, int atom2)
 		return 3.0;
 	}
 
-	if (name == SxString ("vanDerWaalsCutoff")) {
-		return 3. * getRm(atom1, atom2);
+	if (name == SxString ("vdwCutoff")) {
+		return 94.5;  // 50 Angstroms, but in Bohr
 	}
 	
 	if (name == SxString ("cdamp")) return 3.54;
 	
 	if (name == SxString ("dstar")) return 3.00;
 	
-   if (name == SxString ("C6")) {
-		return getC6(atom1, atom2);
+   if (name == SxString ("C6ij")) {
+		return getC6ij(atom1, atom2);
    }
 	
 	if (name == SxString ("beta")) 
@@ -960,6 +784,10 @@ double SxVDW::getParam (SxString name, int atom1, int atom2)
 	if (name == SxString ("sigma")) return 1.;
 	if (name == SxString ("gamma")) return 1.2;
 	if (name == SxString ("constant")) return 21.0;
+
+	if (name == SxString ("s6")) return 0.75;
+	if (name == SxString ("d")) return 20.0;
+	if (name == SxString ("sR")) return 1.0;
 
 	
 	return 1.;

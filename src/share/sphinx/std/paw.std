@@ -171,6 +171,8 @@ PAWHamiltonian        { type="group"; nItems=1; optional;
    }
 }
 
+include <std/vdwCorrection.std>
+
 main                 { type="group"; nItems=1;
    Hirshfeld { type="flag"; optional; }
    evalForces { type="group"; optional;
