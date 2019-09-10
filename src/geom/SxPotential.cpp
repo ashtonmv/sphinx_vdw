@@ -32,12 +32,14 @@ SxPotential::getForces (const SxAtomicStructure &tau,
                         const SxArray<const SxSymbolTable *> &cmds)
 {
    SxAtomicStructure f;
+   cout << "cmds: " << cmds;
    for (int i=0; i < cmds.getSize(); i++)
          f = getForces (tau, cmds(i));
 
+// cmds is an array of tables and idk why...
 //   // --- extremely ugly, to be cleaned up
 
-   if (cmds->containsGroup("vdwCorrection")) {
+   if (true) {
       SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
       SxAtomicStructure help;
       SxAtomicStructure fVDW;
@@ -65,7 +67,7 @@ double SxPotential::getPotentialEnergy (const SxAtomicStructure &tau,
                         const SxArray<const SxSymbolTable *> &cmds)
 {
    double ePot = getEnergy ();
-   if (cmds->containsGroup("vdwCorrection")) {
+   if (true) {
       VDWCorrection = SxVDW(tau, cmds, SxSpeciesData(cmds));
 
       ePot = ePot + VDWCorrection.getTotalEnergy ();
