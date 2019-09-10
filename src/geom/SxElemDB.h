@@ -109,6 +109,19 @@ class SX_EXPORT_GEOM SxElemDB
       SxString getChemSymbol   (int i) const;
       /** Returns the (engl.) name  of the i-th element */
       SxString getName         (int i) const;
+
+      /** Returns the polarizability of the i-th element */
+      double getPolarizability (const SxString &chemName_) const;
+      double getPolarizability (int i) const;
+
+      /** Returns the dispersion coefficient (C6) of the i-th element */
+      double getC6 (const SxString &chemName_) const;
+      double getC6 (int i) const;
+
+      /** Returns the vdW radius of the i-th element */
+      double getVdwRadius (const SxString &chemName_) const;
+      double getVdwRadius (int i) const;
+
 		 /** Returns the atomic weight for a given chemical symbol
           (does not work for isotopes) 
           \author Lars Ismer */

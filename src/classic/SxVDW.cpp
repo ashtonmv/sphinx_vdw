@@ -30,15 +30,10 @@ SxVDW::SxVDW
    SxAtomicStructure tau;
    SxParser parser;
 
-   try {
-      SxParser::Table elemTable = parser.read ("species/elements.sx");
-      read(&*elemTable);
-	  SxElemDB elemDB(elemTable);
+   SxParser::Table elemTable = parser.read ("species/elements.sx");
+   SxElemDB elemDB(elemTable);
 
-   } catch (SxException e) {
-      cout << "WARNING: failed to load element database" << endl;
-   }
-
+   SxString correctionType;
 
    tau.copy(t);
 
@@ -52,9 +47,9 @@ SxVDW::SxVDW
       
 	coord                 = SxArray<SxVector3<Double> > (nAtoms);
 	species               = SxArray<SxString> (nAtoms);
-	polarizability        = SxArray<Double> (nAtoms);
-	C6                    = SxArray<Double> (nAtoms);
-	vdwRadius             = SxArray<Double> (nAtoms);
+	polarizability        = SxArray<double> (nAtoms);
+	C6                    = SxArray<double> (nAtoms);
+	vdwRadius             = SxArray<double> (nAtoms);
 
 
    //SxSpeciesData speciesData = SxSpeciesData(cmd -> topLevel ());
@@ -62,9 +57,9 @@ SxVDW::SxVDW
    for (i = 0; i < nAtoms; i++) {
       coord(i) = tau.ref (i);
       species(i) = speciesData.chemName(tau.getISpecies (i));
-	  polarizability(i) = elemDB -> getGroup("chemElements") -> getGroup(species(i)) -> getGroup("polarizability")->toReal();
-	  C6(i) = elemDB -> getGroup("chemElements") -> getGroup(species(i)) -> getGroup("C6")->toReal();
-	  vdwRadius(i) = elemDB -> getGroup("chemElements") -> getGroup(species(i)) -> getGroup("vdwRadius")->toReal();
+	  polarizability(i) = elemDB.getPolarizability(species(i));
+	  C6(i) = elemDB.getC6(species(i));
+	  vdwRadius(i) = elemDB.getVdwRadius(species(i));
    }
       
 	energyContrib   = SxArray<double>             (nAtoms);
@@ -98,7 +93,6 @@ void SxVDW::resize
 	int i, j;
 	int counter;
   	
-	correctionType = ct;
 	nAtoms = 0;
 	for (i = 0; i < tau.getSize (); i++) {
 			nAtoms += (int)tau(i).getSize ();
@@ -132,7 +126,7 @@ void SxVDW::resize
 	Forces = SxArray<SxVector3<Double> > (nAtoms);
 
 }
-/*
+
 void SxVDW::updateHybridisation ()
 {
 	int i;
@@ -157,7 +151,7 @@ void SxVDW::updateHybridisation ()
 		}
 	}
 }
-*/
+
 
 void SxVDW::update (SxArray<SxVector3<Double > > newcoord) 
 {
@@ -739,7 +733,7 @@ SxArray<SxVector3<Double> > SxVDW::getNumericalForces (double dx) {
 
 double SxVDW::getRij (int atom1, int atom2)
 {
-	double Rij = getR(atom1) + getR(atom2);
+	double Rij = vdwRadius(atom1) + vdwRadius(atom2);
 
 	return Rij;
 }
@@ -751,7 +745,7 @@ double SxVDW::getC6ij (int atom1, int atom2)
 	double C6ij = (2 * C6(atom1)*C6(atom2) /
 		( C6(atom2) * polarizability(atom1) / polarizability(atom2)
 		+ C6(atom1) * polarizability(atom2) / polarizability(atom1) )
-	)
+	);
     return C6ij;
 }	
 

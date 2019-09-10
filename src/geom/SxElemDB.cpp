@@ -159,6 +159,36 @@ int SxElemDB::getRow (const SxString &chemName) const
    return -1;
 }
 
+double SxElemDB::getPolarizability (const SxString &chemName) const
+{
+    return polarizability(getAtomicNumber(chemName));
+}
+
+double SxElemDB::getPolarizability (int i) const
+{
+    return polarizability(i);
+}
+
+double SxElemDB::getC6 (const SxString &chemName) const
+{
+    return C6(getAtomicNumber(chemName));
+}
+
+double SxElemDB::getC6 (int i) const
+{
+    return polarizability(i);
+}
+
+double SxElemDB::getVdwRadius (const SxString &chemName) const
+{
+    return vdwRadius(getAtomicNumber(chemName));
+}
+
+double SxElemDB::getVdwRadius (int i) const
+{
+    return vdwRadius(i);
+}
+
 double SxElemDB::getAtomicWeight (const SxString &chemName) const 
 {
 	return weight(getIdx(getAtomicNumber(chemName)));
