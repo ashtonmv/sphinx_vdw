@@ -62,9 +62,9 @@ SxVDW::SxVDW
    for (i = 0; i < nAtoms; i++) {
       coord(i) = tau.ref (i);
       species(i) = speciesData.chemName(tau.getISpecies (i));
-	  polarizability(i) = elemDB -> getGroup(species(i)) -> getGroup("polarizability");
-	  C6(i) = elemDB -> getGroup(species(i)) -> getGroup("C6");
-	  vdwRadius(i) = elemDB -> getGroup(species(i)) -> getGroup("vdwRadius");
+	  polarizability(i) = elemDB -> getGroup("chemElements") -> getGroup(species(i)) -> getGroup("polarizability")->toReal();
+	  C6(i) = elemDB -> getGroup("chemElements") -> getGroup(species(i)) -> getGroup("C6")->toReal();
+	  vdwRadius(i) = elemDB -> getGroup("chemElements") -> getGroup(species(i)) -> getGroup("vdwRadius")->toReal();
    }
       
 	energyContrib   = SxArray<double>             (nAtoms);
