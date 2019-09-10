@@ -32,11 +32,9 @@ SxPotential::getForces (const SxAtomicStructure &tau,
                         const SxArray<const SxSymbolTable *> &cmds)
 {
    SxAtomicStructure f;
-   cout << "cmds: " << cmds;
    for (int i=0; i < cmds.getSize(); i++)
          f = getForces (tau, cmds(i));
 
-// cmds is an array of tables and idk why...
 //   // --- extremely ugly, to be cleaned up
 
    if (true) {
@@ -44,7 +42,7 @@ SxPotential::getForces (const SxAtomicStructure &tau,
       SxAtomicStructure help;
       SxAtomicStructure fVDW;
 
-      VDWCorrection = SxVDW(tau, cmds, SxSpeciesData(cmds));
+      SxVDW VDWCorrection;
 
       help.copy(tau);
       //TODO (urgent): switch to SxAtomicStructure
@@ -63,12 +61,11 @@ SxPotential::getForces (const SxAtomicStructure &tau,
    return f;
 }
 
-double SxPotential::getPotentialEnergy (const SxAtomicStructure &tau,
-                        const SxArray<const SxSymbolTable *> &cmds)
+double SxPotential::getPotentialEnergy ()
 {
    double ePot = getEnergy ();
    if (true) {
-      VDWCorrection = SxVDW(tau, cmds, SxSpeciesData(cmds));
+      SxVDW VDWCorrection;
 
       ePot = ePot + VDWCorrection.getTotalEnergy ();
       /*
@@ -90,12 +87,11 @@ SxAtomicStructure SxPotential::getSymForces (const SxAtomicStructure  &tau,
    SxAtomicStructure f = getForces (tau, table);
 
 //   // --- extremely ugly, to be cleaned up
-   if (table->containsGroup("vdwCorrection")) {
+   if (true) {
       SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
       SxAtomicStructure help;
       SxAtomicStructure fVDW;
-      VDWCorrection = SxVDW (tau, table, SxSpeciesData(table));
-
+      SxVDW VDWCorrection;
       help.copy(tau);
       //TODO (urgent): switch to SxAtomicStructure
       for (int i = 0; i < tau.nTlAtoms; i++)
