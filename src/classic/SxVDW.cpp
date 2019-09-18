@@ -449,12 +449,11 @@ void SxVDW::compute () {
 	// Reset vdW energy to 0
 	totalEnergy = 0.;
 
-	// Reset force array for atom i to 0
-	for (int j = 0; j < 3; j++) {
-		Forces(i)(j) = 0;
-	}
-
 	for (i = 0; i < nAtoms; i++) {
+		// Reset force array for atom i to 0
+		for (int j = 0; j < 3; j++) {
+			Forces(i)(j) = 0;
+		}
 		for (j = 0; j < neighbours(i).getSize (); j++) {
 			R = dist(i)(j);
 			neighj = neighbours(i)(j);
