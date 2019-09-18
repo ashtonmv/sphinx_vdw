@@ -23,7 +23,7 @@ SxVDW::SxVDW ()
 }
 
 SxVDW::SxVDW 
-(const SxAtomicStructure &t, const SxSymbolTable *cmd, 
+(const SxAtomicStructure &t, const SxSymbolTable *table, 
  const SxSpeciesData &speciesData) 
 { 
    int i;
@@ -33,12 +33,13 @@ SxVDW::SxVDW
    SxParser::Table elemTable = parser.read ("species/elements.sx");
    SxElemDB elemDB(elemTable);
 
-   SxString correctionType;
+   //SxString correctionType;
+   //SxString combinationRule;
+   //SxString damping;
 
    tau.copy(t);
 
-   nAtoms = tau.nTlAtoms;
-   
+   nAtoms = t.nTlAtoms;
 	superCell             = tau.cell;
    //---workaround: will be solved if connected to sxatomicstructure
    if (superCell.absSqr().sum() < 1e-10) { 
@@ -50,7 +51,6 @@ SxVDW::SxVDW
 	polarizability        = SxArray<double> (nAtoms);
 	C6                    = SxArray<double> (nAtoms);
 	vdwRadius             = SxArray<double> (nAtoms);
-
 
    //SxSpeciesData speciesData = SxSpeciesData(cmd -> topLevel ());
    
@@ -77,9 +77,19 @@ SxVDW::SxVDW
 
 	Forces = SxArray<SxVector3<Double> > (nAtoms);
 
-    correctionType = cmd -> getGroup ("vdwCorrection") 
-                       -> get("correctionType") -> toString ();
-      
+    SxSymbolTable *vdwGroup = table -> topLevel() -> getGroup ("vdwCorrection");
+
+    if (vdwGroup -> contains("correctionType")) {
+        correctionType = vdwGroup -> get("correctionType") -> toString ();
+    } else correctionType = SxString("D2");
+    cout << "VDW correction: " << correctionType << endl;
+    if (vdwGroup -> contains("combinationRule")) {
+        combinationRule = vdwGroup -> get("combinationRule") -> toString ();
+    } else combinationRule = SxString("Default");
+    if (vdwGroup -> contains("damping")) {
+        damping = vdwGroup -> get("damping") -> toString ();
+    } else damping = SxString("Fermi");
+
 }
 
 SxVDW::~SxVDW ()
@@ -87,15 +97,18 @@ SxVDW::~SxVDW ()
    // empty
 }
 
+int SxVDW::getnAtoms() {
+    return nAtoms;
+}
+
 void SxVDW::resize 
-(SxList<SxList<SxVector3<Double> > >  tau, SxList<SxString> speciesNameList, SxMatrix3<Double> aMat, SxString ct)
+(SxList<SxList<SxVector3<Double> > >  tauarr, SxList<SxString> speciesNameList, SxMatrix3<Double> aMat)
 {
 	int i, j;
 	int counter;
-  	
 	nAtoms = 0;
-	for (i = 0; i < tau.getSize (); i++) {
-			nAtoms += (int)tau(i).getSize ();
+	for (i = 0; i < tauarr.getSize (); i++) {
+			nAtoms += (int)tauarr(i).getSize ();
 	}
 
 	superCell             = aMat;
@@ -104,13 +117,12 @@ void SxVDW::resize
 	species               = SxArray<SxString> (nAtoms);
 	
 	counter = 0;
-	for (i = 0; i < tau.getSize (); i++) {
-		for (j = 0; j < tau(i).getSize (); j++) {
+	for (i = 0; i < tauarr.getSize (); i++) {
+		for (j = 0; j < tauarr(i).getSize (); j++) {
 			species(counter) = speciesNameList(i);
 			counter++;
 		}
 	}
-
 	energyContrib   = SxArray<double>             (nAtoms);
 	
 	dist                  = SxArray<SxList<double> > (nAtoms);
@@ -124,7 +136,6 @@ void SxVDW::resize
 	output = false;
 
 	Forces = SxArray<SxVector3<Double> > (nAtoms);
-
 }
 
 void SxVDW::updateHybridisation ()
@@ -249,9 +260,9 @@ void SxVDW::updateBorderCrossers ()
 	}
 	
 	// This caused a crash.
-	// for (superCellId = 0; superCellId < 27; superCellId++) {
-	// 	borderCrossers(superCellId).resize(0);
-	// }
+	for (superCellId = 0; superCellId < 27; superCellId++) {
+	 	borderCrossers(superCellId).resize(0);
+	}
 	
 	for (i = 0; i < nAtoms; i++) {
 	if (smallSuperCell) {
@@ -326,7 +337,6 @@ void SxVDW::updateNeighbours (SxString modus)
 		cout << endl;
 	}
 */
-	
 	for (i = 0; i < nAtoms; i++) {
 		dist(i).         resize (0);
 		neighbours(i).   resize (0);
@@ -406,19 +416,19 @@ double SxVDW::getDampingSecondDerivative (double R, double Rm) {
 	double dstar = getParam("dstar", 0, 0);
    fd = e = ePrime = ePrimePrime = a = 0.;
 	
-	if (potentialType == SxString("WTYang_I")) {
+	if (correctionType == SxString("WTYang_I")) {
 		e = exp(-cdamp*(::pow( (R/Rm), 3.)));
 		ePrime = -e*cdamp*3.*R*R/Rm/Rm/Rm;
 		fd = 12*cdamp*R/Rm/Rm/Rm*(1.-e)*e
 			+ 6.*cdamp*R*R/Rm/Rm/Rm*(ePrime - 2.*e*ePrime);
 	}
 	
-	if (potentialType == SxString("WTYang_II")) {
+	if (correctionType == SxString("WTYang_II")) {
 		e = exp(-beta*(R/Rm - 1.));
 		fd = - ::pow((beta/Rm), 2.)*e/(1. + e)/(1. + e)*(1. - 2*e/(1 + e));
 	}
 
-   if (potentialType.contains("Elstner")) {
+   if (correctionType.contains("Elstner")) {
 		a = dstar/::pow (Rm, 7.);
       e = exp(-dstar*(::pow( (R/Rm), 7.)));
       ePrime = -7.*a*::pow(R, 6.)*e;
@@ -435,6 +445,7 @@ double SxVDW::getTotalEnergy () {
 	double R, Rij, fd, eVDW, C6ij;
 	int i, j, neighj;
 	eVDW = 0.;
+    cout << "correctionType and combinationRule: " << correctionType << combinationRule << endl;
 	for (i = 0; i < nAtoms; i++) {
 		for (j = 0; j < neighbours(i).getSize (); j++) {
 			R = dist(i)(j);
@@ -442,28 +453,28 @@ double SxVDW::getTotalEnergy () {
 			Rij = getRij (i, neighj);
 			C6ij = getC6ij (i, neighj);
 			fd = getDampingFunction (R, Rij);
-			/*
-			cout << "R: " << R << endl;
-			cout << "Rm: " << Rm << endl;
-			cout << "C6: " << C6 << endl;
-			cout << "fd: " << fd << endl;
-			cout << "eVDW: " << eVDW << endl;
-			*/
-			eVDW += -fd*C6ij/(::pow(R, 6.))/2.;
+
+            eVDW += -fd*C6ij/(::pow(R, 6.))/2.;
+
+            /*
+            cout << "R: " << R << endl;
+            cout << "Rij: " << Rij << endl;
+            cout << "C6ij: " << C6ij << endl;
+            cout << "fd: " << fd << endl;
+            cout << "eVDW: " << eVDW << endl;
+            */
 		}
 	}
-	
+	cout << "TOTAL eVDW: " << eVDW << endl;
 	return eVDW;
 					
 }		
-
-	
 
 SxVector3<Double>  SxVDW::getForceOnAtom (int i) {
 	
 	SxVector3<Double>  returnValue;
 	
-   double R, Rij, C6ij, fd, fdPrime, derivative;
+    double R, Rij, C6ij, fd, fdPrime, derivative;
 			 
 	int neighj;
 	
@@ -733,21 +744,76 @@ SxArray<SxVector3<Double> > SxVDW::getNumericalForces (double dx) {
 
 double SxVDW::getRij (int atom1, int atom2)
 {
-	double Rij = vdwRadius(atom1) + vdwRadius(atom2);
+    /*
+    Return the combined vdw radius of atom1 and atom2.
+    If the TS correction is chosen, this value is modified
+    according to each atom's Hirshfeld volume ratio.
+    */
+    double Ri = vdwRadius(atom1);
+    double Rj = vdwRadius(atom2);
 
+    if (correctionType == SxString("TS")) {
+        Ri = Ri * getVolumeFraction(atom1);
+        Rj = Rj * getVolumeFraction(atom2);
+    }
+
+    double Rij = Ri + Rj;
 	return Rij;
 }
 
 double SxVDW::getC6ij (int atom1, int atom2) 
 {
-    // double C6ij = ::pow (C6(atom1) * C6(atom2), 0.5);
-	// double C6ij = ::pow (C6(atom1) * C6(atom2), 0.73);
-	double C6ij = (2 * C6(atom1)*C6(atom2) /
-		( C6(atom2) * polarizability(atom1) / polarizability(atom2)
-		+ C6(atom1) * polarizability(atom2) / polarizability(atom1) )
-	);
+    /*
+    Return the combined C6 dispersion coefficient between atom1 and atom2.
+    If the TS correction is chosen, this value is modified
+    according to each atom's Hirshfeld volume ratio.
+    */
+    double C6i, C6j, C6ij, alphai, alphaj;
+    
+    C6i = C6(atom1);
+    C6j = C6(atom2);
+    alphai = polarizability(atom1);
+    alphaj = polarizability(atom2);
+
+    if (correctionType == SxString("TS")) {
+        double nui = getVolumeFraction(atom1);
+        double nuj = getVolumeFraction(atom2);
+
+        C6i = C6i * ::pow(nui, 2);
+        C6j = C6j * ::pow(nuj, 2);
+        alphai = alphai * nui;
+        alphaj = alphaj * nuj;
+    }
+
+    if (correctionType == SxString("TS") or combinationRule == SxString("Tang")) {
+        // from Tang,K. T. Phys. Rev. 1969, 177, 108
+        C6ij = (2 * C6i*C6j /
+            ( C6j * alphai / alphaj + C6i * alphaj / alphai ) );
+    }
+    else if (combinationRule == SxString("GB")) {
+        // from Gould & Bucko (https://arxiv.org/pdf/1604.02751.pdf) page 18
+        double alphaij = ::pow ( alphai * alphaj, 0.5 );
+        C6ij = 1.43 * ::pow (alphaij, 1.45);
+    }
+    else  C6ij = ::pow (C6(atom1) * C6(atom2), 0.5); // Default
+
     return C6ij;
 }	
+
+double SxVDW::getVolumeFraction(int atom) {
+    /*
+    Return the ratio between the Hirshfeld volume of the
+    atom in its present environment and its volume as a free atom.
+    */
+
+    double nu = 1;
+    // TODO: we need to get Hirshfeld volume of the atom
+    // and the volume of the free atom from a lookup table.
+    // Pseudo-code:
+    // double nu = getHirshfeldVolume(atom) / freeAtomicVolume(atom);
+    return nu;
+
+}
 
 
 double SxVDW::getParam (SxString name, int atom1, int atom2) 

@@ -1,5 +1,9 @@
 vdwCorrection      { type="group"; optional;
-      correctionType { type="enum";  
-                  val = "D2,WTYang_I,WTYang_II,Elstner_I,Elstner_II"; }
+      correctionType { type="enum";
+                  val = "D2,TS"; }
+      combinationRule { type="enum"; optional;
+                  val = "GB,Tang"; }
+      damping {type="enum"; optional;
+                  val = "Fermi, BJ"; }
 }
 

@@ -27,7 +27,9 @@ class SX_EXPORT_CLASSIC SxVDW
 {
    public:
 	 
-	  SxString potentialType;
+	  SxString correctionType;
+      SxString combinationRule;
+      SxString damping;
 	  SxArray<SxVector3<Double> > coord;
 	  SxArray<SxString> species;
 	  
@@ -62,10 +64,8 @@ class SX_EXPORT_CLASSIC SxVDW
 
 	  
 	  double getDist(int, int, int);
-	  
 	  void resize 
-		  (SxList<SxList<SxVector3<Double> > > , SxList<SxString>, SxMatrix3<Double>,
-			SxString);
+		  (SxList<SxList<SxVector3<Double> > > , SxList<SxString>, SxMatrix3<Double>);
 	  void update(SxArray<SxVector3<Double> >);
 	  void updateNeighbours (SxString);
 
@@ -90,10 +90,13 @@ class SX_EXPORT_CLASSIC SxVDW
 	  double getDampingDerivative(double, double);
 	  double getDampingSecondDerivative(double, double);
 	  
+      double getVolumeFraction(int);
 	  double getC6ij (int, int); 
 	  double getRij (int, int); 
 	  double getParam (SxString, int, int);
 	  double getTotalEnergy ();
+
+      int getnAtoms ();
 
 	  void printParameters ();
 	  void printNeighbours ();
