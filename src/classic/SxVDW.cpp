@@ -473,7 +473,7 @@ void SxVDW::compute () {
 
 			Forces(i) += derivative * (coord(i) - coord(neighj) 
 					     - getLatticeVec (supercellIds(i)(j))) / R;
-			
+		}
 }
 
 double SxVDW::getTotalEnergy () {
