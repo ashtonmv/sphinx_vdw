@@ -446,7 +446,7 @@ void SxVDW::compute () {
 	// update attributes "eVDW" (double) and
 	// "Forces" (SxArray<SxVector3<Double>>)
 	int i, j, neighj;
-	double R, Rij, C6ij, fd, fdPrime;
+	double R, Rij, C6ij, fd, fdPrime, derivative;
 
 	// Reset vdW energy to 0
 	totalEnergy = 0.;
