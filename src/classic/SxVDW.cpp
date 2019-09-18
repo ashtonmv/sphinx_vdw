@@ -445,6 +445,8 @@ double SxVDW::getDampingSecondDerivative (double R, double Rm) {
 void SxVDW::compute () {
 	// update attributes "eVDW" (double) and
 	// "Forces" (SxArray<SxVector3<Double>>)
+	int i, j, neighj;
+	double R, Rij, fd, eVDW, C6ij, fd, fdPrime;
 
 	// Reset vdW energy to 0
 	totalEnergy = 0.;
