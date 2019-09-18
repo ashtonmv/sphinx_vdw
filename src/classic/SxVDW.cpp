@@ -12,7 +12,8 @@
 //      License:    see sphinx/LICENSE
 //
 // ---------------------------------------------------------------------------
-// Author: Lars Ismer, ismer@fhi-berlin.mpg.de
+// Authors: Lars Ismer (ismer@fhi-berlin.mpg.de)
+//			Michael Ashton (ashton@mpie.de)
 
 #include <SxVDW.h>
 #include <SxElemDB.h>
@@ -441,11 +442,18 @@ double SxVDW::getDampingSecondDerivative (double R, double Rm) {
 }
 */
 
-double SxVDW::getTotalEnergy () {
-	double R, Rij, fd, eVDW, C6ij;
-	int i, j, neighj;
-	eVDW = 0.;
-    cout << "correctionType and combinationRule: " << correctionType << combinationRule << endl;
+void SxVDW::compute () {
+	// update attributes "eVDW" (double) and
+	// "Forces" (SxArray<SxVector3<Double>>)
+
+	// Reset vdW energy to 0
+	totalEnergy = 0.;
+
+	// Reset force array for atom i to 0
+	for (int j = 0; j < 3; j++) {
+		Forces(i)(j) = 0;
+	}
+
 	for (i = 0; i < nAtoms; i++) {
 		for (j = 0; j < neighbours(i).getSize (); j++) {
 			R = dist(i)(j);
@@ -453,19 +461,35 @@ double SxVDW::getTotalEnergy () {
 			Rij = getRij (i, neighj);
 			C6ij = getC6ij (i, neighj);
 			fd = getDampingFunction (R, Rij);
+			fdPrime = getDampingDerivative (R, Rij);
 
-            eVDW += -fd*C6ij/(::pow(R, 6.))/2.;
+			// Update Energy
+            totalEnergy += -fd*C6ij/(::pow(R, 6.))/2.;
 
-            /*
-            cout << "R: " << R << endl;
-            cout << "Rij: " << Rij << endl;
-            cout << "C6ij: " << C6ij << endl;
-            cout << "fd: " << fd << endl;
-            cout << "eVDW: " << eVDW << endl;
-            */
+			// Update Forces
+			derivative = fdPrime * C6ij/::pow(R, 6.) -
+						 6. * fd * C6ij/::pow(R, 7.);
+
+			Forces(i) += derivative * (coord(i) - coord(neighj) 
+					     - getLatticeVec (supercellIds(i)(j))) / R;
+			
+}
+
+double SxVDW::getTotalEnergy () {
+	double R, Rij, fd, eVDW, C6ij;
+	int i, j, neighj;
+	eVDW = 0.;
+	for (i = 0; i < nAtoms; i++) {
+
+		for (j = 0; j < neighbours(i).getSize (); j++) {
+			R = dist(i)(j);
+			neighj = neighbours(i)(j);
+			Rij = getRij (i, neighj);
+			C6ij = getC6ij (i, neighj);
+			fd = getDampingFunction (R, Rij);
+            eVDW += -fd * C6ij/(::pow(R, 6.))/2.;
 		}
 	}
-	cout << "TOTAL eVDW: " << eVDW << endl;
 	return eVDW;
 					
 }		
@@ -526,7 +550,8 @@ SxArray<SxVector3<Double> > SxVDW::getForces () {
 	
 	totalEnergy = 0.;
 	if (output) cout << "...2 Body Contributions..." << endl;
-	updateForces ();
+	//updateForces ();
+	compute (); // inherently updates Forces
 	return Forces;
 }
 			

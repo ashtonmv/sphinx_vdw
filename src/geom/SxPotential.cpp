@@ -53,7 +53,8 @@ SxPotential::getForces (const SxAtomicStructure &tau,
       for (int i = 0; i < tau.nTlAtoms; i++)
          tauArray(i) = help.ref(i);
       VDWCorrection.update (tauArray);
-      tauArray = VDWCorrection.getForces();
+      VDWCorrection.compute ();
+      tauArray = VDWCorrection.Forces;
       fVDW.copy(tau);
       for (int i = 0; i < tau.nTlAtoms; i++)
          fVDW.ref(i) = (tauArray(i));
@@ -69,9 +70,11 @@ double SxPotential::getPotentialEnergy ()
    double ePot = getEnergy ();
    if (applyVDWCorrection) {
 
-      cout << "Energy (no VDW): " << ePot << endl;
-      ePot = ePot + VDWCorrection.getTotalEnergy ();
-      cout << "Energy (+ VDW): " << ePot << endl;
+      cout << "Energy (before compute()): " << VDWCorrection.totalEnergy << endl;
+      VDWCorrection.compute(); // Testing if this is needed here
+      cout << "Energy (after compute()): " << VDWCorrection.totalEnergy << endl;
+
+      ePot = ePot + VDWCorrection.totalEnergy;
       /*
       cout << VDWCorrection.potentialType << endl;
       cout << VDWCorrection.getTotalEnergy () << endl;
@@ -99,7 +102,6 @@ SxAtomicStructure SxPotential::getSymForces (const SxAtomicStructure  &tau,
       SxSpeciesData speciesData(table);
       SxVDW VDW (tau, table, speciesData);
       setVDWCorrection(VDW);
-      cout << "applyVDWCorrection = " << applyVDWCorrection << endl;
       help.copy(tau);
 
       //TODO (urgent): switch to SxAtomicStructure
@@ -107,7 +109,8 @@ SxAtomicStructure SxPotential::getSymForces (const SxAtomicStructure  &tau,
          tauArray(i) = help.ref(i);
 
       VDWCorrection.update (tauArray);
-      tauArray = VDWCorrection.getForces();
+      VDWCorrection.compute ();
+      tauArray = VDWCorrection.Forces;
       fVDW.copy(tau);
 
       for (int i = 0; i < tau.nTlAtoms; i++)

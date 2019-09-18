@@ -75,6 +75,8 @@ class SX_EXPORT_CLASSIC SxVDW
 	  void updateDampingTerms (); 
 	  void updateHybridisation (); 
 	  
+	  void compute ();
+
 	  SxVector3<Double>  getLatticeVec(int);
 	  SxVector3<Double>  getForceOnAtom (int); 
 	  SxMatrix3<Double> getInteraction(int, int, int);
