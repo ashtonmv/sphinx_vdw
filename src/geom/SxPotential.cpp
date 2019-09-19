@@ -69,11 +69,6 @@ double SxPotential::getPotentialEnergy ()
 {
    double ePot = getEnergy ();
    if (applyVDWCorrection) {
-
-      cout << "Energy (before compute()): " << VDWCorrection.totalEnergy << endl;
-      VDWCorrection.compute(); // Testing if this is needed here
-      cout << "Energy (after compute()): " << VDWCorrection.totalEnergy << endl;
-
       ePot = ePot + VDWCorrection.totalEnergy;
       /*
       cout << VDWCorrection.potentialType << endl;

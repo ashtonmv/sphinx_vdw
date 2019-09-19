@@ -31,6 +31,7 @@
 #include <SxParallelHierarchy.h>
 #include <SxPAWSet.h>
 #include <SxHubbardMO.h>
+#include <SxVDW.h>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -162,6 +163,13 @@ void SxPAWHamiltonian::read (const SxSymbolTable *table)
          cout << "WARNING: HubbardU produces no sites" << endl;
          hubbardU = SxPtr<SxHubbardU> ();
       }
+   }
+
+   const SxSymbolTable *topTable = hamGroup->topLevel();
+   if (topTable->containsGroup("vdwCorrection")) {
+      bool applyVDWCorrection = true;
+      SxSpeciesData speciesData(topTable);
+      SxVDW vdwCorrection(structure, topTable, speciesData);
    }
 
    // --- external potential
@@ -1567,6 +1575,10 @@ void SxPAWHamiltonian::compute (const SxPWSet &waves, const SxFermi &fermi,
       SX_CHECK (fabs(fermi.fFull * nSpin - 2.) < 1e-12, fermi.fFull, nSpin);
       sxprintf ("eHubbard  = % 19.12f H\n", hubbardU->energy);
       eTotal += hubbardU->energy;
+   }
+   if (applyVDWCorrection) {
+      vdwCorrection.compute();
+      sxprintf("eVDW = % 19.12f H\n", vdwCorrection.totalEnergy)
    }
    sxprintf ("eTot(Val) = % 19.12f H\n", eTotal);
 
