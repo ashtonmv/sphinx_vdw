@@ -234,11 +234,11 @@ class SX_EXPORT_GEOM SxPotential
       void print (const SxSymbolTable *cmd) { execute (cmd, false); }
 
 //       /**\brief apply van-der-Waals correcion */
-      bool applyVDWCorrection;
+     bool applyVDWCorrection;
 //      /** \brief additive van-der-Waals correction*/
-      SxVDW VDWCorrection;
+     SxVDW VDWCorrection;
 //      /** \brief sets the van-der-Waals correction*/
-      void setVDWCorrection (const SxVDW &);
+     void setVDWCorrection (const SxVDW &);
 
       bool dEnergyLow;
 

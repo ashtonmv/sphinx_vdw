@@ -35,8 +35,8 @@ References:
 #include <SxDipoleCorrZ.h>
 #include <SxPAWExchange.h>
 #include <SxHubbardU.h>
-#include <SxPotential.h>
-#include <SxSpeciesData.h>
+#include <SxVDW.h>
+
 
 /**\brief PAW Hamiltonian
 
@@ -166,10 +166,6 @@ class SX_EXPORT_DFT SxPAWHamiltonian : public SxHamiltonian
       /// Hubbard U
       SxPtr<SxHubbardU> hubbardU;
 
-      /// vdW Correction
-      //bool applyVDWCorrection;
-      //SxVDW vdwCorrection;
-
       /// External potential
       SxMeshR vExt;
 
@@ -197,6 +193,11 @@ class SX_EXPORT_DFT SxPAWHamiltonian : public SxHamiltonian
       double eDoubleCounting;
       /// Core energy
       double eCore;
+      /// vdW energy
+      double eVDW;
+
+      bool applyVDWCorrection;
+      SxVDW vdwCorrection;
 
       /// pseudoized potential (Ref. 1, Eq. 34)
       SxArray<SxMeshR> vPS;

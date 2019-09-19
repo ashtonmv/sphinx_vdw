@@ -31,6 +31,7 @@
 #include <SxEESGProj.h>
 #include <SxRSProj.h>
 #include <SxDFT.h>
+#include <SxVDW.h>
 
 /** \brief Plane-wave Hamiltonian \f$
               \langle \bf {G+k} | \hat{H} | \bf{G+k} \rangle
@@ -285,6 +286,10 @@ class SX_EXPORT_DFT SxPWHamiltonian : public SxHamiltonian
       PrecEnergy  eTotal;
       PrecEnergy  eExternal;
       PrecEnergy  eDoubleCounting;
+      PrecEnergy  eVDW;
+
+      bool applyVDWCorrection;
+      SxVDW vdwCorrection;
 
       // --- Hartree contribution
       SxArray<SxDiracVec<TPrecPhi> >  phiGaussG;   //:is,:ig

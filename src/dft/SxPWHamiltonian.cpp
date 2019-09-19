@@ -586,6 +586,13 @@ void SxPWHamiltonian::update (const SxFermi &fermi)
           + (contrib & CALC_EXT     ? eExt       : 0.)
           + (contrib & CALC_NL      ? eNl        : 0.)
           +  eEwald - eSelf;
+
+   if (applyVDWCorrection) {
+      SxVDW vdwCorrection(structure, table);
+      vdwCorrection.compute();
+      eVDW = vdwCorrection.totalEnergy;
+      eTotal = eTotal + eVDW;
+   }
    eDoubleCounting += eEwald - eSelf;
 
    if (wavesPtr && fermi.getNk () > 0) {
@@ -1508,6 +1515,10 @@ void SxPWHamiltonian::read (const SxSymbolTable *table)
 //       nExcessElectrons = hamiltonian->get("nExcessElectrons")->toReal();
 //    if (hamiltonian->contains("ekt"))
 //       ekt = hamiltonian->get("ekt")->toReal();
+
+      if hamiltonian->containsGroup("vdwCorrection") {
+         bool applyVDWCorrection = true;
+      }
 
       ekt = hamiltonian->get("ekt")->toReal() / HA2EV;
 

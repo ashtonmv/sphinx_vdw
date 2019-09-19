@@ -75,6 +75,10 @@ SxPAWHamiltonian::SxPAWHamiltonian (const SxGBasis  &G,
    structure = *G.structPtr;
    const SxRBasis &R = G.getRBasis ();
    int nSpin = SxHamiltonian::getNSpin (table);
+   if table->containsGroup("vdwCorrection") {
+      bool applyVDWCorrection = true;
+      SxVDW vdwCorrection(structure, table);
+   }
    pBasis    = SxPtr<SxPartialWaveBasis>::create (potPtr, structure);
    rPtr      = const_cast<SxRBasis*>(&R);
    setupProj (Gk);
@@ -163,13 +167,6 @@ void SxPAWHamiltonian::read (const SxSymbolTable *table)
          cout << "WARNING: HubbardU produces no sites" << endl;
          hubbardU = SxPtr<SxHubbardU> ();
       }
-   }
-
-   const SxSymbolTable *topTable = hamGroup->topLevel();
-   if (topTable->containsGroup("vdwCorrection")) {
-      bool applyVDWCorrection = true;
-      SxSpeciesData speciesData(topTable);
-      SxVDW VDWCorrection(structure, topTable, speciesData);
    }
 
    // --- external potential
@@ -1494,12 +1491,10 @@ void SxPAWHamiltonian::compute (const SxPWSet &waves, const SxFermi &fermi,
       eDoubleCounting -= SxXCFunctional::alphaHybrid * eX;
    }
 
-
    // kinetic energy
    double eKin = 0.;
    // --- pseudo-kinetic enery
    int nSpin = waves.getNSpin ();
-
 
    if (hContrib & CalcKinPS)  {
       SX_NEW_LOOP (waves);
@@ -1568,18 +1563,23 @@ void SxPAWHamiltonian::compute (const SxPWSet &waves, const SxFermi &fermi,
    sxprintf ("eXc       = % 19.12f H\n", eXc);
    sxprintf ("eBar      = % 19.12f H\n", eBar);
    sxprintf ("eCore     = % 19.12f H\n", eCore);
+   if (applyVDWCorrection) {
+      vdwCorrection.compute()
+      eVDW = vdwCorrection.totalEnergy;
+      sxprintf ("eVDW     = % 19.12f H\n", eVDW);
+   }
    if (vExt.getSize () > 0)
       sxprintf ("eExt      = %19.12f H\n", eExt);
    eTotal = eKin + eHartree + eXc + eBar - eCore + eExt;
+   if (applyVDWCorrection) {
+      eTotal = eTotal + eVDW;
+   }
    if (hubbardU) {
       SX_CHECK (fabs(fermi.fFull * nSpin - 2.) < 1e-12, fermi.fFull, nSpin);
       sxprintf ("eHubbard  = % 19.12f H\n", hubbardU->energy);
       eTotal += hubbardU->energy;
    }
-   if (applyVDWCorrection) {
-      VDWCorrection.compute();
-      sxprintf("eVDW = % 19.12f H\n", VDWCorrection.totalEnergy)
-   }
+
    sxprintf ("eTot(Val) = % 19.12f H\n", eTotal);
 
 }

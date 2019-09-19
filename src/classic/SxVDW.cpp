@@ -24,28 +24,23 @@ SxVDW::SxVDW ()
 }
 
 SxVDW::SxVDW 
-(const SxAtomicStructure &t, const SxSymbolTable *table, 
- const SxSpeciesData &speciesData) 
+(const SxAtomicStructure &t, const SxSymbolTable *table) 
 { 
-   int i;
-   SxAtomicStructure tau;
-   SxParser parser;
+    int i;
+    SxAtomicStructure tau;
+    SxParser parser;
 
-   SxParser::Table elemTable = parser.read ("species/elements.sx");
-   SxElemDB elemDB(elemTable);
+    SxParser::Table elemTable = parser.read ("species/elements.sx");
+    SxElemDB elemDB(elemTable);
 
-   //SxString correctionType;
-   //SxString combinationRule;
-   //SxString damping;
+    tau.copy(t);
 
-   tau.copy(t);
-
-   nAtoms = t.nTlAtoms;
+    nAtoms = t.nTlAtoms;
 	superCell             = tau.cell;
    //---workaround: will be solved if connected to sxatomicstructure
-   if (superCell.absSqr().sum() < 1e-10) { 
-      superCell (0, 0) = superCell(1, 1) = superCell(2, 2) = 100;
-   }
+    if (superCell.absSqr().sum() < 1e-10) { 
+        superCell (0, 0) = superCell(1, 1) = superCell(2, 2) = 100;
+    }
       
 	coord                 = SxArray<SxVector3<Double> > (nAtoms);
 	species               = SxArray<SxString> (nAtoms);
@@ -53,15 +48,15 @@ SxVDW::SxVDW
 	C6                    = SxArray<double> (nAtoms);
 	vdwRadius             = SxArray<double> (nAtoms);
 
-   //SxSpeciesData speciesData = SxSpeciesData(cmd -> topLevel ());
+   SxSpeciesData speciesData = SxSpeciesData(table->topLevel());
    
-   for (i = 0; i < nAtoms; i++) {
-      coord(i) = tau.ref (i);
-      species(i) = speciesData.chemName(tau.getISpecies (i));
-	  polarizability(i) = elemDB.getPolarizability(species(i));
-	  C6(i) = elemDB.getC6(species(i));
-	  vdwRadius(i) = elemDB.getVdwRadius(species(i));
-   }
+    for (i = 0; i < nAtoms; i++) {
+        coord(i) = tau.ref (i);
+        species(i) = speciesData.chemName(tau.getISpecies (i));
+	    polarizability(i) = elemDB.getPolarizability(species(i));
+ 	    C6(i) = elemDB.getC6(species(i));
+ 	    vdwRadius(i) = elemDB.getVdwRadius(species(i));
+    }
       
 	energyContrib   = SxArray<double>             (nAtoms);
    
@@ -78,11 +73,9 @@ SxVDW::SxVDW
 
 	Forces = SxArray<SxVector3<Double> > (nAtoms);
 
-    SxSymbolTable *vdwGroup = table -> topLevel() -> getGroup ("vdwCorrection");
+    SxSymbolTable *vdwGroup = table -> getGroup ("vdwCorrection");
 
-    if (vdwGroup -> contains("correctionType")) {
-        correctionType = vdwGroup -> get("correctionType") -> toString ();
-    } else correctionType = SxString("D2");
+    correctionType = vdwGroup -> get("correctionType");
     cout << "VDW correction: " << correctionType << endl;
     if (vdwGroup -> contains("combinationRule")) {
         combinationRule = vdwGroup -> get("combinationRule") -> toString ();
