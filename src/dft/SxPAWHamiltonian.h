@@ -36,6 +36,7 @@ References:
 #include <SxPAWExchange.h>
 #include <SxHubbardU.h>
 #include <SxPotential.h>
+#include <SxSpeciesData.h>
 
 /**\brief PAW Hamiltonian
 

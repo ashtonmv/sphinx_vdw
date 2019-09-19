@@ -165,12 +165,12 @@ void SxPAWHamiltonian::read (const SxSymbolTable *table)
       }
    }
 
-//   const SxSymbolTable *topTable = hamGroup->topLevel();
-//   if (topTable->containsGroup("vdwCorrection")) {
-//      applyVDWCorrection = true;
-//      SxSpeciesData speciesData(topTable);
-//      VDWCorrection(structure, topTable, speciesData);
-//   }
+   const SxSymbolTable *topTable = hamGroup->topLevel();
+   if (topTable->containsGroup("vdwCorrection")) {
+      applyVDWCorrection = true;
+      SxSpeciesData speciesData(topTable);
+      VDWCorrection(structure, topTable, speciesData);
+   }
 
    // --- external potential
    if (hamGroup->containsGroup("vExt"))  {
