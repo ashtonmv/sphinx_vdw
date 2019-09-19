@@ -31,8 +31,7 @@
 #include <SxParallelHierarchy.h>
 #include <SxPAWSet.h>
 #include <SxHubbardMO.h>
-#include <SxVDW.h>
-#include <SxPotential.h>
+
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -166,12 +165,12 @@ void SxPAWHamiltonian::read (const SxSymbolTable *table)
       }
    }
 
-   const SxSymbolTable *topTable = hamGroup->topLevel();
-   if (topTable->containsGroup("vdwCorrection")) {
-      bool applyVDWCorrection = true;
-      SxSpeciesData speciesData(topTable);
-      SxVDW vdwCorrection(structure, topTable, speciesData);
-   }
+//   const SxSymbolTable *topTable = hamGroup->topLevel();
+//   if (topTable->containsGroup("vdwCorrection")) {
+//      applyVDWCorrection = true;
+//      SxSpeciesData speciesData(topTable);
+//      VDWCorrection(structure, topTable, speciesData);
+//   }
 
    // --- external potential
    if (hamGroup->containsGroup("vExt"))  {
@@ -1578,8 +1577,8 @@ void SxPAWHamiltonian::compute (const SxPWSet &waves, const SxFermi &fermi,
       eTotal += hubbardU->energy;
    }
    if (applyVDWCorrection) {
-      vdwCorrection.compute();
-      sxprintf("eVDW = % 19.12f H\n", vdwCorrection.totalEnergy)
+      VDWCorrection.compute();
+      sxprintf("eVDW = % 19.12f H\n", VDWCorrection.totalEnergy)
    }
    sxprintf ("eTot(Val) = % 19.12f H\n", eTotal);
 
