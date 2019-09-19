@@ -32,6 +32,7 @@
 #include <SxPAWSet.h>
 #include <SxHubbardMO.h>
 #include <SxVDW.h>
+#include <SxPotential.h>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
