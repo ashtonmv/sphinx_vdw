@@ -164,6 +164,9 @@ class SX_EXPORT_DFT SxPAWHamiltonian : public SxHamiltonian
       /// Hubbard U
       SxPtr<SxHubbardU> hubbardU;
 
+      /// vdW Correction
+      bool applyVDWCorrection;
+
       /// External potential
       SxMeshR vExt;
 
