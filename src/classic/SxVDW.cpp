@@ -48,7 +48,7 @@ SxVDW::SxVDW
 	C6                    = SxArray<double> (nAtoms);
 	vdwRadius             = SxArray<double> (nAtoms);
 
-   SxSpeciesData speciesData = SxSpeciesData(table->topLevel());
+    SxSpeciesData speciesData = SxSpeciesData(table->topLevel());
    
     for (i = 0; i < nAtoms; i++) {
         coord(i) = tau.ref (i);
@@ -75,8 +75,7 @@ SxVDW::SxVDW
 
     SxSymbolTable *vdwGroup = table -> getGroup ("vdwCorrection");
 
-    correctionType = vdwGroup -> get("correctionType");
-    cout << "VDW correction: " << correctionType << endl;
+    correctionType = vdwGroup -> get("correctionType") -> toString ();
     if (vdwGroup -> contains("combinationRule")) {
         combinationRule = vdwGroup -> get("combinationRule") -> toString ();
     } else combinationRule = SxString("Default");
@@ -260,6 +259,7 @@ void SxVDW::updateBorderCrossers ()
 	
 	for (i = 0; i < nAtoms; i++) {
 	if (smallSuperCell) {
+        cout << "building" << endl;
 		for (superCellId = 0; superCellId < 27; superCellId++) {
 			borderCrossers(superCellId).append(i);
 	}
@@ -436,14 +436,14 @@ double SxVDW::getDampingSecondDerivative (double R, double Rm) {
 */
 
 void SxVDW::compute () {
-	// update attributes "eVDW" (double) and
+	// update attributes "totalEnergy" (double) and
 	// "Forces" (SxArray<SxVector3<Double>>)
 	int i, j, neighj;
 	double R, Rij, C6ij, fd, fdPrime, derivative;
 
+
 	// Reset vdW energy to 0
 	totalEnergy = 0.;
-
 	for (i = 0; i < nAtoms; i++) {
 		// Reset force array for atom i to 0
 		for (int j = 0; j < 3; j++) {
@@ -466,6 +466,7 @@ void SxVDW::compute () {
 
 			Forces(i) += derivative * (coord(i) - coord(neighj) 
 					     - getLatticeVec (supercellIds(i)(j))) / R;
+
 		}
 	}
 }

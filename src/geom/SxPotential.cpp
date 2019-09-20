@@ -43,9 +43,8 @@ SxPotential::getForces (const SxAtomicStructure &tau,
       SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
       SxAtomicStructure help;
       SxAtomicStructure fVDW;
-      SxSpeciesData speciesData (table);
 
-      SxVDW VDW (tau, table, speciesData);
+      SxVDW VDW (tau, table);
       setVDWCorrection(VDW);
 
       help.copy(tau);
@@ -94,8 +93,7 @@ SxAtomicStructure SxPotential::getSymForces (const SxAtomicStructure  &tau,
       SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
       SxAtomicStructure help;
       SxAtomicStructure fVDW;
-      SxSpeciesData speciesData(table);
-      SxVDW VDW (tau, table, speciesData);
+      SxVDW VDW (tau, table);
       setVDWCorrection(VDW);
       help.copy(tau);
 

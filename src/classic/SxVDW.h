@@ -59,7 +59,7 @@ class SX_EXPORT_CLASSIC SxVDW
 	  double totalEnergy;
 
 	   SxVDW ();
-      SxVDW (const SxAtomicStructure &, const SxSymbolTable *, const SxSpeciesData &);
+      SxVDW (const SxAtomicStructure &, const SxSymbolTable *);
      ~SxVDW ();
 
 	  

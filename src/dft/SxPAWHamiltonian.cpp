@@ -75,10 +75,6 @@ SxPAWHamiltonian::SxPAWHamiltonian (const SxGBasis  &G,
    structure = *G.structPtr;
    const SxRBasis &R = G.getRBasis ();
    int nSpin = SxHamiltonian::getNSpin (table);
-   if table->containsGroup("vdwCorrection") {
-      bool applyVDWCorrection = true;
-      SxVDW vdwCorrection(structure, table);
-   }
    pBasis    = SxPtr<SxPartialWaveBasis>::create (potPtr, structure);
    rPtr      = const_cast<SxRBasis*>(&R);
    setupProj (Gk);
@@ -158,6 +154,12 @@ void SxPAWHamiltonian::read (const SxSymbolTable *table)
          e.print ();
          SX_EXIT;
       }
+   }
+
+   // --- vdW correction
+   if (hamGroup->containsGroup ("vdwCorrection")) {
+      applyVDWCorrection = true;
+      vdwCorrection = SxVDW(structure, hamGroup);
    }
 
    if (hamGroup->containsGroup ("HubbardU"))  {
@@ -1564,7 +1566,12 @@ void SxPAWHamiltonian::compute (const SxPWSet &waves, const SxFermi &fermi,
    sxprintf ("eBar      = % 19.12f H\n", eBar);
    sxprintf ("eCore     = % 19.12f H\n", eCore);
    if (applyVDWCorrection) {
-      vdwCorrection.compute()
+      SxArray<SxVector3<Double> > newCoords (structure.nTlAtoms);
+      for (int i=0; i<structure.nTlAtoms; i++) {
+          newCoords(i) = structure.ref(i);
+      }
+      vdwCorrection.update(newCoords);
+      vdwCorrection.compute();
       eVDW = vdwCorrection.totalEnergy;
       sxprintf ("eVDW     = % 19.12f H\n", eVDW);
    }

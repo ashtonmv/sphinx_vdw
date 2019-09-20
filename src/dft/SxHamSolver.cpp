@@ -3829,8 +3829,15 @@ void SxHamSolver::scfDiagonalization (const SxSymbolTable *cmd, bool calc)
       eTot = hamPtr->getEnergy (); // Kohn-Sham functional
       double eHarris = (keepRho ? fermi.getEBand (SxFermi::UseFocc) : eBand)
                      + doubleCounting;
-      if (!useKSenergy)
+      if (!useKSenergy) {
          eTot = eHarris;
+         // eVDW is auto-included in hamPtr->getEnergy() but
+         // not in eHarris.
+         if (applyVDWCorrection) {
+             sxprintf ("Adding eVDW to eHarris.\n");
+             //eTot = eTot + eVDW;
+         }
+      }
       
       energy = (keepRho) ? eBand : eTot;
       sxprintf ("eTot(%d)=%15.12f, eBand=%15.12f,  |R|=%15.12f\n", 

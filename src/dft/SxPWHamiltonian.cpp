@@ -588,7 +588,6 @@ void SxPWHamiltonian::update (const SxFermi &fermi)
           +  eEwald - eSelf;
 
    if (applyVDWCorrection) {
-      SxVDW vdwCorrection(structure, table);
       vdwCorrection.compute();
       eVDW = vdwCorrection.totalEnergy;
       eTotal = eTotal + eVDW;
@@ -1516,8 +1515,9 @@ void SxPWHamiltonian::read (const SxSymbolTable *table)
 //    if (hamiltonian->contains("ekt"))
 //       ekt = hamiltonian->get("ekt")->toReal();
 
-      if hamiltonian->containsGroup("vdwCorrection") {
+      if (hamiltonian->containsGroup("vdwCorrection")) {
          bool applyVDWCorrection = true;
+         SxVDW vdwCorrection(structure, table);
       }
 
       ekt = hamiltonian->get("ekt")->toReal() / HA2EV;
