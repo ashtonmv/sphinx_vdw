@@ -1580,6 +1580,7 @@ void SxPAWHamiltonian::compute (const SxPWSet &waves, const SxFermi &fermi,
    eTotal = eKin + eHartree + eXc + eBar - eCore + eExt;
    if (applyVDWCorrection) {
       eTotal = eTotal + eVDW;
+      eDoubleCounting = eDoubleCounting + eVDW;
    }
    if (hubbardU) {
       SX_CHECK (fabs(fermi.fFull * nSpin - 2.) < 1e-12, fermi.fFull, nSpin);

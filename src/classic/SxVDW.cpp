@@ -259,7 +259,6 @@ void SxVDW::updateBorderCrossers ()
 	
 	for (i = 0; i < nAtoms; i++) {
 	if (smallSuperCell) {
-        cout << "building" << endl;
 		for (superCellId = 0; superCellId < 27; superCellId++) {
 			borderCrossers(superCellId).append(i);
 	}

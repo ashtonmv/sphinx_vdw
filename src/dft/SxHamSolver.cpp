@@ -3831,12 +3831,6 @@ void SxHamSolver::scfDiagonalization (const SxSymbolTable *cmd, bool calc)
                      + doubleCounting;
       if (!useKSenergy) {
          eTot = eHarris;
-         // eVDW is auto-included in hamPtr->getEnergy() but
-         // not in eHarris.
-         if (applyVDWCorrection) {
-             sxprintf ("Adding eVDW to eHarris.\n");
-             //eTot = eTot + eVDW;
-         }
       }
       
       energy = (keepRho) ? eBand : eTot;
