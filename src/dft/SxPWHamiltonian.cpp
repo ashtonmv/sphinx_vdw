@@ -587,12 +587,14 @@ void SxPWHamiltonian::update (const SxFermi &fermi)
           + (contrib & CALC_NL      ? eNl        : 0.)
           +  eEwald - eSelf;
 
-   if (applyVDWCorrection) {
-      vdwCorrection.compute();
-      eVDW = vdwCorrection.totalEnergy;
-      eTotal = eTotal + eVDW;
-   }
    eDoubleCounting += eEwald - eSelf;
+
+   if (applyVDWCorrection) {
+      VDW.compute();
+      eVDW = VDW.totalEnergy;
+      eTotal += eVDW;
+      eDoubleCounting += eVDW;
+   }
 
    if (wavesPtr && fermi.getNk () > 0) {
       PrecEnergy eHarrisFoulkes = 0.;
@@ -1517,7 +1519,7 @@ void SxPWHamiltonian::read (const SxSymbolTable *table)
 
       if (hamiltonian->containsGroup("vdwCorrection")) {
          bool applyVDWCorrection = true;
-         SxVDW vdwCorrection(structure, table);
+         VDW = SxVDW(structure, table, rho);
       }
 
       ekt = hamiltonian->get("ekt")->toReal() / HA2EV;

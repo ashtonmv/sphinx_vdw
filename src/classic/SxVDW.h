@@ -33,6 +33,8 @@ class SX_EXPORT_CLASSIC SxVDW
 	  SxArray<SxVector3<Double> > coord;
 	  SxArray<SxString> species;
 	  
+	  SxRho rho;
+
 	  SxMatrix3<Double> superCell;
 	  SxArray<double>  energyContrib;
 
@@ -52,8 +54,9 @@ class SX_EXPORT_CLASSIC SxVDW
 	  SxArray<double> polarizability;
 	  SxArray<double> C6;
 	  SxArray<double> vdwRadius;
-	  SxArrya<double> effectiveVolume;
-
+	  SxArray<double> effectiveVolume;
+	  SxArray<double> hirshfeldVolume;
+	  SxArray<double> freeVolume;
 
 	  bool output;
 	  int nAtoms;
@@ -67,7 +70,7 @@ class SX_EXPORT_CLASSIC SxVDW
 	  double getDist(int, int, int);
 	  void resize 
 		  (SxList<SxList<SxVector3<Double> > > , SxList<SxString>, SxMatrix3<Double>);
-	  void update(SxArray<SxVector3<Double> >, SxArray<double>);
+	  void update(SxArray<SxVector3<Double> >);
 	  void updateNeighbours (SxString);
 
 	  void updateCoord (SxArray<SxVector3<Double> >);

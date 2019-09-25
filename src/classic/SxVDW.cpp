@@ -24,7 +24,7 @@ SxVDW::SxVDW ()
 }
 
 SxVDW::SxVDW 
-(const SxAtomicStructure &t, const SxSymbolTable *table) 
+(const SxAtomicStructure &t, const SxSymbolTable *table, const SxRho &dens) 
 { 
     int i;
     SxAtomicStructure tau;
@@ -35,6 +35,7 @@ SxVDW::SxVDW
 
     tau.copy(t);
 
+	rho = dens;
     nAtoms = t.nTlAtoms;
 	superCell             = tau.cell;
    //---workaround: will be solved if connected to sxatomicstructure
@@ -48,6 +49,9 @@ SxVDW::SxVDW
 	C6                    = SxArray<double> (nAtoms);
 	vdwRadius             = SxArray<double> (nAtoms);
 	effectiveVolume       = SxArray<double> (nAtoms);
+	hirshfeldVolume       = SxArray<double> (nAtoms);
+	freeVolume            = SxArray<double> (nAtoms);
+
 
     SxSpeciesData speciesData = SxSpeciesData(table->topLevel());
    
@@ -57,6 +61,7 @@ SxVDW::SxVDW
 	    polarizability(i) = elemDB.getPolarizability(species(i));
  	    C6(i) = elemDB.getC6(species(i));
  	    vdwRadius(i) = elemDB.getVdwRadius(species(i));
+		freeVolume(i) = 1.; // Need to figure out how to read this in.
     }
       
 	energyContrib   = SxArray<double>             (nAtoms);
@@ -158,10 +163,8 @@ void SxVDW::updateHybridisation ()
 }
 
 
-void SxVDW::update (SxArray<SxVector3<Double > > newcoord, SxArray<double> newEffectiveVolume) 
+void SxVDW::update (SxArray<SxVector3<Double > > newcoord) 
 {
-	effectiveVolume = newEffectiveVolume;
-
 	if (output) cout << " ---- Updating Coords" << endl;
 	updateCoord (newcoord);
 	//printParameters();
@@ -437,12 +440,33 @@ double SxVDW::getDampingSecondDerivative (double R, double Rm) {
 }
 */
 
+void computeHirshfeldVolume () {
+	for (int i = 0; i<nAtoms; i++) {
+		hirshfeldVolume(i) = 1.;
+	}
+}
+
+void computeEffectiveVolume () {
+	if (correctionType == SxString("TS")) {
+		computeHirshfeldVolume ();
+		for (int i = 0; i<nAtoms; i++) {
+			effectiveVolume(i) = hirshfeldVolume(i) / freeVolume(i);
+		}
+	}
+	else {
+		for (int i = 0; i<nAtoms; i++) {
+			effectiveVolume(i) = 1.;
+		}
+	}
+}
+
 void SxVDW::compute () {
 	// update attributes "totalEnergy" (double) and
 	// "Forces" (SxArray<SxVector3<Double>>)
 	int i, j, neighj;
 	double R, Rij, C6ij, fd, fdPrime, derivative;
 
+	computeEffectiveVolume();
 
 	// Reset vdW energy to 0
 	totalEnergy = 0.;

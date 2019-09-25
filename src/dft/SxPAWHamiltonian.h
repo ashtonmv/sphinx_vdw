@@ -196,9 +196,6 @@ class SX_EXPORT_DFT SxPAWHamiltonian : public SxHamiltonian
       /// vdW energy
       double eVDW;
 
-      bool applyVDWCorrection;
-      SxVDW vdwCorrection;
-
       SxArray<Double> freeVolume;
       SxArray<Double> getEffectiveVolume (SxString &correctiontype);
 

@@ -93,6 +93,9 @@ class SX_EXPORT_DFT SxHamiltonian
       /** \brief Get access to density */
       virtual SxDensity& getRho () { SX_EXIT; return *(SxDensity *)NULL; };
       
+      // VDW Correction
+      bool applyVDWCorrection;
+      SxVDW VDW;
 
       static const SxSymbolTable *getHamiltonianGroup (const SxSymbolTable *);
       static int getNSpin (const SxSymbolTable *);

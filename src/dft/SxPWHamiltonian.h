@@ -288,9 +288,6 @@ class SX_EXPORT_DFT SxPWHamiltonian : public SxHamiltonian
       PrecEnergy  eDoubleCounting;
       PrecEnergy  eVDW;
 
-      bool applyVDWCorrection;
-      SxVDW vdwCorrection;
-
       // --- Hartree contribution
       SxArray<SxDiracVec<TPrecPhi> >  phiGaussG;   //:is,:ig
       SxMeshG                         rhoGaussG;   // :ig

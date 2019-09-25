@@ -234,10 +234,11 @@ class SX_EXPORT_GEOM SxPotential
           \sa SxPotential::execute */
       void print (const SxSymbolTable *cmd) { execute (cmd, false); }
 
+       // All VDW stuff is imported from SxHamiltonian.h
 //       /**\brief apply van-der-Waals correcion */
-     bool applyVDWCorrection;
+//     bool applyVDWCorrection;
 //      /** \brief additive van-der-Waals correction*/
-     SxVDW vdwCorrection;
+//     SxVDW VDW;
 //      /** \brief sets the van-der-Waals correction*/
 //     void setVDWCorrection (const SxVDW &);
 
