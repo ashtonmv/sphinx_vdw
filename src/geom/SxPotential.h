@@ -22,6 +22,7 @@
 #include <SxSymbolTable.h>
 #include <SxForceSym.h>
 #include <SxGeom.h>
+#include <SxHamiltonian.h>
 
 /** \brief Interface between energy/forces and structure-related algrotihms
 
@@ -236,9 +237,9 @@ class SX_EXPORT_GEOM SxPotential
 //       /**\brief apply van-der-Waals correcion */
      bool applyVDWCorrection;
 //      /** \brief additive van-der-Waals correction*/
-     SxVDW VDWCorrection;
+     SxVDW vdwCorrection;
 //      /** \brief sets the van-der-Waals correction*/
-     void setVDWCorrection (const SxVDW &);
+//     void setVDWCorrection (const SxVDW &);
 
       bool dEnergyLow;
 
