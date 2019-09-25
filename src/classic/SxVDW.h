@@ -67,7 +67,7 @@ class SX_EXPORT_CLASSIC SxVDW
 	  double getDist(int, int, int);
 	  void resize 
 		  (SxList<SxList<SxVector3<Double> > > , SxList<SxString>, SxMatrix3<Double>);
-	  void update(SxArray<SxVector3<Double> >, SxArray<Double>);
+	  void update(SxArray<SxVector3<Double> >, SxArray<double>);
 	  void updateNeighbours (SxString);
 
 	  void updateCoord (SxArray<SxVector3<Double> >);

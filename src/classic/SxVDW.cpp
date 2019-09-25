@@ -158,7 +158,7 @@ void SxVDW::updateHybridisation ()
 }
 
 
-void SxVDW::update (SxArray<SxVector3<Double > > newcoord, SxArray<Double> newEffectiveVolume) 
+void SxVDW::update (SxArray<SxVector3<Double > > newcoord, SxArray<double> newEffectiveVolume) 
 {
 	effectiveVolume = newEffectiveVolume;
 

@@ -1571,7 +1571,7 @@ void SxPAWHamiltonian::compute (const SxPWSet &waves, const SxFermi &fermi,
    sxprintf ("eCore     = % 19.12f H\n", eCore);
    if (applyVDWCorrection) {
       SxArray<SxVector3<Double> > newCoords (structure.nTlAtoms);
-      SxArray<Double> effectiveVolume = getEffectiveVolume(vdwCorrection.correctionType);
+      SxArray<double> effectiveVolume = getEffectiveVolume(vdwCorrection.correctionType);
       for (int i=0; i<structure.nTlAtoms; i++) {
           newCoords(i) = structure.ref(i);
       }
@@ -1597,11 +1597,11 @@ void SxPAWHamiltonian::compute (const SxPWSet &waves, const SxFermi &fermi,
 
 }
 
-SxArray<Double> SxPAWHamiltonian::getEffectiveVolume (SxString correctiontype)
+SxArray<double> SxPAWHamiltonian::getEffectiveVolume (SxString correctiontype)
 {
-   SxArray<Double> effectivevolume(structure.nTlAtoms);
+   SxArray<double> effectivevolume(structure.nTlAtoms);
    if (correctiontype == SxString("TS")) {
-      SxArray<Double> hirshfeldVolume = pawRho.getHirshfeldVolume ();
+      SxArray<double> hirshfeldVolume = pawRho.getHirshfeldVolume ();
       for (int i=0; i<structure.nTlAtoms; i++) {
          effectivevolume(i) = hirshfeldVolume(i) / freeVolume(structure.elements(i));
          //effectivevolume(i) = 1.;
