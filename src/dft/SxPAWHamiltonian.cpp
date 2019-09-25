@@ -1601,7 +1601,7 @@ SxArray<Double> SxPAWHamiltonian::getEffectiveVolume (SxString correctiontype)
 {
    SxArray<Double> effectivevolume(structure.nTlAtoms);
    if (correctiontype == SxString("TS")) {
-      SxArray<double> hirshfeldVolume = pawRho.getHirshfeldVolume ();
+      SxArray<Double> hirshfeldVolume = pawRho.getHirshfeldVolume ();
       for (int i=0; i<structure.nTlAtoms; i++) {
          effectivevolume(i) = hirshfeldVolume(i) / freeVolume(structure.elements(i));
          //effectivevolume(i) = 1.;

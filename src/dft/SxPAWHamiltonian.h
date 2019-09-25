@@ -199,8 +199,8 @@ class SX_EXPORT_DFT SxPAWHamiltonian : public SxHamiltonian
       bool applyVDWCorrection;
       SxVDW vdwCorrection;
 
-      SxArray<double> freeVolume;
-      SxArray<double> getEffectiveVolume (SxString &correctiontype);
+      SxArray<Double> freeVolume;
+      SxArray<Double> getEffectiveVolume (SxString &correctiontype);
 
       /// pseudoized potential (Ref. 1, Eq. 34)
       SxArray<SxMeshR> vPS;
