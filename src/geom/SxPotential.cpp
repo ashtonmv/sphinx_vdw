@@ -91,8 +91,8 @@ SxAtomicStructure SxPotential::getSymForces (const SxAtomicStructure  &tau,
    const SxSymbolTable *hamGroup = SxHamiltonian::getHamiltonianGroup( table -> topLevel() );
 
 //   // --- extremely ugly, to be cleaned up
-   if (SxHamiltonian::applyVDWCorrection) {
-      // applyVDWCorrection = true;
+   if (hamGroup->containsGroup("vdwCorrection")) {
+      applyVDWCorrection = true;
 
       SxArray<SxVector3<Double> > tauArray (tau.nTlAtoms);
       SxAtomicStructure help;

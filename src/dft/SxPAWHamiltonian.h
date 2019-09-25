@@ -196,9 +196,6 @@ class SX_EXPORT_DFT SxPAWHamiltonian : public SxHamiltonian
       /// vdW energy
       double eVDW;
 
-      SxArray<Double> freeVolume;
-      SxArray<Double> getEffectiveVolume (SxString &correctiontype);
-
       /// pseudoized potential (Ref. 1, Eq. 34)
       SxArray<SxMeshR> vPS;
 
