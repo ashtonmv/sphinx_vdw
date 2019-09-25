@@ -160,6 +160,10 @@ void SxPAWHamiltonian::read (const SxSymbolTable *table)
    if (hamGroup->containsGroup ("vdwCorrection")) {
       applyVDWCorrection = true;
       vdwCorrection = SxVDW(structure, hamGroup);
+      SxArray<double> freeVolume(structure.nTlAtoms);
+      for (int i = 0; i<structure.nTlAtoms; i++) {
+         freeVolume(i) = 1.;
+      }
    }
 
    if (hamGroup->containsGroup ("HubbardU"))  {
@@ -1567,10 +1571,11 @@ void SxPAWHamiltonian::compute (const SxPWSet &waves, const SxFermi &fermi,
    sxprintf ("eCore     = % 19.12f H\n", eCore);
    if (applyVDWCorrection) {
       SxArray<SxVector3<Double> > newCoords (structure.nTlAtoms);
+      effectiveVolume = getEffectiveVolume(vdwCorrection.correctionType);
       for (int i=0; i<structure.nTlAtoms; i++) {
           newCoords(i) = structure.ref(i);
       }
-      vdwCorrection.update(newCoords);
+      vdwCorrection.update(newCoords, effectiveVolume);
       vdwCorrection.compute();
       eVDW = vdwCorrection.totalEnergy;
       sxprintf ("eVDW     = % 19.12f H\n", eVDW);
@@ -1590,6 +1595,26 @@ void SxPAWHamiltonian::compute (const SxPWSet &waves, const SxFermi &fermi,
 
    sxprintf ("eTot(Val) = % 19.12f H\n", eTotal);
 
+}
+
+SxArray<Double> SxPAWHamiltonian::getEffectiveVolume (SxString correctiontype)
+{
+   SxArray<Double> effectivevolume(structure.nTlAtoms);
+   if (correctiontype == SxString("TS")) {
+      SxArray<double> hirshfeldVolume = pawRho.getHirshfeldVolume ();
+      for (int i=0; i<structure.nTlAtoms; i++) {
+         effectivevolume(i) = hirshfeldVolume(i) / freeVolume(structure.elements(i));
+         //effectivevolume(i) = 1.;
+      }
+
+   }
+   else {
+      for (int i=0; i<structure.nTlAtoms; i++) {
+         effectivevolume(i) = 1.;
+      }
+   }
+
+   return effectivevolume;
 }
 
 double SxPAWHamiltonian::computeU (SxArray<SxArray<SxVector<Double> > > *dEdQrl)

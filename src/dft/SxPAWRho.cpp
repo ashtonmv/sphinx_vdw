@@ -972,6 +972,18 @@ void SxPAWRho::atomicChargeDensity (const SxAtomicStructure    &str,
 
 }
 
+SxArray<double> SxPAWRho::getHirshfeldVolume ()
+{
+   const SxAtomicStructure *strPtr = R.getGBasis ().structPtr;
+   SxArray<double> hirshfeldVolume(strPtr.nTlAtoms);
+
+   for (int i=0; i<strPtr.nTlAtoms; i++) {
+      //hirshfeldVolume(i) = third_integral_wrt_r(weight(r) * density(r))
+      hirshfeldVolume(i) = 1.
+   }
+   return hirshfeldVolume
+}
+
 void SxPAWRho::syncMPI ()
 {
 #ifdef USE_LOOPMPI

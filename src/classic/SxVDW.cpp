@@ -47,6 +47,7 @@ SxVDW::SxVDW
 	polarizability        = SxArray<double> (nAtoms);
 	C6                    = SxArray<double> (nAtoms);
 	vdwRadius             = SxArray<double> (nAtoms);
+	effectiveVolume       = SxArray<double> (nAtoms);
 
     SxSpeciesData speciesData = SxSpeciesData(table->topLevel());
    
@@ -157,8 +158,10 @@ void SxVDW::updateHybridisation ()
 }
 
 
-void SxVDW::update (SxArray<SxVector3<Double > > newcoord) 
+void SxVDW::update (SxArray<SxVector3<Double > > newcoord, SxArray<Double> newEffectiveVolume) 
 {
+	effectiveVolume = newEffectiveVolume;
+
 	if (output) cout << " ---- Updating Coords" << endl;
 	updateCoord (newcoord);
 	//printParameters();
@@ -773,8 +776,8 @@ double SxVDW::getRij (int atom1, int atom2)
     double Rj = vdwRadius(atom2);
 
     if (correctionType == SxString("TS")) {
-        Ri = Ri * getVolumeFraction(atom1);
-        Rj = Rj * getVolumeFraction(atom2);
+        Ri = Ri * getEffectiveVolume(atom1);
+        Rj = Rj * getEffectiveVolume(atom2);
     }
 
     double Rij = Ri + Rj;
@@ -796,13 +799,13 @@ double SxVDW::getC6ij (int atom1, int atom2)
     alphaj = polarizability(atom2);
 
     if (correctionType == SxString("TS")) {
-        double nui = getVolumeFraction(atom1);
-        double nuj = getVolumeFraction(atom2);
+        double vEffi = effectiveVolume(atom1);
+        double vEffj = effectiveVolume(atom2);
 
-        C6i = C6i * ::pow(nui, 2);
-        C6j = C6j * ::pow(nuj, 2);
-        alphai = alphai * nui;
-        alphaj = alphaj * nuj;
+        C6i = C6i * ::pow(vEffi, 2);
+        C6j = C6j * ::pow(vEffj, 2);
+        alphai = alphai * vEffi;
+        alphaj = alphaj * vEffj;
     }
 
     if (correctionType == SxString("TS") or combinationRule == SxString("Tang")) {
@@ -819,21 +822,6 @@ double SxVDW::getC6ij (int atom1, int atom2)
 
     return C6ij;
 }	
-
-double SxVDW::getVolumeFraction(int atom) {
-    /*
-    Return the ratio between the Hirshfeld volume of the
-    atom in its present environment and its volume as a free atom.
-    */
-
-    double nu = 1;
-    // TODO: we need to get Hirshfeld volume of the atom
-    // and the volume of the free atom from a lookup table.
-    // Pseudo-code:
-    // double nu = getHirshfeldVolume(atom) / freeAtomicVolume(atom);
-    return nu;
-
-}
 
 
 double SxVDW::getParam (SxString name, int atom1, int atom2) 

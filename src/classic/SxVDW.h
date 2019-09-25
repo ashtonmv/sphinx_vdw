@@ -52,6 +52,7 @@ class SX_EXPORT_CLASSIC SxVDW
 	  SxArray<double> polarizability;
 	  SxArray<double> C6;
 	  SxArray<double> vdwRadius;
+	  SxArrya<double> effectiveVolume;
 
 
 	  bool output;
@@ -92,7 +93,6 @@ class SX_EXPORT_CLASSIC SxVDW
 	  double getDampingDerivative(double, double);
 	  double getDampingSecondDerivative(double, double);
 	  
-      double getVolumeFraction(int);
 	  double getC6ij (int, int); 
 	  double getRij (int, int); 
 	  double getParam (SxString, int, int);
