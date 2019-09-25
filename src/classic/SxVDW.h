@@ -18,7 +18,7 @@
 
 #include <SxClassic.h>
 #include <SxAtomicStructure.h>
-#include <SxVDW.h>
+#include <SxRho.h>
 #include <SxSpeciesData.h>
 #include <SxSymbolTable.h>
 
