@@ -1571,7 +1571,7 @@ void SxPAWHamiltonian::compute (const SxPWSet &waves, const SxFermi &fermi,
    sxprintf ("eCore     = % 19.12f H\n", eCore);
    if (applyVDWCorrection) {
       SxArray<SxVector3<Double> > newCoords (structure.nTlAtoms);
-      SxArray <double> effectiveVolume = getEffectiveVolume(vdwCorrection.correctionType);
+      SxArray<Double> effectiveVolume = getEffectiveVolume(vdwCorrection.correctionType);
       for (int i=0; i<structure.nTlAtoms; i++) {
           newCoords(i) = structure.ref(i);
       }
