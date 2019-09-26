@@ -1519,7 +1519,7 @@ void SxPWHamiltonian::read (const SxSymbolTable *table)
 
       if (hamiltonian->containsGroup("vdwCorrection")) {
          bool applyVDWCorrection = true;
-         VDW = SxVDW(structure, table, rho);
+         VDW = SxVDW(structure, table, rho.rhoR);
       }
 
       ekt = hamiltonian->get("ekt")->toReal() / HA2EV;

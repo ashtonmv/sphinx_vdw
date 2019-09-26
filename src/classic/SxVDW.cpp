@@ -24,7 +24,7 @@ SxVDW::SxVDW ()
 }
 
 SxVDW::SxVDW 
-(const SxAtomicStructure &t, const SxSymbolTable *table, const SxRho &dens) 
+(const SxAtomicStructure &t, const SxSymbolTable *table, const RhoR &dens) 
 { 
     int i;
     SxAtomicStructure tau;
@@ -440,17 +440,17 @@ double SxVDW::getDampingSecondDerivative (double R, double Rm) {
 }
 */
 
-void computeHirshfeldVolume () {
+void SxVDW::computeHirshfeldVolume () {
 	for (int i = 0; i<nAtoms; i++) {
 		hirshfeldVolume(i) = 1.;
 	}
 }
 
-void computeEffectiveVolume () {
+void SxVDW::computeEffectiveVolume () {
 	if (correctionType == SxString("TS")) {
 		computeHirshfeldVolume ();
 		for (int i = 0; i<nAtoms; i++) {
-			effectiveVolume(i) = hirshfeldVolume(i) / freeVolume(i);
+	        effectiveVolume(i) = hirshfeldVolume(i) / freeVolume(i);
 		}
 	}
 	else {
@@ -800,8 +800,8 @@ double SxVDW::getRij (int atom1, int atom2)
     double Rj = vdwRadius(atom2);
 
     if (correctionType == SxString("TS")) {
-        Ri = Ri * getEffectiveVolume(atom1);
-        Rj = Rj * getEffectiveVolume(atom2);
+        Ri = Ri * effectiveVolume(atom1);
+        Rj = Rj * effectiveVolume(atom2);
     }
 
     double Rij = Ri + Rj;

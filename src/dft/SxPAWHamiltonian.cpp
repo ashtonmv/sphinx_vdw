@@ -159,7 +159,7 @@ void SxPAWHamiltonian::read (const SxSymbolTable *table)
    // --- vdW correction
    if (hamGroup->containsGroup ("vdwCorrection")) {
       applyVDWCorrection = true;
-      VDW = SxVDW(structure, hamGroup, pawRho);
+      VDW = SxVDW(structure, hamGroup, pawRho.pwRho.rhoR);
    }
 
    if (hamGroup->containsGroup ("HubbardU"))  {

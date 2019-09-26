@@ -371,7 +371,14 @@ void SxHamSolver::execute (const SxSymbolTable *cmd, bool calc)
    else if (str == "linGrad")       linGradTest (cmd, calc);
    else if (str == "lcao")          tightBindingPAW (cmd, calc);
    else if (str == "evalForces") {
-      SxAtomicStructure force = getSymForces (structure, NULL);
+      SxAtomicStructure force;
+      const SxSymbolTable *hamGroup =
+        SxHamiltonian::getHamiltonianGroup(cmd->topLevel());
+      if (hamGroup->containsGroup("vdwCorrection")) {
+         SxPWHamiltonian &H = *dynamic_cast<SxPWHamiltonian *> (hamPtr.getPtr());
+         SxVDW VDW(structure, hamGroup, H.rho.rhoR);
+         force = getSymForces (structure, NULL, VDW);
+      } else force = getSymForces (structure, NULL);
       SX_MPI_MASTER_ONLY {
          SxString fname;
          SYMBOLPARSE(cmd) {

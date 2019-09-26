@@ -173,11 +173,25 @@ class SX_EXPORT_GEOM SxPotential
                  correction*/
 
       double getPotentialEnergy ();
-
+      double getPotentialEnergy (const SxVDW &VDW);
 
       /** \brief Force symmetrize filter
         */
       SxForceSym forceSymmetrizer;
+
+      /** \brief compute (symmetrized) forces with VDW object.
+
+          Compute the unsymmetrized forces to each atom according to the
+          provided minimization command using SxPotential::getForces.
+          The unsymmetrized forces are symmetrized according to the
+          symmetry elements existing in the system.
+
+          \param tau       atomic stucture \f$ \{ \tau_{i_s i_a} \} \f$
+          \param cmd       minimization command group */
+      SxAtomicStructure getSymForces (const SxAtomicStructure &tau,
+                                      const SxSymbolTable *cmd,
+                                      const SxVDW & VDW);
+
       /** \brief compute (symmetrized) forces.
 
           Compute the unsymmetrized forces to each atom according to the

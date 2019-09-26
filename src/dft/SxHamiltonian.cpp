@@ -54,11 +54,6 @@ int SxHamiltonian::getNSpin (const SxSymbolTable *table)
    return nSpin;
 }
 
-SxVDW getVDWCorrection ()
-{
-   return VDW;   
-}
-
 int SxHamiltonian::getNEmptyStates (const SxSymbolTable *table)
 {
    int nEmptyStates = 0;

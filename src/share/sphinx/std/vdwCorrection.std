@@ -4,6 +4,6 @@ vdwCorrection      { type="group"; optional;
       combinationRule { type="enum"; optional;
                   val = "GB,Tang"; }
       damping {type="enum"; optional;
-                  val = "Fermi, BJ"; }
+                  val = "Fermi,BJ"; }
 }
 

@@ -605,3 +605,4 @@ void SxRho::displaceHirshfeld (const SxAtomicStructure &toStr,
    }
    if (!haveAllAtom) delete allAtomRptr;
 }
+

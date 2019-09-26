@@ -33,7 +33,7 @@ class SX_EXPORT_CLASSIC SxVDW
 	  SxArray<SxVector3<Double> > coord;
 	  SxArray<SxString> species;
 	  
-	  SxRho rho;
+	  RhoR rho;
 
 	  SxMatrix3<Double> superCell;
 	  SxArray<double>  energyContrib;
@@ -63,7 +63,7 @@ class SX_EXPORT_CLASSIC SxVDW
 	  double totalEnergy;
 
 	   SxVDW ();
-      SxVDW (const SxAtomicStructure &, const SxSymbolTable *);
+      SxVDW (const SxAtomicStructure &, const SxSymbolTable *, const RhoR &);
      ~SxVDW ();
 
 	  
@@ -79,6 +79,8 @@ class SX_EXPORT_CLASSIC SxVDW
 	  void updateDampingTerms (); 
 	  void updateHybridisation (); 
 	  
+      void computeHirshfeldVolume ();
+      void computeEffectiveVolume ();
 	  void compute ();
 
 	  SxVector3<Double>  getLatticeVec(int);

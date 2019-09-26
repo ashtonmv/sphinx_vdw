@@ -159,7 +159,6 @@ class SX_EXPORT_DFT SxRho : public SxDensity
       void displaceHirshfeld (const SxAtomicStructure &toStr,
                               const SxArray<PsiG> &atomRhoG,
                               SxDiracVec<Double> *allAtomRptr = NULL);
-      
       /** \brief Compute charge density
 
           The charge density will be computed according to

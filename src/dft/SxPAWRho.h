@@ -117,8 +117,6 @@ class SX_EXPORT_DFT SxPAWRho : public SxDensity
          return pwRho.getNSpin ();
       }
 
-      SxArray<double> getHirshfeldVolume ();
-
       /// Pointer to PAW potential
       SxConstPtr<SxPAWPot> potPtr;
 

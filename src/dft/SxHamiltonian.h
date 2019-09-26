@@ -27,7 +27,7 @@
 #include <SxDensity.h>
 #include <SxPWOverlap.h>
 #include <SxXC.h>
-
+#include <SxVDW.h>
 
 /** \brief Abstract Hamiltonian \f$\hat{H}\f$ class
 
